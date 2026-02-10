@@ -1,5 +1,3 @@
-import React from "react";
-import { useParams } from "react-router-dom";
 import { useData } from "../../nonview/core/DataContext";
 import {
   Box,
@@ -13,7 +11,6 @@ import {
 } from "@mui/material";
 
 const FoodPage = () => {
-  const { foodId } = useParams();
   const { currentFood } = useData();
 
   if (!currentFood) {
