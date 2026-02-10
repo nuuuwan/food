@@ -1,24 +1,50 @@
-import logo from "./logo.svg";
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ThemeProvider, createTheme, CssBaseline, Box } from "@mui/material";
+import { DataProvider } from "./nonview/core/DataContext";
+import CameraPage from "./view/pages/CameraPage";
+import ProcessingPage from "./view/pages/ProcessingPage";
+import FoodPage from "./view/pages/FoodPage";
+import HistoryPage from "./view/pages/HistoryPage";
+import CustomAppBar from "./view/moles/CustomAppBar";
+import CustomBottomNavigator from "./view/moles/CustomBottomNavigator";
 import "./App.css";
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#2196f3",
+    },
+    secondary: {
+      main: "#4caf50",
+    },
+  },
+  typography: {
+    fontFamily:
+      '"PT Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+  },
+});
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <DataProvider>
+        <BrowserRouter basename="/food">
+          <Box sx={{ pb: 7 }}>
+            <CustomAppBar />
+            <Routes>
+              <Route path="/" element={<Navigate to="/camera" replace />} />
+              <Route path="/camera" element={<CameraPage />} />
+              <Route path="/processing" element={<ProcessingPage />} />
+              <Route path="/food/:foodId" element={<FoodPage />} />
+              <Route path="/foods" element={<HistoryPage />} />
+            </Routes>
+            <CustomBottomNavigator />
+          </Box>
+        </BrowserRouter>
+      </DataProvider>
+    </ThemeProvider>
   );
 }
 
