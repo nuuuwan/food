@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
+import { FoodAnalysis } from "./FoodAnalysis";
 
 const DataContext = createContext();
 
@@ -11,28 +12,31 @@ export const useData = () => {
 };
 
 // Dummy data for M0
-const dummyFoodAnalysis = {
-  id: "food-001",
-  timestamp: Date.now(),
-  imageUri: "/food/peanut-butter.jpg",
-  productName: "Organic Peanut Butter",
-  servingSize: "32g (2 tbsp)",
-  nutrients: {
-    calories: 190,
-    protein: 8,
-    carbs: 7,
-    fat: 16,
-    fiber: 2,
-    sodium: 65,
-    sugar: 2,
-  },
-  ingredients: [
-    { name: "Organic Dry Roasted Peanuts", quantity: "30g" },
-    { name: "Sea Salt", quantity: "2g" },
-  ],
-  warnings: ["Contains Peanuts", "May contain tree nuts"],
-  healthScore: 78,
+const createDummyFood = () => {
+  return FoodAnalysis.fromJSON({
+    id: "food-001",
+    timestamp: Date.now(),
+    imageUri: "/food/peanut-butter.jpg",
+    productName: "Organic Peanut Butter",
+    servingSize: "32g (2 tbsp)",
+    nutrients: {
+      calories: 190,
+      protein: 8,
+      carbs: 7,
+      fat: 16,
+      fiber: 2,
+      sodium: 65,
+      sugar: 2,
+    },
+    ingredients: [
+      { name: "Organic Dry Roasted Peanuts", quantity: "30g" },
+      { name: "Sea Salt", quantity: "2g" },
+    ],
+    warnings: ["Contains Peanuts", "May contain tree nuts"],
+  });
 };
+
+const dummyFoodAnalysis = createDummyFood().toJSON();
 
 const dummyFoodHistory = [
   {
@@ -40,21 +44,18 @@ const dummyFoodHistory = [
     timestamp: Date.now() - 86400000, // 1 day ago
     imageUri: "/food/peanut-butter.jpg",
     productName: "Organic Peanut Butter",
-    healthScore: 78,
   },
   {
     id: "food-002",
     timestamp: Date.now() - 172800000, // 2 days ago
     imageUri: "/food/peanut-butter.jpg",
     productName: "Whole Grain Bread",
-    healthScore: 85,
   },
   {
     id: "food-003",
     timestamp: Date.now() - 259200000, // 3 days ago
     imageUri: "/food/peanut-butter.jpg",
     productName: "Greek Yogurt",
-    healthScore: 92,
   },
 ];
 
@@ -79,7 +80,6 @@ export const DataProvider = ({ children }) => {
         timestamp: foodData.timestamp,
         imageUri: foodData.imageUri,
         productName: foodData.productName,
-        healthScore: foodData.healthScore,
       },
       ...foodHistory,
     ]);
