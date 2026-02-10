@@ -13,21 +13,21 @@ This application empowers users by providing deep insights into the food they co
 
 ## 🏗 Component Architecture
 
-### Pages
+### Pages (in view/pages)
 
 * **CameraPage:** Interface for capturing or selecting photos. Includes the `ScanOverlay`.
 * **ProcessingPage:** A transition state showing analysis progress (crucial for M1/M2).
 * **FoodPage:** Displays structured data from `DataContext`.
 * **HistoryPage (`/foods`):** A list view of all previously scanned items.
 
-### Molecules (Complex Components)
+### Molecules (Complex Components - in view/moles)
 
 * **ScanOverlay:** A viewfinder UI with alignment guides for food labels.
 * **NutrientSummaryCard:** A visual breakdown of macros (Fats, Carbs, Protein) using charts or bars.
 * **InsightList:** A list of "Green Flags" (e.g., High Fiber) and "Red Flags" (e.g., High Sodium).
 * **FoodListItem:** A preview row for the history page featuring a thumbnail and date.
 
-### Atoms (UI Elements)
+### Atoms (UI Elements - in view/atoms)
 
 * **ScannerLine:** An animated line across the camera view to indicate active scanning.
 * **Badge:** Color-coded tags for dietary labels (Vegan, Gluten-Free, Keto).
@@ -40,7 +40,7 @@ This application empowers users by providing deep insights into the food they co
 
 ### DataContext
 
-The `DataContext` acts as the single source of truth. It manages:
+The `nonview/core/DataContext` acts as the single source of truth. It manages:
 
 * **CurrentScan:** The base64 or Blob of the current image.
 * **AnalysisState:** `idle` | `scanning` | `success` | `error`.
@@ -62,7 +62,7 @@ The `DataContext` acts as the single source of truth. It manages:
 ### M0: Static Prototype
 
 * [ ] UI Shell with `BrowserRouter`.
-* [ ] Dummy data injection in `FoodPage`.
+* [ ] Dummy data generated in DataContext
 * [ ] Navigation flow from Camera -> Processing -> Food.
 
 ### M1: The AI Engine (MVP)
