@@ -31,28 +31,17 @@ export class FoodAnalysis {
   }
 
   static fromJSON(data) {
-    // Handle legacy format with imageUri at top level
-    const photos =
-      data.photos ||
-      (data.imageUri
-        ? [
-            {
-              id: `${data.id}-photo-1`,
-              timestamp: data.timestamp,
-              imageUri: data.imageUri,
-            },
-          ]
-        : []);
-
     return new FoodAnalysis({
       id: data.id,
       productName: data.productName,
       timestamp: data.timestamp,
-      nutritionInfo: data.nutrients || data.nutritionInfo,
-      ingredients: data.ingredients || [],
+      nutritionInfo: new NutritionInfo(data.nutrients || data.nutritionInfo),
+      ingredients: (data.ingredients || []).map((ing) =>
+        Ingredient.fromJSON(ing),
+      ),
       warnings: data.warnings || [],
       servingSize: data.servingSize || "",
-      photos: photos,
+      photos: (data.photos || []).map((photo) => Photo.fromJSON(photo)),
     });
   }
 

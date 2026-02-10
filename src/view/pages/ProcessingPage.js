@@ -5,18 +5,18 @@ import { Box, Typography, Container, CircularProgress } from "@mui/material";
 
 const ProcessingPage = () => {
   const navigate = useNavigate();
-  const { currentFood, completeAnalysis } = useData();
+  const { currentFood, analysisState } = useData();
 
   useEffect(() => {
-    // Simulate AI processing delay
-    const timer = setTimeout(() => {
-      // For M0, we use the dummy data that's already in DataContext
-      completeAnalysis(currentFood);
+    // When analysis is complete, navigate to the food page
+    if (analysisState === "success" && currentFood) {
       navigate(`/food/${currentFood.id}`);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [navigate, currentFood, completeAnalysis]);
+    } else if (analysisState === "error") {
+      // Handle error - for now just go back to camera
+      console.error("Analysis failed");
+      navigate("/camera");
+    }
+  }, [analysisState, currentFood, navigate]);
 
   return (
     <Container maxWidth="sm">

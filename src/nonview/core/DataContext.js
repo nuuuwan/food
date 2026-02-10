@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState } from "react";
-import { FoodAnalysis } from "./FoodAnalysis";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { foodAPIClient } from "./FoodAPIClient";
 
 const DataContext = createContext();
 
@@ -11,63 +11,46 @@ export const useData = () => {
   return context;
 };
 
-// Dummy data for M0
-const createDummyFood = () => {
-  return FoodAnalysis.fromJSON({
-    id: "food-001",
-    timestamp: Date.now(),
-    imageUri: "/food/peanut-butter.jpg",
-    productName: "Organic Peanut Butter",
-    servingSize: "32g (2 tbsp)",
-    nutrients: {
-      calories: 190,
-      protein: 8,
-      carbs: 7,
-      fat: 16,
-      fiber: 2,
-      sodium: 65,
-      sugar: 2,
-    },
-    ingredients: [
-      { name: "Organic Dry Roasted Peanuts", quantity: "30g" },
-      { name: "Sea Salt", quantity: "2g" },
-    ],
-    warnings: ["Contains Peanuts", "May contain tree nuts"],
-  });
-};
-
-const dummyFoodAnalysis = createDummyFood().toJSON();
-
-const dummyFoodHistory = [
-  {
-    id: "food-001",
-    timestamp: Date.now() - 86400000, // 1 day ago
-    imageUri: "/food/peanut-butter.jpg",
-    productName: "Organic Peanut Butter",
-  },
-  {
-    id: "food-002",
-    timestamp: Date.now() - 172800000, // 2 days ago
-    imageUri: "/food/peanut-butter.jpg",
-    productName: "Whole Grain Bread",
-  },
-  {
-    id: "food-003",
-    timestamp: Date.now() - 259200000, // 3 days ago
-    imageUri: "/food/peanut-butter.jpg",
-    productName: "Greek Yogurt",
-  },
-];
-
 export const DataProvider = ({ children }) => {
   const [currentScan, setCurrentScan] = useState(null);
   const [analysisState, setAnalysisState] = useState("idle"); // idle | scanning | success | error
-  const [currentFood, setCurrentFood] = useState(dummyFoodAnalysis);
-  const [foodHistory, setFoodHistory] = useState(dummyFoodHistory);
+  const [currentFood, setCurrentFood] = useState(null);
+  const [foodHistory, setFoodHistory] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const startScan = (imageData) => {
+  // Load initial data on mount
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        setIsLoading(true);
+        const [food, history] = await Promise.all([
+          foodAPIClient.getFoodById("food-001"),
+          foodAPIClient.getFoodHistory(),
+        ]);
+        setCurrentFood(food.toJSON());
+        setFoodHistory(history.map((item) => item.toJSON()));
+      } catch (error) {
+        console.error("Failed to load initial data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadInitialData();
+  }, []);
+
+  const startScan = async (imageData) => {
     setCurrentScan(imageData);
     setAnalysisState("scanning");
+
+    try {
+      // Call API to analyze the photo
+      const analysis = await foodAPIClient.analyzeFoodPhoto(imageData);
+      completeAnalysis(analysis.toJSON());
+    } catch (error) {
+      console.error("Failed to analyze food photo:", error);
+      setAnalysisState("error");
+    }
   };
 
   const completeAnalysis = (foodData) => {
@@ -90,14 +73,25 @@ export const DataProvider = ({ children }) => {
     setAnalysisState("idle");
   };
 
+  const loadFoodById = async (foodId) => {
+    try {
+      const food = await foodAPIClient.getFoodById(foodId);
+      setCurrentFood(food.toJSON());
+    } catch (error) {
+      console.error(`Failed to load food ${foodId}:`, error);
+    }
+  };
+
   const value = {
     currentScan,
     analysisState,
     currentFood,
     foodHistory,
+    isLoading,
     startScan,
     completeAnalysis,
     resetScan,
+    loadFoodById,
   };
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
