@@ -4,6 +4,8 @@ const {
   saveFood,
   withCors,
 } = require("./_mockStore");
+const crypto = require("crypto");
+const { head, put } = require("@vercel/blob");
 
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
 const GEMINI_API_VERSIONS = ["v1beta", "v1"];
@@ -23,6 +25,11 @@ const defaultNutrients = {
   sugar: 0,
 };
 
+const blobPaths = {
+  image: (hash, extension) => `food-images/${hash}.${extension}`,
+  analysis: (hash) => `food-analyses/${hash}.json`,
+};
+
 const parseDataUrl = (imageData) => {
   if (!imageData || typeof imageData !== "string") {
     return null;
@@ -37,6 +44,128 @@ const parseDataUrl = (imageData) => {
     mimeType: match[1],
     data: match[2],
   };
+};
+
+const extensionForMimeType = (mimeType = "") => {
+  const normalized = mimeType.toLowerCase();
+
+  if (normalized === "image/jpeg") {
+    return "jpg";
+  }
+
+  if (normalized === "image/png") {
+    return "png";
+  }
+
+  if (normalized === "image/webp") {
+    return "webp";
+  }
+
+  return "img";
+};
+
+const hashImageInput = (imageData, parsedImage) => {
+  if (!imageData) {
+    return "";
+  }
+
+  const hasher = crypto.createHash("sha256");
+
+  if (parsedImage?.data) {
+    hasher.update(Buffer.from(parsedImage.data, "base64"));
+  } else {
+    hasher.update(String(imageData));
+  }
+
+  return hasher.digest("hex");
+};
+
+const isBlobNotFoundError = (error) => {
+  const message = error?.message || "";
+  return /not found|404/i.test(message);
+};
+
+const getCachedAnalysisByHash = async (imageHash) => {
+  if (!imageHash) {
+    return null;
+  }
+
+  try {
+    const metadata = await head(blobPaths.analysis(imageHash));
+    const response = await fetch(metadata.url);
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return response.json();
+  } catch (error) {
+    if (isBlobNotFoundError(error)) {
+      return null;
+    }
+
+    console.error("Failed to load cached analysis from blob:", error);
+    return null;
+  }
+};
+
+const putBlobDeterministic = async (pathname, body, options) => {
+  try {
+    return await put(pathname, body, {
+      ...options,
+      addRandomSuffix: false,
+    });
+  } catch (error) {
+    if (isBlobNotFoundError(error)) {
+      throw error;
+    }
+
+    const message = error?.message || "";
+    if (/already exists|409|conflict/i.test(message)) {
+      return head(pathname);
+    }
+
+    throw error;
+  }
+};
+
+const persistAnalysisByHash = async ({ imageHash, parsedImage, analysis }) => {
+  if (!imageHash) {
+    return analysis;
+  }
+
+  let imageUrl = analysis?.photos?.[0]?.imageUri || "";
+
+  if (parsedImage?.data) {
+    const extension = extensionForMimeType(parsedImage.mimeType);
+    const imagePath = blobPaths.image(imageHash, extension);
+    const imageBuffer = Buffer.from(parsedImage.data, "base64");
+
+    const imageBlob = await putBlobDeterministic(imagePath, imageBuffer, {
+      access: "public",
+      contentType: parsedImage.mimeType,
+    });
+
+    imageUrl = imageBlob.url;
+  }
+
+  const persistedAnalysis = {
+    ...analysis,
+    imageHash,
+    photos: Array.isArray(analysis.photos)
+      ? analysis.photos.map((photo, index) =>
+          index === 0 ? { ...photo, imageUri: imageUrl || photo.imageUri } : photo,
+        )
+      : analysis.photos,
+  };
+
+  const analysisPath = blobPaths.analysis(imageHash);
+  await putBlobDeterministic(analysisPath, JSON.stringify(persistedAnalysis), {
+    access: "public",
+    contentType: "application/json",
+  });
+
+  return persistedAnalysis;
 };
 
 const extractJsonObject = (text) => {
@@ -91,7 +220,7 @@ const normalizeGeminiAnalysis = (analysis, imageData) => {
   };
 };
 
-const requestGeminiAnalysis = async (imageData) => {
+const requestGeminiAnalysis = async (imageData, parsedImage) => {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY is not configured");
@@ -101,7 +230,6 @@ const requestGeminiAnalysis = async (imageData) => {
     (value, index, array) => value && array.indexOf(value) === index,
   );
 
-  const parsedImage = parseDataUrl(imageData);
   const prompt =
     "Identify what food or packaged product is likely shown in this image. Return only JSON with keys: productName (string), servingSize (string), nutrients (object with calories, protein, carbs, fat, fiber, sodium, sugar as numbers), ingredients (array of {name, quantity}), warnings (array of strings). Use conservative estimates and set unknown numeric values to 0.";
 
@@ -183,10 +311,19 @@ module.exports = async function handler(req, res) {
   }
 
   const imageData = req.body?.imageData || "";
+  const parsedImage = parseDataUrl(imageData);
+  const imageHash = hashImageInput(imageData, parsedImage);
   let analysis;
 
+  const cachedAnalysis = await getCachedAnalysisByHash(imageHash);
+  if (cachedAnalysis) {
+    saveFood(cachedAnalysis);
+    res.status(200).json(cachedAnalysis);
+    return;
+  }
+
   try {
-    analysis = await requestGeminiAnalysis(imageData);
+    analysis = await requestGeminiAnalysis(imageData, parsedImage);
   } catch (error) {
     console.error("Gemini analysis failed, falling back to mock:", error);
     analysis = buildAnalysisFromImage(imageData);
@@ -195,6 +332,16 @@ module.exports = async function handler(req, res) {
       ...(analysis.warnings || []),
       `AI analysis unavailable; showing mock estimate (${reason})`,
     ];
+  }
+
+  try {
+    analysis = await persistAnalysisByHash({
+      imageHash,
+      parsedImage,
+      analysis,
+    });
+  } catch (error) {
+    console.error("Failed to persist analysis/image in Vercel Blob:", error);
   }
 
   saveFood(analysis);

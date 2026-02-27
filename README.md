@@ -10,7 +10,13 @@ This project now includes a Node-based Vercel mock backend under `api/`:
 - `GET /api/foods` - list food history
 - `GET /api/foods/:id` - fetch a food analysis
 - `POST /api/foods` - save a food analysis
-- `POST /api/analyze` - Gemini-powered photo analysis (with mock fallback)
+- `POST /api/analyze` - Gemini-powered photo analysis (with mock fallback + hash cache)
+
+`/api/analyze` now:
+
+- hashes uploaded image bytes (`sha256`)
+- stores image blob + analysis JSON in Vercel Blob
+- reuses cached analysis for duplicate image uploads (same hash)
 
 `FoodAPIClient` calls these endpoints over HTTP.
 
@@ -46,5 +52,6 @@ Set these environment variables for the backend:
 
 - `GEMINI_API_KEY=your_api_key`
 - `GEMINI_MODEL=gemini-2.0-flash` (optional)
+- `BLOB_READ_WRITE_TOKEN=...` (required for local `vercel dev`; managed automatically in deployed Vercel when Blob is attached)
 
 For local development with `vercel dev`, add them in `.env.local` at repo root.
