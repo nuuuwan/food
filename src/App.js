@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider, createTheme, CssBaseline, Box } from "@mui/material";
 import { DataProvider } from "./nonview/core/DataContext";
-import ProcessingPage from "./view/pages/ProcessingPage";
 import FoodPage from "./view/pages/FoodPage";
 import HistoryPage from "./view/pages/HistoryPage";
 import CustomAppBar from "./view/moles/CustomAppBar";
@@ -34,9 +33,9 @@ function App() {
             <CustomAppBar />
             <Routes>
               <Route path="/" element={<Navigate to="/list" replace />} />
-              <Route path="/processing" element={<ProcessingPage />} />
               <Route path="/item/:foodId" element={<FoodPage />} />
               <Route path="/list" element={<HistoryPage />} />
+              <Route path="*" element={<Navigate to="/list" replace />} />
             </Routes>
             <CustomBottomNavigator />
           </Box>
