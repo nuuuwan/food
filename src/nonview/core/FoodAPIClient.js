@@ -65,6 +65,14 @@ export class FoodAPIClient {
   }
 
   _shouldFallbackToLocal(primaryBaseURL, error) {
+    const fallbackEnabled =
+      (process.env.REACT_APP_ENABLE_LOCAL_FALLBACK || "false").toLowerCase() ===
+      "true";
+
+    if (!fallbackEnabled) {
+      return false;
+    }
+
     if (!this._isLocalFrontend()) {
       return false;
     }

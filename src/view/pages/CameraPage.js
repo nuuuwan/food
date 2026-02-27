@@ -10,6 +10,7 @@ const CameraPage = () => {
   const fileInputRef = useRef(null);
   const [previewImage, setPreviewImage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const MAX_UPLOAD_BYTES = 3 * 1024 * 1024;
 
   const readFileAsDataUrl = (file) =>
     new Promise((resolve, reject) => {
@@ -18,6 +19,52 @@ const CameraPage = () => {
       reader.onerror = () => reject(new Error("Failed to read image file"));
       reader.readAsDataURL(file);
     });
+
+  const loadImageFromDataUrl = (dataUrl) =>
+    new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error("Failed to load image"));
+      image.src = dataUrl;
+    });
+
+  const estimateDataUrlBytes = (dataUrl) => {
+    const base64 = dataUrl.split(",")[1] || "";
+    return Math.floor((base64.length * 3) / 4);
+  };
+
+  const compressImageDataUrl = async (originalDataUrl) => {
+    const image = await loadImageFromDataUrl(originalDataUrl);
+
+    const maxDimension = 1400;
+    const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+    const targetWidth = Math.max(1, Math.round(image.width * scale));
+    const targetHeight = Math.max(1, Math.round(image.height * scale));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+      throw new Error("Could not initialize image compressor");
+    }
+
+    context.drawImage(image, 0, 0, targetWidth, targetHeight);
+
+    const qualitySteps = [0.85, 0.75, 0.65, 0.55, 0.45, 0.35];
+    let bestCandidate = originalDataUrl;
+
+    for (const quality of qualitySteps) {
+      const candidate = canvas.toDataURL("image/jpeg", quality);
+      bestCandidate = candidate;
+      if (estimateDataUrlBytes(candidate) <= MAX_UPLOAD_BYTES) {
+        return candidate;
+      }
+    }
+
+    return bestCandidate;
+  };
 
   const handleScan = () => {
     if (fileInputRef.current) {
@@ -34,8 +81,9 @@ const CameraPage = () => {
     try {
       setIsUploading(true);
       const imageDataUrl = await readFileAsDataUrl(file);
-      setPreviewImage(imageDataUrl);
-      await startScan(imageDataUrl);
+      const compressedImageDataUrl = await compressImageDataUrl(imageDataUrl);
+      setPreviewImage(compressedImageDataUrl);
+      await startScan(compressedImageDataUrl);
     } catch (error) {
       console.error("Failed to process selected image:", error);
       return;
