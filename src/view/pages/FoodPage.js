@@ -126,7 +126,6 @@ const FoodPage = () => {
     productName,
     nutrients,
     ingredients,
-    warnings,
     servingSize,
     timestamp,
     photos,
@@ -708,22 +707,6 @@ const FoodPage = () => {
         </CardContent>
       </Card>
 
-      {/* Warnings */}
-      {warnings.length > 0 && (
-        <Card sx={{ mb: 3, backgroundColor: "#fff3e0" }}>
-          <CardContent>
-            <Typography variant="h5" gutterBottom>
-              ⚠️ Allergen Warnings
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            {warnings.map((warning, index) => (
-              <Typography key={index} variant="body1" sx={{ mb: 0.5 }}>
-                • {warning}
-              </Typography>
-            ))}
-          </CardContent>
-        </Card>
-      )}
     </Container>
   );
 };
