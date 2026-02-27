@@ -37,7 +37,10 @@ const CameraPage = () => {
     const image = await loadImageFromDataUrl(originalDataUrl);
 
     const maxDimension = 1400;
-    const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+    const scale = Math.min(
+      1,
+      maxDimension / Math.max(image.width, image.height),
+    );
     const targetWidth = Math.max(1, Math.round(image.width * scale));
     const targetHeight = Math.max(1, Math.round(image.height * scale));
 
