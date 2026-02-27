@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
@@ -72,11 +72,11 @@ const CustomBottomNavigator = () => {
     return bestCandidate;
   };
 
-  const openUploader = () => {
+  const openUploader = useCallback(() => {
     if (fileInputRef.current && !isUploading) {
       fileInputRef.current.click();
     }
-  };
+  }, [isUploading]);
 
   const handleFileSelected = async (event) => {
     const file = event.target.files?.[0];
@@ -119,7 +119,7 @@ const CustomBottomNavigator = () => {
     return () => {
       window.removeEventListener("food:open-uploader", handleOpenUploader);
     };
-  }, [isUploading]);
+  }, [openUploader]);
 
   const handleChange = (event, newValue) => {
     switch (newValue) {

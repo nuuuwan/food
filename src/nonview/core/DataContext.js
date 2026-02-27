@@ -18,55 +18,55 @@ export const DataProvider = ({ children }) => {
   const [currentFood, setCurrentFood] = useState(null);
   const [foodHistory, setFoodHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const isSeedMockFood = (food) => /^food-00\d+$/.test(food?.id || "");
-  const sortByTimestampDesc = (items) =>
-    [...items].sort(
-      (left, right) => (right?.timestamp || 0) - (left?.timestamp || 0),
-    );
-
-  const mergeById = (first, second) => {
-    const merged = new Map();
-
-    first.forEach((item) => {
-      if (item?.id) {
-        merged.set(item.id, item);
-      }
-    });
-
-    second.forEach((item) => {
-      if (item?.id) {
-        merged.set(item.id, item);
-      }
-    });
-
-    return sortByTimestampDesc(Array.from(merged.values()));
-  };
-
-  const loadHistoryFromLocalStorage = () => {
-    if (typeof window === "undefined") {
-      return [];
-    }
-
-    try {
-      const raw = window.localStorage.getItem(HISTORY_STORAGE_KEY);
-      if (!raw) {
-        return [];
-      }
-
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed)) {
-        return [];
-      }
-
-      return parsed.filter((item) => item?.id && !isSeedMockFood(item));
-    } catch {
-      return [];
-    }
-  };
-
   // Load initial data on mount
   useEffect(() => {
+    const sortByTimestampDesc = (items) =>
+      [...items].sort(
+        (left, right) => (right?.timestamp || 0) - (left?.timestamp || 0),
+      );
+
+    const mergeById = (first, second) => {
+      const merged = new Map();
+
+      first.forEach((item) => {
+        if (item?.id) {
+          merged.set(item.id, item);
+        }
+      });
+
+      second.forEach((item) => {
+        if (item?.id) {
+          merged.set(item.id, item);
+        }
+      });
+
+      return sortByTimestampDesc(Array.from(merged.values()));
+    };
+
+    const loadHistoryFromLocalStorage = () => {
+      if (typeof window === "undefined") {
+        return [];
+      }
+
+      try {
+        const raw = window.localStorage.getItem(HISTORY_STORAGE_KEY);
+        if (!raw) {
+          return [];
+        }
+
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) {
+          return [];
+        }
+
+        return parsed.filter(
+          (item) => item?.id && !/^food-00\d+$/.test(item?.id || ""),
+        );
+      } catch {
+        return [];
+      }
+    };
+
     const loadInitialData = async () => {
       try {
         setIsLoading(true);
@@ -78,7 +78,9 @@ export const DataProvider = ({ children }) => {
         }
 
         const history = await foodAPIClient.getFoodHistory();
-        const realHistory = history.filter((item) => !isSeedMockFood(item));
+        const realHistory = history.filter(
+          (item) => !/^food-00\d+$/.test(item?.id || ""),
+        );
         const loadedHistory = realHistory.map((item) => item.toJSON());
 
         setFoodHistory((previousHistory) =>
@@ -92,7 +94,7 @@ export const DataProvider = ({ children }) => {
     };
 
     loadInitialData();
-  }, []);
+  }, [HISTORY_STORAGE_KEY]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
