@@ -317,7 +317,9 @@ const FoodPage = () => {
                 sx={{
                   mb: 1,
                   color:
-                    insight.type === "positive" ? "success.main" : "warning.main",
+                    insight.type === "positive"
+                      ? "success.main"
+                      : "warning.main",
                 }}
               >
                 {insight.type === "positive" ? "✓" : "✗"} {insight.text}
