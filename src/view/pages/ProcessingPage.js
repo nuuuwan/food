@@ -12,9 +12,9 @@ const ProcessingPage = () => {
     if (analysisState === "success" && currentFood) {
       navigate(`/item/${currentFood.id}`);
     } else if (analysisState === "error") {
-      // Handle error - for now just go back to camera
+      // Handle error - for now just go back to list
       console.error("Analysis failed");
-      navigate("/camera");
+      navigate("/list");
     }
   }, [analysisState, currentFood, navigate]);
 

@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider, createTheme, CssBaseline, Box } from "@mui/material";
 import { DataProvider } from "./nonview/core/DataContext";
-import CameraPage from "./view/pages/CameraPage";
 import ProcessingPage from "./view/pages/ProcessingPage";
 import FoodPage from "./view/pages/FoodPage";
 import HistoryPage from "./view/pages/HistoryPage";
@@ -34,8 +33,7 @@ function App() {
           <Box sx={{ pb: 7 }}>
             <CustomAppBar />
             <Routes>
-              <Route path="/" element={<Navigate to="/camera" replace />} />
-              <Route path="/camera" element={<CameraPage />} />
+              <Route path="/" element={<Navigate to="/list" replace />} />
               <Route path="/processing" element={<ProcessingPage />} />
               <Route path="/item/:foodId" element={<FoodPage />} />
               <Route path="/list" element={<HistoryPage />} />

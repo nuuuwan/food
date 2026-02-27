@@ -16,6 +16,12 @@ const HistoryPage = () => {
   const navigate = useNavigate();
   const { foodHistory } = useData();
 
+  const openUploader = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("food:open-uploader"));
+    }
+  };
+
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);
     const dateStr = date.toLocaleDateString("en-US", {
@@ -128,7 +134,7 @@ const HistoryPage = () => {
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
             Start scanning food labels to build your history
           </Typography>
-          <Button variant="contained" onClick={() => navigate("/camera")}>
+          <Button variant="contained" onClick={openUploader}>
             Scan Your First Label
           </Button>
         </Box>
