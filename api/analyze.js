@@ -316,11 +316,18 @@ module.exports = async function handler(req, res) {
   const parsedImage = parseDataUrl(imageData);
   const imageHash = hashImageInput(imageData, parsedImage);
   let analysis;
+  let blobStored = false;
+  let blobStoreError = null;
 
   const cachedAnalysis = await getCachedAnalysisByHash(imageHash);
   if (cachedAnalysis) {
     saveFood(cachedAnalysis);
-    res.status(200).json(cachedAnalysis);
+    res.status(200).json({
+      ...cachedAnalysis,
+      cacheHit: true,
+      blobStored: true,
+      blobStoreError: null,
+    });
     return;
   }
 
@@ -342,11 +349,18 @@ module.exports = async function handler(req, res) {
       parsedImage,
       analysis,
     });
+    blobStored = true;
   } catch (error) {
     console.error("Failed to persist analysis/image in Vercel Blob:", error);
+    blobStoreError = error?.message || "Unknown blob persistence error";
   }
 
   saveFood(analysis);
 
-  res.status(200).json(analysis);
+  res.status(200).json({
+    ...analysis,
+    cacheHit: false,
+    blobStored,
+    blobStoreError,
+  });
 };
