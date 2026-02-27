@@ -14,9 +14,12 @@ import {
 
 const NUTRIENT_GROUPS = [
   {
-    title: "Energy & Carbs",
+    title: "Energy",
+    fields: [{ key: "calories", label: "Calories", unit: "" }],
+  },
+  {
+    title: "Carbohydrates",
     fields: [
-      { key: "calories", label: "Calories", unit: "" },
       { key: "carbs", label: "Carbs", unit: "g" },
       { key: "sugar", label: "Sugar", unit: "g" },
       { key: "addedSugar", label: "Added Sugar", unit: "g" },
@@ -38,10 +41,15 @@ const NUTRIENT_GROUPS = [
     ],
   },
   {
-    title: "Minerals",
+    title: "Electrolytes",
     fields: [
       { key: "sodium", label: "Sodium", unit: "mg" },
       { key: "potassium", label: "Potassium", unit: "mg" },
+    ],
+  },
+  {
+    title: "Minerals",
+    fields: [
       { key: "calcium", label: "Calcium", unit: "mg" },
       { key: "iron", label: "Iron", unit: "mg" },
       { key: "magnesium", label: "Magnesium", unit: "mg" },
@@ -171,231 +179,6 @@ const FoodPage = () => {
 
     return "text.secondary";
   };
-
-  const insights = (() => {
-    const calories = toNullableNumber(nutrients?.calories);
-    const protein = toNullableNumber(nutrients?.protein);
-    const fat = toNullableNumber(nutrients?.fat);
-    const saturatedFat = toNullableNumber(nutrients?.saturatedFat);
-    const cholesterol = toNullableNumber(nutrients?.cholesterol);
-    const fiber = toNullableNumber(nutrients?.fiber);
-    const sodium = toNullableNumber(nutrients?.sodium);
-    const potassium = toNullableNumber(nutrients?.potassium);
-    const calcium = toNullableNumber(nutrients?.calcium);
-    const iron = toNullableNumber(nutrients?.iron);
-    const magnesium = toNullableNumber(nutrients?.magnesium);
-    const zinc = toNullableNumber(nutrients?.zinc);
-    const vitaminD = toNullableNumber(nutrients?.vitaminD);
-    const vitaminB12 = toNullableNumber(nutrients?.vitaminB12);
-    const folate = toNullableNumber(nutrients?.folate);
-    const vitaminC = toNullableNumber(nutrients?.vitaminC);
-    const sugar = toNullableNumber(nutrients?.sugar);
-    const addedSugar = toNullableNumber(nutrients?.addedSugar);
-    const caffeine = toNullableNumber(nutrients?.caffeine);
-    const alcohol = toNullableNumber(nutrients?.alcohol);
-
-    const items = [];
-
-    if (protein !== null && protein >= 15) {
-      items.push({
-        type: "positive",
-        text: `High protein (${protein}g per serving)`,
-      });
-    } else if (protein !== null && protein >= 8) {
-      items.push({
-        type: "positive",
-        text: `Good source of protein (${protein}g per serving)`,
-      });
-    } else if (protein !== null) {
-      items.push({
-        type: "warning",
-        text: `Low protein content (${protein}g per serving)`,
-      });
-    }
-
-    if (fiber !== null && fiber >= 5) {
-      items.push({
-        type: "positive",
-        text: `High in fiber (${fiber}g)`,
-      });
-    } else if (fiber !== null && fiber <= 2) {
-      items.push({
-        type: "warning",
-        text: `Low fiber (${fiber}g)`,
-      });
-    }
-
-    if (sodium !== null && sodium <= 140) {
-      items.push({
-        type: "positive",
-        text: `Low in sodium (${sodium}mg)`,
-      });
-    } else if (sodium !== null && sodium >= 400) {
-      items.push({
-        type: "warning",
-        text: `High sodium (${sodium}mg)`,
-      });
-    }
-
-    if (sugar !== null && sugar <= 5) {
-      items.push({
-        type: "positive",
-        text: `Low sugar (${sugar}g)`,
-      });
-    } else if (sugar !== null && sugar >= 15) {
-      items.push({
-        type: "warning",
-        text: `High sugar (${sugar}g)`,
-      });
-    }
-
-    if (addedSugar !== null && addedSugar <= 2) {
-      items.push({
-        type: "positive",
-        text: `Low added sugar (${addedSugar}g)`,
-      });
-    } else if (addedSugar !== null && addedSugar >= 10) {
-      items.push({
-        type: "warning",
-        text: `High added sugar (${addedSugar}g)`,
-      });
-    }
-
-    if (fat !== null && sugar !== null && fat >= 10 && sugar <= 6) {
-      items.push({
-        type: "positive",
-        text: `Contains healthy fats (${fat}g)`,
-      });
-    } else if (fat !== null && fat >= 20) {
-      items.push({
-        type: "warning",
-        text: `High in fat (${fat}g)`,
-      });
-    }
-
-    if (saturatedFat !== null && saturatedFat <= 2) {
-      items.push({
-        type: "positive",
-        text: `Low saturated fat (${saturatedFat}g)`,
-      });
-    } else if (saturatedFat !== null && saturatedFat >= 5) {
-      items.push({
-        type: "warning",
-        text: `High saturated fat (${saturatedFat}g)`,
-      });
-    }
-
-    if (cholesterol !== null && cholesterol <= 5) {
-      items.push({
-        type: "positive",
-        text: `Low cholesterol (${cholesterol}mg)`,
-      });
-    } else if (cholesterol !== null && cholesterol >= 20) {
-      items.push({
-        type: "warning",
-        text: `Higher cholesterol (${cholesterol}mg)`,
-      });
-    }
-
-    if (calories !== null && calories >= 450) {
-      items.push({
-        type: "warning",
-        text: `High in calories (${calories}) — watch portion size`,
-      });
-    } else if (calories !== null && calories <= 180) {
-      items.push({
-        type: "positive",
-        text: `Lower-calorie option (${calories} calories)`,
-      });
-    }
-
-    if (potassium !== null && potassium >= 300) {
-      items.push({
-        type: "positive",
-        text: `Good potassium content (${potassium}mg)`,
-      });
-    }
-
-    if (calcium !== null && calcium >= 100) {
-      items.push({
-        type: "positive",
-        text: `Useful calcium amount (${calcium}mg)`,
-      });
-    }
-
-    if (iron !== null && iron >= 2) {
-      items.push({
-        type: "positive",
-        text: `Contains iron (${iron}mg)`,
-      });
-    }
-
-    if (magnesium !== null && magnesium >= 40) {
-      items.push({
-        type: "positive",
-        text: `Contains magnesium (${magnesium}mg)`,
-      });
-    }
-
-    if (zinc !== null && zinc >= 1.5) {
-      items.push({
-        type: "positive",
-        text: `Contains zinc (${zinc}mg)`,
-      });
-    }
-
-    if (vitaminD !== null && vitaminD >= 2) {
-      items.push({
-        type: "positive",
-        text: `Contains vitamin D (${vitaminD}mcg)`,
-      });
-    }
-
-    if (vitaminB12 !== null && vitaminB12 >= 0.5) {
-      items.push({
-        type: "positive",
-        text: `Contains vitamin B12 (${vitaminB12}mcg)`,
-      });
-    }
-
-    if (folate !== null && folate >= 80) {
-      items.push({
-        type: "positive",
-        text: `Contains folate (${folate}mcg)`,
-      });
-    }
-
-    if (vitaminC !== null && vitaminC >= 12) {
-      items.push({
-        type: "positive",
-        text: `Contains vitamin C (${vitaminC}mg)`,
-      });
-    }
-
-    if (caffeine !== null && caffeine > 0) {
-      items.push({
-        type: "warning",
-        text: `Contains caffeine (${caffeine}mg)`,
-      });
-    }
-
-    if (alcohol !== null && alcohol > 0) {
-      items.push({
-        type: "warning",
-        text: `Contains alcohol (${alcohol}g)`,
-      });
-    }
-
-    return items;
-  })();
-
-  const positiveInsights = insights.filter(
-    (insight) => insight.type === "positive",
-  );
-  const warningInsights = insights.filter(
-    (insight) => insight.type === "warning",
-  );
-  const MAX_INSIGHTS_PER_COLUMN = 6;
 
   const formatDateTime = (ts) => {
     const date = new Date(ts);
@@ -543,81 +326,9 @@ const FoodPage = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Photo Collage with Overlaid Title */}
       {renderPhotoCollage()}
-
-      {/* Insights */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h5" gutterBottom>
-            Insights
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: 1,
-                  backgroundColor: "action.hover",
-                  height: "100%",
-                }}
-              >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ mb: 1, color: "success.main" }}
-                >
-                  Highlights
-                </Typography>
-                {positiveInsights.length === 0 ? (
-                  <Typography variant="body2" color="text.secondary">
-                    -
-                  </Typography>
-                ) : (
-                  positiveInsights
-                    .slice(0, MAX_INSIGHTS_PER_COLUMN)
-                    .map((insight, index) => (
-                      <Typography key={index} variant="body2" sx={{ mb: 0.75 }}>
-                        • {insight.text}
-                      </Typography>
-                    ))
-                )}
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: 1,
-                  backgroundColor: "action.hover",
-                  height: "100%",
-                }}
-              >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ mb: 1, color: "warning.main" }}
-                >
-                  Watch-outs
-                </Typography>
-                {warningInsights.length === 0 ? (
-                  <Typography variant="body2" color="text.secondary">
-                    -
-                  </Typography>
-                ) : (
-                  warningInsights
-                    .slice(0, MAX_INSIGHTS_PER_COLUMN)
-                    .map((insight, index) => (
-                      <Typography key={index} variant="body2" sx={{ mb: 0.75 }}>
-                        • {insight.text}
-                      </Typography>
-                    ))
-                )}
-              </Box>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
 
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
         Serving Size: {servingSize || "-"}
@@ -630,18 +341,18 @@ const FoodPage = () => {
             Nutrition Facts
           </Typography>
           <Divider sx={{ mb: 2 }} />
-          <Grid container spacing={2}>
+          <Grid container spacing={3}>
             {NUTRIENT_GROUPS.map((group) => (
-              <Grid item xs={12} md={6} key={group.title}>
+              <Grid item xs={12} md={6} lg={4} key={group.title}>
                 <Box
                   sx={{
-                    p: 2,
+                    p: 2.5,
                     borderRadius: 1,
                     backgroundColor: "action.hover",
                     height: "100%",
                   }}
                 >
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                  <Typography variant="h6" sx={{ mb: 1.5 }}>
                     {group.title}
                   </Typography>
                   <Box>
@@ -656,7 +367,7 @@ const FoodPage = () => {
                         <Box key={nutrient.key}>
                           <Box
                             sx={{
-                              py: 0.75,
+                              py: 1,
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "space-between",
@@ -664,13 +375,13 @@ const FoodPage = () => {
                             }}
                           >
                             <Typography
-                              variant="body2"
+                              variant="body1"
                               sx={{ color: nutrientColor }}
                             >
                               {nutrient.label}
                             </Typography>
                             <Typography
-                              variant="subtitle2"
+                              variant="h6"
                               sx={{ color: nutrientColor, fontWeight: 700 }}
                             >
                               {formatNutrientValue(value, nutrient.unit)}
