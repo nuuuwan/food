@@ -5,7 +5,7 @@ import { Box, Typography, Container, CircularProgress } from "@mui/material";
 
 const ProcessingPage = () => {
   const navigate = useNavigate();
-  const { currentFood, analysisState } = useData();
+  const { currentFood, analysisState, processingStatus } = useData();
 
   useEffect(() => {
     // When analysis is complete, navigate to the food page
@@ -35,10 +35,10 @@ const ProcessingPage = () => {
           Analyzing Label...
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          AI is processing your nutrition label
+          {processingStatus.title || "AI is processing your nutrition label"}
         </Typography>
         <Typography variant="caption" color="text.secondary" sx={{ mt: 2 }}>
-          This usually takes 2-3 seconds
+          {processingStatus.detail || "This usually takes 2-3 seconds"}
         </Typography>
       </Box>
     </Container>

@@ -8,6 +8,7 @@ export class FoodAPIClient {
   constructor(baseURL) {
     this.baseURL = this._resolveBaseURL(baseURL);
     this.localImageKeyPrefix = "food:image:";
+    this.localAnalysisKeyPrefix = "food:analysis:";
   }
 
   _resolveBaseURL(explicitBaseURL) {
@@ -118,6 +119,40 @@ export class FoodAPIClient {
       );
     } catch {
       return "";
+    }
+  }
+
+  _storeAnalysisLocally(imageHash, analysisData) {
+    if (!imageHash || !analysisData || typeof window === "undefined") {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(
+        `${this.localAnalysisKeyPrefix}${imageHash}`,
+        JSON.stringify(analysisData),
+      );
+    } catch (error) {
+      console.warn("Failed to store analysis in localStorage:", error);
+    }
+  }
+
+  _getLocalAnalysis(imageHash) {
+    if (!imageHash || typeof window === "undefined") {
+      return null;
+    }
+
+    try {
+      const raw = window.localStorage.getItem(
+        `${this.localAnalysisKeyPrefix}${imageHash}`,
+      );
+      if (!raw) {
+        return null;
+      }
+
+      return JSON.parse(raw);
+    } catch {
+      return null;
     }
   }
 
@@ -259,21 +294,59 @@ export class FoodAPIClient {
    * @param {string} imageData - Base64 encoded image or file
    * @returns {Promise<FoodAnalysis>}
    */
-  async analyzeFoodPhoto(imageData) {
+  async analyzeFoodPhotoWithMeta(imageData, onStatusChange) {
     const imageHash = await this._hashImageData(imageData);
     this._storeImageLocally(imageHash, imageData);
+
+    onStatusChange?.("cache-check");
+    const localAnalysis = this._getLocalAnalysis(imageHash);
+    if (localAnalysis) {
+      const hydratedLocal = this._hydrateImageFromLocalStorage(
+        localAnalysis,
+        imageHash,
+        imageData,
+      );
+
+      return {
+        analysis: FoodAnalysis.fromJSON(hydratedLocal),
+        meta: {
+          cacheHit: true,
+          cacheSource: "localStorage",
+          imageHash,
+        },
+      };
+    }
+
+    onStatusChange?.("uploading");
 
     const data = await this._request("/api/analyze", {
       method: "POST",
       body: JSON.stringify({ imageData }),
     });
 
+    onStatusChange?.("computing");
+
     const hydratedData = this._hydrateImageFromLocalStorage(
       data,
       imageHash,
       imageData,
     );
-    return FoodAnalysis.fromJSON(hydratedData);
+
+    this._storeAnalysisLocally(imageHash, hydratedData);
+
+    return {
+      analysis: FoodAnalysis.fromJSON(hydratedData),
+      meta: {
+        cacheHit: Boolean(data?.cacheHit),
+        cacheSource: data?.cacheHit ? "backend" : "none",
+        imageHash,
+      },
+    };
+  }
+
+  async analyzeFoodPhoto(imageData) {
+    const result = await this.analyzeFoodPhotoWithMeta(imageData);
+    return result.analysis;
   }
 
   /**

@@ -18,6 +18,10 @@ export const DataProvider = ({ children }) => {
   const [currentFood, setCurrentFood] = useState(null);
   const [foodHistory, setFoodHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [processingStatus, setProcessingStatus] = useState({
+    title: "",
+    detail: "",
+  });
   // Load initial data on mount
   useEffect(() => {
     const sortByTimestampDesc = (items) =>
@@ -114,13 +118,60 @@ export const DataProvider = ({ children }) => {
   const startScan = async (imageData) => {
     setCurrentScan(imageData);
     setAnalysisState("scanning");
+    setProcessingStatus({
+      title: "Image extracted",
+      detail: "Preparing upload payload...",
+    });
 
     try {
-      // Call API to analyze the photo
-      const analysis = await foodAPIClient.analyzeFoodPhoto(imageData);
+      const stageToStatus = {
+        "cache-check": {
+          title: "Checking local cache",
+          detail: "Looking for previous analysis in localStorage...",
+        },
+        uploading: {
+          title: "Uploading image",
+          detail: "Sending image for analysis...",
+        },
+        computing: {
+          title: "Computing results",
+          detail: "Model is generating nutrition insights...",
+        },
+      };
+
+      const { analysis, meta } = await foodAPIClient.analyzeFoodPhotoWithMeta(
+        imageData,
+        (stage) => {
+          if (stageToStatus[stage]) {
+            setProcessingStatus(stageToStatus[stage]);
+          }
+        },
+      );
+
+      if (meta?.cacheSource === "localStorage") {
+        setProcessingStatus({
+          title: "Found in localStorage",
+          detail: "Analysis already cached locally. Skipping model analysis.",
+        });
+      } else if (meta?.cacheSource === "backend") {
+        setProcessingStatus({
+          title: "Using cached analysis",
+          detail: "Image was previously analyzed. Reusing stored results.",
+        });
+      } else {
+        setProcessingStatus({
+          title: "Analysis complete",
+          detail: "Results computed successfully.",
+        });
+      }
+
       completeAnalysis(analysis.toJSON());
     } catch (error) {
       console.error("Failed to analyze food photo:", error);
+      setProcessingStatus({
+        title: "Analysis failed",
+        detail: "Unable to process this image.",
+      });
       setAnalysisState("error");
     }
   };
@@ -138,6 +189,7 @@ export const DataProvider = ({ children }) => {
   const resetScan = () => {
     setCurrentScan(null);
     setAnalysisState("idle");
+    setProcessingStatus({ title: "", detail: "" });
   };
 
   const loadFoodById = async (foodId) => {
@@ -160,6 +212,7 @@ export const DataProvider = ({ children }) => {
     currentFood,
     foodHistory,
     isLoading,
+    processingStatus,
     startScan,
     completeAnalysis,
     resetScan,

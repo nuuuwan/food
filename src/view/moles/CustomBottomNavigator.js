@@ -88,8 +88,8 @@ const CustomBottomNavigator = () => {
       setIsUploading(true);
       const imageDataUrl = await readFileAsDataUrl(file);
       const compressedImageDataUrl = await compressImageDataUrl(imageDataUrl);
-      await startScan(compressedImageDataUrl);
       navigate("/processing");
+      await startScan(compressedImageDataUrl);
     } catch (error) {
       console.error("Failed to process selected image:", error);
     } finally {
