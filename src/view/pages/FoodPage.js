@@ -139,7 +139,7 @@ const FoodPage = () => {
               >
                 <img
                   src={photo.imageUri}
-                  alt={`${productName} - Photo ${index + 1}`}
+                  alt={`${productName} - ${index + 1}`}
                   style={{
                     position: "absolute",
                     top: 0,
