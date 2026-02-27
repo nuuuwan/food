@@ -6,10 +6,34 @@ import { FoodAnalysis } from "./FoodAnalysis";
  */
 export class FoodAPIClient {
   constructor(baseURL) {
-    this.baseURL =
-      baseURL ||
-      process.env.REACT_APP_API_BASE_URL ||
-      this._getDefaultBaseURLForEnvironment();
+    this.baseURL = this._resolveBaseURL(baseURL);
+  }
+
+  _resolveBaseURL(explicitBaseURL) {
+    if (explicitBaseURL) {
+      return explicitBaseURL;
+    }
+
+    if (process.env.REACT_APP_API_BASE_URL) {
+      return process.env.REACT_APP_API_BASE_URL;
+    }
+
+    const target = (
+      process.env.REACT_APP_VERCEL_TARGET || "local"
+    ).toLowerCase();
+    const localBaseURL =
+      process.env.REACT_APP_LOCAL_API_BASE_URL || "http://localhost:3001";
+    const remoteBaseURL = process.env.REACT_APP_REMOTE_API_BASE_URL || "";
+
+    if (target === "remote") {
+      return remoteBaseURL;
+    }
+
+    if (target === "local") {
+      return localBaseURL;
+    }
+
+    return this._getDefaultBaseURLForEnvironment();
   }
 
   _getDefaultBaseURLForEnvironment() {

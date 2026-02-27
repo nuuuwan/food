@@ -21,15 +21,30 @@ Run frontend and backend in separate terminals:
 1. Frontend: `npm start`
 2. Backend: `npm run start:backend`
 
-If your frontend is not served from the same origin as Vercel backend, set:
+Use these frontend variables to choose backend target:
 
-- `REACT_APP_API_BASE_URL=http://localhost:3001` (or your deployed backend URL)
+- `REACT_APP_VERCEL_TARGET=local` or `remote`
+- `REACT_APP_LOCAL_API_BASE_URL=http://localhost:3001`
+- `REACT_APP_REMOTE_API_BASE_URL=https://<your-project>.vercel.app`
+
+Optional override (takes highest priority):
+
+- `REACT_APP_API_BASE_URL=<any-api-base-url>`
+
+Examples for `.env.local`:
+
+- Local backend:
+  - `REACT_APP_VERCEL_TARGET=local`
+  - `REACT_APP_LOCAL_API_BASE_URL=http://localhost:3001`
+- Deployed backend:
+  - `REACT_APP_VERCEL_TARGET=remote`
+  - `REACT_APP_REMOTE_API_BASE_URL=https://<your-project>.vercel.app`
 
 ### Gemini setup
 
 Set these environment variables for the backend:
 
 - `GEMINI_API_KEY=your_api_key`
-- `GEMINI_MODEL=gemini-1.5-flash` (optional)
+- `GEMINI_MODEL=gemini-2.0-flash` (optional)
 
 For local development with `vercel dev`, add them in `.env.local` at repo root.
