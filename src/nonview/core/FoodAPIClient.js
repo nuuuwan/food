@@ -48,12 +48,41 @@ export class FoodAPIClient {
     return isLocalFrontend ? "http://localhost:3001" : "";
   }
 
-  _buildUrl(path) {
-    return `${this.baseURL}${path}`;
+  _getLocalBaseURL() {
+    return process.env.REACT_APP_LOCAL_API_BASE_URL || "http://localhost:3001";
   }
 
-  async _request(path, options = {}) {
-    const response = await fetch(this._buildUrl(path), {
+  _buildUrl(path, baseURL = this.baseURL) {
+    return `${baseURL}${path}`;
+  }
+
+  _isLocalFrontend() {
+    return (
+      typeof window !== "undefined" &&
+      window.location.hostname === "localhost" &&
+      window.location.port === "3000"
+    );
+  }
+
+  _shouldFallbackToLocal(primaryBaseURL, error) {
+    if (!this._isLocalFrontend()) {
+      return false;
+    }
+
+    const localBaseURL = this._getLocalBaseURL();
+    if (!primaryBaseURL || primaryBaseURL === localBaseURL) {
+      return false;
+    }
+
+    if (error?.name === "TypeError") {
+      return true;
+    }
+
+    return /401|403|network|cors/i.test(error?.message || "");
+  }
+
+  async _requestFromBase(path, options = {}, baseURL = this.baseURL) {
+    const response = await fetch(this._buildUrl(path, baseURL), {
       headers: {
         "Content-Type": "application/json",
         ...(options.headers || {}),
@@ -77,6 +106,20 @@ export class FoodAPIClient {
     }
 
     return response.json();
+  }
+
+  async _request(path, options = {}) {
+    const primaryBaseURL = this.baseURL;
+
+    try {
+      return await this._requestFromBase(path, options, primaryBaseURL);
+    } catch (error) {
+      if (!this._shouldFallbackToLocal(primaryBaseURL, error)) {
+        throw error;
+      }
+
+      return this._requestFromBase(path, options, this._getLocalBaseURL());
+    }
   }
 
   /**
