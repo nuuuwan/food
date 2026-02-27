@@ -8,7 +8,6 @@ import {
   Container,
   Card,
   CardContent,
-  CardMedia,
   CardActionArea,
   Grid,
 } from "@mui/material";
