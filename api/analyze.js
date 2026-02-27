@@ -46,24 +46,6 @@ const parseDataUrl = (imageData) => {
   };
 };
 
-const extensionForMimeType = (mimeType = "") => {
-  const normalized = mimeType.toLowerCase();
-
-  if (normalized === "image/jpeg") {
-    return "jpg";
-  }
-
-  if (normalized === "image/png") {
-    return "png";
-  }
-
-  if (normalized === "image/webp") {
-    return "webp";
-  }
-
-  return "img";
-};
-
 const hashImageInput = (imageData, parsedImage) => {
   if (!imageData) {
     return "";
@@ -129,24 +111,9 @@ const putBlobDeterministic = async (pathname, body, options) => {
   }
 };
 
-const persistAnalysisByHash = async ({ imageHash, parsedImage, analysis }) => {
+const persistAnalysisByHash = async ({ imageHash, analysis }) => {
   if (!imageHash) {
-    return analysis;
-  }
-
-  let imageUrl = analysis?.photos?.[0]?.imageUri || "";
-
-  if (parsedImage?.data) {
-    const extension = extensionForMimeType(parsedImage.mimeType);
-    const imagePath = blobPaths.image(imageHash, extension);
-    const imageBuffer = Buffer.from(parsedImage.data, "base64");
-
-    const imageBlob = await putBlobDeterministic(imagePath, imageBuffer, {
-      access: "public",
-      contentType: parsedImage.mimeType,
-    });
-
-    imageUrl = imageBlob.url;
+    return;
   }
 
   const persistedAnalysis = {
@@ -154,9 +121,7 @@ const persistAnalysisByHash = async ({ imageHash, parsedImage, analysis }) => {
     imageHash,
     photos: Array.isArray(analysis.photos)
       ? analysis.photos.map((photo, index) =>
-          index === 0
-            ? { ...photo, imageUri: imageUrl || photo.imageUri }
-            : photo,
+          index === 0 ? { ...photo, imageUri: "" } : photo,
         )
       : analysis.photos,
   };
@@ -166,8 +131,6 @@ const persistAnalysisByHash = async ({ imageHash, parsedImage, analysis }) => {
     access: "public",
     contentType: "application/json",
   });
-
-  return persistedAnalysis;
 };
 
 const extractJsonObject = (text) => {
@@ -346,7 +309,6 @@ module.exports = async function handler(req, res) {
   try {
     analysis = await persistAnalysisByHash({
       imageHash,
-      parsedImage,
       analysis,
     });
     blobStored = true;
@@ -359,6 +321,7 @@ module.exports = async function handler(req, res) {
 
   res.status(200).json({
     ...analysis,
+    imageHash,
     cacheHit: false,
     blobStored,
     blobStoreError,

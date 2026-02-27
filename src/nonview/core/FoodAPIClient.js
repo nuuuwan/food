@@ -7,6 +7,7 @@ import { FoodAnalysis } from "./FoodAnalysis";
 export class FoodAPIClient {
   constructor(baseURL) {
     this.baseURL = this._resolveBaseURL(baseURL);
+    this.localImageKeyPrefix = "food:image:";
   }
 
   _resolveBaseURL(explicitBaseURL) {
@@ -54,6 +55,107 @@ export class FoodAPIClient {
 
   _buildUrl(path, baseURL = this.baseURL) {
     return `${baseURL}${path}`;
+  }
+
+  _toBytesFromImageData(imageData) {
+    if (!imageData) {
+      return new Uint8Array();
+    }
+
+    const match = String(imageData).match(/^data:.*;base64,(.+)$/);
+    if (!match) {
+      return new TextEncoder().encode(String(imageData));
+    }
+
+    const base64 = match[1];
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+
+    for (let i = 0; i < binary.length; i += 1) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+
+    return bytes;
+  }
+
+  async _hashImageData(imageData) {
+    if (!imageData || typeof window === "undefined" || !window.crypto?.subtle) {
+      return "";
+    }
+
+    const bytes = this._toBytesFromImageData(imageData);
+    const digest = await window.crypto.subtle.digest("SHA-256", bytes);
+    return Array.from(new Uint8Array(digest))
+      .map((value) => value.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  _storeImageLocally(imageHash, imageData) {
+    if (!imageHash || !imageData || typeof window === "undefined") {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(
+        `${this.localImageKeyPrefix}${imageHash}`,
+        imageData,
+      );
+    } catch (error) {
+      console.warn("Failed to store image in localStorage:", error);
+    }
+  }
+
+  _getLocalImage(imageHash) {
+    if (!imageHash || typeof window === "undefined") {
+      return "";
+    }
+
+    try {
+      return (
+        window.localStorage.getItem(
+          `${this.localImageKeyPrefix}${imageHash}`,
+        ) || ""
+      );
+    } catch {
+      return "";
+    }
+  }
+
+  _hydrateImageFromLocalStorage(
+    foodData,
+    fallbackHash = "",
+    fallbackImageData = "",
+  ) {
+    if (!foodData || typeof foodData !== "object") {
+      return foodData;
+    }
+
+    const imageHash = foodData.imageHash || fallbackHash;
+    const localImage = this._getLocalImage(imageHash) || fallbackImageData;
+
+    if (!localImage) {
+      return foodData;
+    }
+
+    const photos = Array.isArray(foodData.photos) ? [...foodData.photos] : [];
+    if (photos.length === 0) {
+      photos.push({
+        id: `${foodData.id || "food"}-photo-local`,
+        timestamp: foodData.timestamp || Date.now(),
+        imageUri: localImage,
+      });
+    } else {
+      photos[0] = {
+        ...photos[0],
+        imageUri: localImage,
+      };
+    }
+
+    return {
+      ...foodData,
+      imageHash,
+      photos,
+    };
   }
 
   _isLocalFrontend() {
@@ -137,7 +239,8 @@ export class FoodAPIClient {
    */
   async getFoodById(foodId) {
     const data = await this._request(`/api/foods/${foodId}`);
-    return FoodAnalysis.fromJSON(data);
+    const hydratedData = this._hydrateImageFromLocalStorage(data);
+    return FoodAnalysis.fromJSON(hydratedData);
   }
 
   /**
@@ -146,7 +249,9 @@ export class FoodAPIClient {
    */
   async getFoodHistory() {
     const data = await this._request("/api/foods");
-    return data.map((item) => FoodAnalysis.fromJSON(item));
+    return data.map((item) =>
+      FoodAnalysis.fromJSON(this._hydrateImageFromLocalStorage(item)),
+    );
   }
 
   /**
@@ -155,12 +260,20 @@ export class FoodAPIClient {
    * @returns {Promise<FoodAnalysis>}
    */
   async analyzeFoodPhoto(imageData) {
+    const imageHash = await this._hashImageData(imageData);
+    this._storeImageLocally(imageHash, imageData);
+
     const data = await this._request("/api/analyze", {
       method: "POST",
       body: JSON.stringify({ imageData }),
     });
 
-    return FoodAnalysis.fromJSON(data);
+    const hydratedData = this._hydrateImageFromLocalStorage(
+      data,
+      imageHash,
+      imageData,
+    );
+    return FoodAnalysis.fromJSON(hydratedData);
   }
 
   /**

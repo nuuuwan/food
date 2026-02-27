@@ -10,7 +10,7 @@ const CameraPage = () => {
   const fileInputRef = useRef(null);
   const [previewImage, setPreviewImage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const MAX_UPLOAD_BYTES = 3 * 1024 * 1024;
+  const MAX_UPLOAD_BYTES = 500 * 1024;
 
   const readFileAsDataUrl = (file) =>
     new Promise((resolve, reject) => {
@@ -36,7 +36,7 @@ const CameraPage = () => {
   const compressImageDataUrl = async (originalDataUrl) => {
     const image = await loadImageFromDataUrl(originalDataUrl);
 
-    const maxDimension = 1400;
+    const maxDimension = 960;
     const scale = Math.min(
       1,
       maxDimension / Math.max(image.width, image.height),
@@ -55,7 +55,7 @@ const CameraPage = () => {
 
     context.drawImage(image, 0, 0, targetWidth, targetHeight);
 
-    const qualitySteps = [0.85, 0.75, 0.65, 0.55, 0.45, 0.35];
+    const qualitySteps = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3];
     let bestCandidate = originalDataUrl;
 
     for (const quality of qualitySteps) {

@@ -10,7 +10,7 @@ const ProcessingPage = () => {
   useEffect(() => {
     // When analysis is complete, navigate to the food page
     if (analysisState === "success" && currentFood) {
-      navigate(`/food/${currentFood.id}`);
+      navigate(`/item/${currentFood.id}`);
     } else if (analysisState === "error") {
       // Handle error - for now just go back to camera
       console.error("Analysis failed");

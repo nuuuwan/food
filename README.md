@@ -15,7 +15,8 @@ This project now includes a Node-based Vercel mock backend under `api/`:
 `/api/analyze` now:
 
 - hashes uploaded image bytes (`sha256`)
-- stores image blob + analysis JSON in Vercel Blob
+- stores analysis JSON in Vercel Blob
+- stores resized image data in browser `localStorage`
 - reuses cached analysis for duplicate image uploads (same hash)
 
 `FoodAPIClient` calls these endpoints over HTTP.

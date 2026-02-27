@@ -37,8 +37,8 @@ function App() {
               <Route path="/" element={<Navigate to="/camera" replace />} />
               <Route path="/camera" element={<CameraPage />} />
               <Route path="/processing" element={<ProcessingPage />} />
-              <Route path="/food/:foodId" element={<FoodPage />} />
-              <Route path="/foods" element={<HistoryPage />} />
+              <Route path="/item/:foodId" element={<FoodPage />} />
+              <Route path="/list" element={<HistoryPage />} />
             </Routes>
             <CustomBottomNavigator />
           </Box>
