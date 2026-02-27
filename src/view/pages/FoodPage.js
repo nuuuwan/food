@@ -387,7 +387,10 @@ const FoodPage = () => {
                       height: "100%",
                     }}
                   >
-                    <Typography variant="overline" sx={{ mb: 1.25, color: "text.secondary" }}>
+                    <Typography
+                      variant="overline"
+                      sx={{ mb: 1.25, color: "text.secondary" }}
+                    >
                       {group.title}
                     </Typography>
                     <Grid container spacing={1.25}>
