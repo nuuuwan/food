@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useData } from "../../nonview/core/DataContext";
 import { Box, Button, Typography, Container, Paper } from "@mui/material";
@@ -7,10 +7,45 @@ import CameraAltIcon from "@mui/icons-material/CameraAlt";
 const CameraPage = () => {
   const navigate = useNavigate();
   const { startScan } = useData();
+  const fileInputRef = useRef(null);
+  const [previewImage, setPreviewImage] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+
+  const readFileAsDataUrl = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error("Failed to read image file"));
+      reader.readAsDataURL(file);
+    });
 
   const handleScan = () => {
-    // For M0, we'll just simulate scanning with dummy data
-    startScan("dummy-image-data");
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileSelected = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      const imageDataUrl = await readFileAsDataUrl(file);
+      setPreviewImage(imageDataUrl);
+      await startScan(imageDataUrl);
+    } catch (error) {
+      console.error("Failed to process selected image:", error);
+      return;
+    } finally {
+      setIsUploading(false);
+      if (event.target) {
+        event.target.value = "";
+      }
+    }
+
     navigate("/processing");
   };
 
@@ -37,17 +72,25 @@ const CameraPage = () => {
             overflow: "hidden",
           }}
         >
-          <Box sx={{ textAlign: "center" }}>
-            <CameraAltIcon
-              sx={{ fontSize: 80, color: "text.secondary", mb: 2 }}
+          {previewImage ? (
+            <img
+              src={previewImage}
+              alt="Selected food label"
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
-            <Typography variant="h6" color="text.secondary">
-              Camera Preview
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              (M0: Static Prototype)
-            </Typography>
-          </Box>
+          ) : (
+            <Box sx={{ textAlign: "center" }}>
+              <CameraAltIcon
+                sx={{ fontSize: 80, color: "text.secondary", mb: 2 }}
+              />
+              <Typography variant="h6" color="text.secondary">
+                Upload Label Photo
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Select an image to analyze
+              </Typography>
+            </Box>
+          )}
 
           {/* Scan Overlay Simulation */}
           <Box
@@ -68,10 +111,18 @@ const CameraPage = () => {
           size="large"
           startIcon={<CameraAltIcon />}
           onClick={handleScan}
+          disabled={isUploading}
           sx={{ px: 6, py: 1.5 }}
         >
-          Scan Label
+          {isUploading ? "Uploading..." : "Scan Label"}
         </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileSelected}
+          style={{ display: "none" }}
+        />
       </Box>
     </Container>
   );
