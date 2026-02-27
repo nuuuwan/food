@@ -1,3 +1,5 @@
+import React, { useEffect, useMemo } from "react";
+import { useParams } from "react-router-dom";
 import { useData } from "../../nonview/core/DataContext";
 import {
   Box,
@@ -11,9 +13,30 @@ import {
 } from "@mui/material";
 
 const FoodPage = () => {
-  const { currentFood } = useData();
+  const { foodId } = useParams();
+  const { currentFood, foodHistory, loadFoodById } = useData();
 
-  if (!currentFood) {
+  const routeFoodFromHistory = useMemo(
+    () => foodHistory.find((item) => item.id === foodId) || null,
+    [foodHistory, foodId],
+  );
+
+  useEffect(() => {
+    if (!foodId) {
+      return;
+    }
+
+    if (!currentFood || currentFood.id !== foodId) {
+      loadFoodById(foodId);
+    }
+  }, [foodId, currentFood, loadFoodById]);
+
+  const displayFood =
+    currentFood && currentFood.id === foodId
+      ? currentFood
+      : routeFoodFromHistory;
+
+  if (!displayFood) {
     return (
       <Container maxWidth="md" sx={{ mt: 4 }}>
         <Typography>Loading...</Typography>
@@ -29,7 +52,7 @@ const FoodPage = () => {
     servingSize,
     timestamp,
     photos,
-  } = currentFood;
+  } = displayFood;
 
   const formatDateTime = (ts) => {
     const date = new Date(ts);
