@@ -12,6 +12,30 @@ import {
   CardContent,
 } from "@mui/material";
 
+const NUTRIENT_FIELDS = [
+  { key: "calories", label: "Calories", unit: "" },
+  { key: "protein", label: "Protein", unit: "g" },
+  { key: "carbs", label: "Carbs", unit: "g" },
+  { key: "fat", label: "Fat", unit: "g" },
+  { key: "saturatedFat", label: "Saturated Fat", unit: "g" },
+  { key: "cholesterol", label: "Cholesterol", unit: "mg" },
+  { key: "fiber", label: "Fiber", unit: "g" },
+  { key: "sodium", label: "Sodium", unit: "mg" },
+  { key: "potassium", label: "Potassium", unit: "mg" },
+  { key: "calcium", label: "Calcium", unit: "mg" },
+  { key: "iron", label: "Iron", unit: "mg" },
+  { key: "magnesium", label: "Magnesium", unit: "mg" },
+  { key: "zinc", label: "Zinc", unit: "mg" },
+  { key: "vitaminD", label: "Vitamin D", unit: "mcg" },
+  { key: "vitaminB12", label: "Vitamin B12", unit: "mcg" },
+  { key: "folate", label: "Folate", unit: "mcg" },
+  { key: "vitaminC", label: "Vitamin C", unit: "mg" },
+  { key: "sugar", label: "Sugar", unit: "g" },
+  { key: "addedSugar", label: "Added Sugar", unit: "g" },
+  { key: "caffeine", label: "Caffeine", unit: "mg" },
+  { key: "alcohol", label: "Alcohol", unit: "g" },
+];
+
 const FoodPage = () => {
   const { foodId } = useParams();
   const { currentFood, foodHistory, loadFoodById } = useData();
@@ -66,9 +90,23 @@ const FoodPage = () => {
     const calories = toNumber(nutrients?.calories);
     const protein = toNumber(nutrients?.protein);
     const fat = toNumber(nutrients?.fat);
+    const saturatedFat = toNumber(nutrients?.saturatedFat);
+    const cholesterol = toNumber(nutrients?.cholesterol);
     const fiber = toNumber(nutrients?.fiber);
     const sodium = toNumber(nutrients?.sodium);
+    const potassium = toNumber(nutrients?.potassium);
+    const calcium = toNumber(nutrients?.calcium);
+    const iron = toNumber(nutrients?.iron);
+    const magnesium = toNumber(nutrients?.magnesium);
+    const zinc = toNumber(nutrients?.zinc);
+    const vitaminD = toNumber(nutrients?.vitaminD);
+    const vitaminB12 = toNumber(nutrients?.vitaminB12);
+    const folate = toNumber(nutrients?.folate);
+    const vitaminC = toNumber(nutrients?.vitaminC);
     const sugar = toNumber(nutrients?.sugar);
+    const addedSugar = toNumber(nutrients?.addedSugar);
+    const caffeine = toNumber(nutrients?.caffeine);
+    const alcohol = toNumber(nutrients?.alcohol);
 
     const items = [];
 
@@ -125,6 +163,18 @@ const FoodPage = () => {
       });
     }
 
+    if (addedSugar <= 2) {
+      items.push({
+        type: "positive",
+        text: `Low added sugar (${addedSugar}g)`,
+      });
+    } else if (addedSugar >= 10) {
+      items.push({
+        type: "warning",
+        text: `High added sugar (${addedSugar}g)`,
+      });
+    }
+
     if (fat >= 10 && sugar <= 6) {
       items.push({
         type: "positive",
@@ -134,6 +184,30 @@ const FoodPage = () => {
       items.push({
         type: "warning",
         text: `High in fat (${fat}g)`,
+      });
+    }
+
+    if (saturatedFat <= 2) {
+      items.push({
+        type: "positive",
+        text: `Low saturated fat (${saturatedFat}g)`,
+      });
+    } else if (saturatedFat >= 5) {
+      items.push({
+        type: "warning",
+        text: `High saturated fat (${saturatedFat}g)`,
+      });
+    }
+
+    if (cholesterol <= 5) {
+      items.push({
+        type: "positive",
+        text: `Low cholesterol (${cholesterol}mg)`,
+      });
+    } else if (cholesterol >= 20) {
+      items.push({
+        type: "warning",
+        text: `Higher cholesterol (${cholesterol}mg)`,
       });
     }
 
@@ -149,7 +223,84 @@ const FoodPage = () => {
       });
     }
 
-    return items.slice(0, 4);
+    if (potassium >= 300) {
+      items.push({
+        type: "positive",
+        text: `Good potassium content (${potassium}mg)`,
+      });
+    }
+
+    if (calcium >= 100) {
+      items.push({
+        type: "positive",
+        text: `Useful calcium amount (${calcium}mg)`,
+      });
+    }
+
+    if (iron >= 2) {
+      items.push({
+        type: "positive",
+        text: `Contains iron (${iron}mg)`,
+      });
+    }
+
+    if (magnesium >= 40) {
+      items.push({
+        type: "positive",
+        text: `Contains magnesium (${magnesium}mg)`,
+      });
+    }
+
+    if (zinc >= 1.5) {
+      items.push({
+        type: "positive",
+        text: `Contains zinc (${zinc}mg)`,
+      });
+    }
+
+    if (vitaminD >= 2) {
+      items.push({
+        type: "positive",
+        text: `Contains vitamin D (${vitaminD}mcg)`,
+      });
+    }
+
+    if (vitaminB12 >= 0.5) {
+      items.push({
+        type: "positive",
+        text: `Contains vitamin B12 (${vitaminB12}mcg)`,
+      });
+    }
+
+    if (folate >= 80) {
+      items.push({
+        type: "positive",
+        text: `Contains folate (${folate}mcg)`,
+      });
+    }
+
+    if (vitaminC >= 12) {
+      items.push({
+        type: "positive",
+        text: `Contains vitamin C (${vitaminC}mg)`,
+      });
+    }
+
+    if (caffeine > 0) {
+      items.push({
+        type: "warning",
+        text: `Contains caffeine (${caffeine}mg)`,
+      });
+    }
+
+    if (alcohol > 0) {
+      items.push({
+        type: "warning",
+        text: `Contains alcohol (${alcohol}g)`,
+      });
+    }
+
+    return items;
   })();
 
   const formatDateTime = (ts) => {
@@ -341,48 +492,21 @@ const FoodPage = () => {
           </Typography>
           <Divider sx={{ mb: 2 }} />
           <Grid container spacing={2}>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="body2" color="text.secondary">
-                Calories
-              </Typography>
-              <Typography variant="h6">{nutrients.calories}</Typography>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="body2" color="text.secondary">
-                Protein
-              </Typography>
-              <Typography variant="h6">{nutrients.protein}g</Typography>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="body2" color="text.secondary">
-                Carbs
-              </Typography>
-              <Typography variant="h6">{nutrients.carbs}g</Typography>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="body2" color="text.secondary">
-                Fat
-              </Typography>
-              <Typography variant="h6">{nutrients.fat}g</Typography>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="body2" color="text.secondary">
-                Fiber
-              </Typography>
-              <Typography variant="h6">{nutrients.fiber}g</Typography>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="body2" color="text.secondary">
-                Sodium
-              </Typography>
-              <Typography variant="h6">{nutrients.sodium}mg</Typography>
-            </Grid>
-            <Grid item xs={6} sm={3}>
-              <Typography variant="body2" color="text.secondary">
-                Sugar
-              </Typography>
-              <Typography variant="h6">{nutrients.sugar}g</Typography>
-            </Grid>
+            {NUTRIENT_FIELDS.map((nutrient) => {
+              const value = toNumber(nutrients?.[nutrient.key]);
+
+              return (
+                <Grid item xs={6} sm={3} key={nutrient.key}>
+                  <Typography variant="body2" color="text.secondary">
+                    {nutrient.label}
+                  </Typography>
+                  <Typography variant="h6">
+                    {value}
+                    {nutrient.unit}
+                  </Typography>
+                </Grid>
+              );
+            })}
           </Grid>
         </CardContent>
       </Card>
