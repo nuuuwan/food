@@ -528,14 +528,16 @@ const FoodPage = () => {
                   Highlights
                 </Typography>
                 {positiveInsights.length === 0 ? (
-                  <Typography variant="body2" color="text.secondary">-</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    -
+                  </Typography>
                 ) : (
                   positiveInsights
                     .slice(0, MAX_INSIGHTS_PER_COLUMN)
                     .map((insight, index) => (
-                    <Typography key={index} variant="body2" sx={{ mb: 0.75 }}>
-                      • {insight.text}
-                    </Typography>
+                      <Typography key={index} variant="body2" sx={{ mb: 0.75 }}>
+                        • {insight.text}
+                      </Typography>
                     ))
                 )}
               </Box>
@@ -556,14 +558,16 @@ const FoodPage = () => {
                   Watch-outs
                 </Typography>
                 {warningInsights.length === 0 ? (
-                  <Typography variant="body2" color="text.secondary">-</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    -
+                  </Typography>
                 ) : (
                   warningInsights
                     .slice(0, MAX_INSIGHTS_PER_COLUMN)
                     .map((insight, index) => (
-                    <Typography key={index} variant="body2" sx={{ mb: 0.75 }}>
-                      • {insight.text}
-                    </Typography>
+                      <Typography key={index} variant="body2" sx={{ mb: 0.75 }}>
+                        • {insight.text}
+                      </Typography>
                     ))
                 )}
               </Box>

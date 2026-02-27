@@ -5,7 +5,6 @@ const {
   withCors,
 } = require("./_mockStore");
 const crypto = require("crypto");
-const { head, put } = require("@vercel/blob");
 
 class NonFoodImageError extends Error {
   constructor(message) {
@@ -46,11 +45,6 @@ const defaultNutrients = {
   alcohol: 0,
 };
 
-const blobPaths = {
-  image: (hash, extension) => `food-images/${hash}.${extension}`,
-  analysis: (hash) => `food-analyses/${hash}.json`,
-};
-
 const parseDataUrl = (imageData) => {
   if (!imageData || typeof imageData !== "string") {
     return null;
@@ -81,79 +75,6 @@ const hashImageInput = (imageData, parsedImage) => {
   }
 
   return hasher.digest("hex");
-};
-
-const isBlobNotFoundError = (error) => {
-  const message = error?.message || "";
-  return /not found|404/i.test(message);
-};
-
-const getCachedAnalysisByHash = async (imageHash) => {
-  if (!imageHash) {
-    return null;
-  }
-
-  try {
-    const metadata = await head(blobPaths.analysis(imageHash));
-    const response = await fetch(metadata.url);
-
-    if (!response.ok) {
-      return null;
-    }
-
-    return response.json();
-  } catch (error) {
-    if (isBlobNotFoundError(error)) {
-      return null;
-    }
-
-    console.error("Failed to load cached analysis from blob:", error);
-    return null;
-  }
-};
-
-const putBlobDeterministic = async (pathname, body, options) => {
-  try {
-    return await put(pathname, body, {
-      ...options,
-      addRandomSuffix: false,
-    });
-  } catch (error) {
-    if (isBlobNotFoundError(error)) {
-      throw error;
-    }
-
-    const message = error?.message || "";
-    if (/already exists|409|conflict/i.test(message)) {
-      return head(pathname);
-    }
-
-    throw error;
-  }
-};
-
-const persistAnalysisByHash = async ({ imageHash, analysis }) => {
-  if (!imageHash) {
-    return analysis;
-  }
-
-  const persistedAnalysis = {
-    ...analysis,
-    imageHash,
-    photos: Array.isArray(analysis.photos)
-      ? analysis.photos.map((photo, index) =>
-          index === 0 ? { ...photo, imageUri: "" } : photo,
-        )
-      : analysis.photos,
-  };
-
-  const analysisPath = blobPaths.analysis(imageHash);
-  await putBlobDeterministic(analysisPath, JSON.stringify(persistedAnalysis), {
-    access: "public",
-    contentType: "application/json",
-  });
-
-  return persistedAnalysis;
 };
 
 const extractJsonObject = (text) => {
@@ -308,20 +229,6 @@ module.exports = async function handler(req, res) {
   const parsedImage = parseDataUrl(imageData);
   const imageHash = hashImageInput(imageData, parsedImage);
   let analysis;
-  let blobStored = false;
-  let blobStoreError = null;
-
-  const cachedAnalysis = await getCachedAnalysisByHash(imageHash);
-  if (cachedAnalysis) {
-    saveFood(cachedAnalysis);
-    res.status(200).json({
-      ...cachedAnalysis,
-      cacheHit: true,
-      blobStored: true,
-      blobStoreError: null,
-    });
-    return;
-  }
 
   try {
     analysis = await requestGeminiAnalysis(imageData, parsedImage);
@@ -342,24 +249,11 @@ module.exports = async function handler(req, res) {
     ];
   }
 
-  try {
-    analysis = await persistAnalysisByHash({
-      imageHash,
-      analysis,
-    });
-    blobStored = true;
-  } catch (error) {
-    console.error("Failed to persist analysis/image in Vercel Blob:", error);
-    blobStoreError = error?.message || "Unknown blob persistence error";
-  }
-
   saveFood(analysis);
 
   res.status(200).json({
     ...analysis,
     imageHash,
     cacheHit: false,
-    blobStored,
-    blobStoreError,
   });
 };
