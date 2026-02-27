@@ -160,12 +160,12 @@ export const DataProvider = ({ children }) => {
 
       await statusQueue;
 
-      if (meta?.cacheSource === "localStorage") {
+      if (meta?.cacheHit && meta?.cacheSource === "localStorage") {
         enqueueStatus({
           title: "Cached local",
           detail: "Analysis skipped",
         });
-      } else if (meta?.cacheSource === "backend") {
+      } else if (meta?.cacheHit && meta?.cacheSource === "backend") {
         enqueueStatus({
           title: "Cached remote",
           detail: "Reusing previous result",

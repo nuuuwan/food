@@ -226,6 +226,23 @@ export class FoodAPIClient {
     return /401|403|network|cors/i.test(error?.message || "");
   }
 
+  _isCacheHit(value) {
+    if (typeof value === "boolean") {
+      return value;
+    }
+
+    if (typeof value === "number") {
+      return value === 1;
+    }
+
+    if (typeof value === "string") {
+      const normalized = value.trim().toLowerCase();
+      return normalized === "true" || normalized === "1";
+    }
+
+    return false;
+  }
+
   async _requestFromBase(path, options = {}, baseURL = this.baseURL) {
     const response = await fetch(this._buildUrl(path, baseURL), {
       headers: {
@@ -337,8 +354,8 @@ export class FoodAPIClient {
     return {
       analysis: FoodAnalysis.fromJSON(hydratedData),
       meta: {
-        cacheHit: Boolean(data?.cacheHit),
-        cacheSource: data?.cacheHit ? "backend" : "none",
+        cacheHit: this._isCacheHit(data?.cacheHit),
+        cacheSource: this._isCacheHit(data?.cacheHit) ? "backend" : "none",
         imageHash,
       },
     };
