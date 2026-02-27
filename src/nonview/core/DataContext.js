@@ -18,17 +18,17 @@ export const DataProvider = ({ children }) => {
   const [foodHistory, setFoodHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const isSeedMockFood = (food) => /^food-00\d+$/.test(food?.id || "");
+
   // Load initial data on mount
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         setIsLoading(true);
-        const [food, history] = await Promise.all([
-          foodAPIClient.getFoodById("food-001"),
-          foodAPIClient.getFoodHistory(),
-        ]);
-        setCurrentFood(food.toJSON());
-        setFoodHistory(history.map((item) => item.toJSON()));
+        const history = await foodAPIClient.getFoodHistory();
+        const realHistory = history.filter((item) => !isSeedMockFood(item));
+
+        setFoodHistory(realHistory.map((item) => item.toJSON()));
       } catch (error) {
         console.error("Failed to load initial data:", error);
       } finally {
