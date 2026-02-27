@@ -66,6 +66,30 @@ const NUTRIENT_GROUPS = [
   },
 ];
 
+const NUTRIENT_TONES = {
+  calories: "neutral",
+  carbs: "neutral",
+  fat: "neutral",
+  caffeine: "neutral",
+  protein: "good",
+  fiber: "good",
+  potassium: "good",
+  calcium: "good",
+  iron: "good",
+  magnesium: "good",
+  zinc: "good",
+  vitaminD: "good",
+  vitaminB12: "good",
+  folate: "good",
+  vitaminC: "good",
+  sugar: "bad",
+  addedSugar: "bad",
+  saturatedFat: "bad",
+  cholesterol: "bad",
+  sodium: "bad",
+  alcohol: "bad",
+};
+
 const FoodPage = () => {
   const { foodId } = useParams();
   const { currentFood, foodHistory, loadFoodById } = useData();
@@ -127,6 +151,26 @@ const FoodPage = () => {
     }
 
     return `${value}${unit}`;
+  };
+
+  const getNutrientTone = (key) => NUTRIENT_TONES[key] || "neutral";
+
+  const getNutrientColor = (key, value) => {
+    if (value === null || value === undefined) {
+      return "text.disabled";
+    }
+
+    const tone = getNutrientTone(key);
+
+    if (tone === "good") {
+      return "success.main";
+    }
+
+    if (tone === "bad") {
+      return "error.main";
+    }
+
+    return "text.secondary";
   };
 
   const insights = (() => {
@@ -604,6 +648,10 @@ const FoodPage = () => {
                   <Box>
                     {group.fields.map((nutrient, index) => {
                       const value = toNullableNumber(nutrients?.[nutrient.key]);
+                      const nutrientColor = getNutrientColor(
+                        nutrient.key,
+                        value,
+                      );
 
                       return (
                         <Box key={nutrient.key}>
@@ -616,10 +664,16 @@ const FoodPage = () => {
                               gap: 2,
                             }}
                           >
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography
+                              variant="body2"
+                              sx={{ color: nutrientColor }}
+                            >
                               {nutrient.label}
                             </Typography>
-                            <Typography variant="subtitle2">
+                            <Typography
+                              variant="subtitle2"
+                              sx={{ color: nutrientColor, fontWeight: 700 }}
+                            >
                               {formatNutrientValue(value, nutrient.unit)}
                             </Typography>
                           </Box>
