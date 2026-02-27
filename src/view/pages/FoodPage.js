@@ -152,12 +152,18 @@ const FoodPage = () => {
     return Number.isFinite(parsed) ? parsed : null;
   };
 
-  const formatNutrientValue = (value, unit = "") => {
+  const getNutrientDisplayParts = (value, unit = "") => {
     if (value === null || value === undefined) {
-      return "-";
+      return {
+        number: "-",
+        unit: "",
+      };
     }
 
-    return `${value}${unit}`;
+    return {
+      number: `${value}`,
+      unit,
+    };
   };
 
   const getNutrientTone = (key) => NUTRIENT_TONES[key] || "neutral";
@@ -178,6 +184,22 @@ const FoodPage = () => {
     }
 
     return "text.secondary";
+  };
+
+  const getLabelFontSize = (label) => {
+    if (!label) {
+      return { xs: "0.72rem", sm: "0.75rem" };
+    }
+
+    if (label.length >= 14) {
+      return { xs: "0.62rem", sm: "0.68rem" };
+    }
+
+    if (label.length >= 10) {
+      return { xs: "0.66rem", sm: "0.72rem" };
+    }
+
+    return { xs: "0.72rem", sm: "0.75rem" };
   };
 
   const formatDateTime = (ts) => {
@@ -345,67 +367,120 @@ const FoodPage = () => {
         </Typography>
 
         <Card sx={{ mb: 3 }}>
-          <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+          <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
             <Typography variant="h5" sx={{ mb: 1 }}>
               Nutrition Facts
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               Values per serving
             </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
+            <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }}>
               {NUTRIENT_GROUPS.map((group) => (
                 <Grid item xs={12} sm={6} lg={4} key={group.title}>
                   <Box
                     sx={{
                       p: { xs: 1.75, sm: 2.25 },
                       borderRadius: 2,
-                      backgroundColor: "background.paper",
+                      backgroundColor: "background.default",
                       border: "1px solid",
                       borderColor: "divider",
                       height: "100%",
                     }}
                   >
-                    <Typography variant="subtitle1" sx={{ mb: 1.25, fontWeight: 700 }}>
+                    <Typography variant="overline" sx={{ mb: 1.25, color: "text.secondary" }}>
                       {group.title}
                     </Typography>
-                    <Box>
-                      {group.fields.map((nutrient, index) => {
-                        const value = toNullableNumber(nutrients?.[nutrient.key]);
+                    <Grid container spacing={1.25}>
+                      {group.fields.map((nutrient) => {
+                        const value = toNullableNumber(
+                          nutrients?.[nutrient.key],
+                        );
                         const nutrientColor = getNutrientColor(
                           nutrient.key,
                           value,
                         );
+                        const nutrientDisplay = getNutrientDisplayParts(
+                          value,
+                          nutrient.unit,
+                        );
 
                         return (
-                          <Box key={nutrient.key}>
+                          <Grid
+                            item
+                            xs={6}
+                            key={nutrient.key}
+                            sx={{ display: "flex", minWidth: 0 }}
+                          >
                             <Box
                               sx={{
-                                py: { xs: 0.75, sm: 1 },
+                                width: "100%",
+                                aspectRatio: "1 / 1",
+                                p: 1.25,
+                                borderRadius: 1.5,
+                                backgroundColor: "background.paper",
+                                border: "1px solid",
+                                borderColor: "divider",
                                 display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "center",
                                 alignItems: "center",
-                                justifyContent: "space-between",
-                                gap: 2,
+                                textAlign: "center",
+                                gap: 0.5,
+                                overflow: "hidden",
                               }}
                             >
                               <Typography
-                                variant="body2"
-                                sx={{ color: nutrientColor, fontSize: { xs: "0.9rem", sm: "1rem" } }}
+                                variant="caption"
+                                sx={{
+                                  color: nutrientColor,
+                                  fontSize: getLabelFontSize(nutrient.label),
+                                  minHeight: "2.4em",
+                                  lineHeight: 1.2,
+                                  display: "-webkit-box",
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: "vertical",
+                                  overflow: "hidden",
+                                }}
                               >
                                 {nutrient.label}
                               </Typography>
                               <Typography
-                                variant="subtitle1"
-                                sx={{ color: nutrientColor, fontWeight: 700, whiteSpace: "nowrap" }}
+                                variant="subtitle2"
+                                sx={{
+                                  color: nutrientColor,
+                                  whiteSpace: "nowrap",
+                                  display: "flex",
+                                  alignItems: "baseline",
+                                  justifyContent: "center",
+                                }}
                               >
-                                {formatNutrientValue(value, nutrient.unit)}
+                                <Box
+                                  component="span"
+                                  sx={{
+                                    fontSize: { xs: "1.2rem", sm: "1.35rem" },
+                                    lineHeight: 1,
+                                  }}
+                                >
+                                  {nutrientDisplay.number}
+                                </Box>
+                                {nutrientDisplay.unit && (
+                                  <Box
+                                    component="span"
+                                    sx={{
+                                      ml: 0.25,
+                                      fontSize: "0.7rem",
+                                      color: "text.secondary",
+                                    }}
+                                  >
+                                    {nutrientDisplay.unit}
+                                  </Box>
+                                )}
                               </Typography>
                             </Box>
-                            {index < group.fields.length - 1 && <Divider />}
-                          </Box>
+                          </Grid>
                         );
                       })}
-                    </Box>
+                    </Grid>
                   </Box>
                 </Grid>
               ))}
