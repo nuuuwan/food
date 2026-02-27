@@ -27,8 +27,23 @@ export const DataProvider = ({ children }) => {
         setIsLoading(true);
         const history = await foodAPIClient.getFoodHistory();
         const realHistory = history.filter((item) => !isSeedMockFood(item));
+        const loadedHistory = realHistory.map((item) => item.toJSON());
 
-        setFoodHistory(realHistory.map((item) => item.toJSON()));
+        setFoodHistory((previousHistory) => {
+          const mergedById = new Map();
+
+          previousHistory.forEach((item) => {
+            mergedById.set(item.id, item);
+          });
+
+          loadedHistory.forEach((item) => {
+            mergedById.set(item.id, item);
+          });
+
+          return Array.from(mergedById.values()).sort(
+            (left, right) => (right.timestamp || 0) - (left.timestamp || 0),
+          );
+        });
       } catch (error) {
         console.error("Failed to load initial data:", error);
       } finally {
@@ -56,15 +71,10 @@ export const DataProvider = ({ children }) => {
   const completeAnalysis = (foodData) => {
     setCurrentFood(foodData);
     setAnalysisState("success");
-    // Add to history
-    setFoodHistory([
-      {
-        id: foodData.id,
-        timestamp: foodData.timestamp,
-        imageUri: foodData.imageUri,
-        productName: foodData.productName,
-      },
-      ...foodHistory,
+
+    setFoodHistory((previousHistory) => [
+      foodData,
+      ...previousHistory.filter((item) => item.id !== foodData.id),
     ]);
   };
 
