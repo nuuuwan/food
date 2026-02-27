@@ -7,7 +7,9 @@ The food data model consists of two main classes: `FoodAnalysis` and `Photo`. A 
 ## Class Structure
 
 ### `Photo`
+
 Represents a single photo with metadata.
+
 ```javascript
 {
   id: "photo-001",
@@ -17,7 +19,9 @@ Represents a single photo with metadata.
 ```
 
 ### `Ingredient`
+
 Represents a single ingredient with optional quantity.
+
 ```javascript
 {
   name: "Organic Peanuts",
@@ -26,7 +30,9 @@ Represents a single ingredient with optional quantity.
 ```
 
 ### `NutritionInfo`
+
 Contains all nutritional data.
+
 ```javascript
 {
   calories: 190,
@@ -40,7 +46,9 @@ Contains all nutritional data.
 ```
 
 ### `FoodAnalysis`
+
 The main class representing a food item with its complete analysis including multiple photos.
+
 ```javascript
 {
   id: "food-001",
@@ -57,8 +65,9 @@ The main class representing a food item with its complete analysis including mul
 ## Usage Examples
 
 ### Create a new food analysis with single photo
+
 ```javascript
-import { FoodAnalysis, Photo } from './nonview/core';
+import { FoodAnalysis, Photo } from "./nonview/core";
 
 const food = FoodAnalysis.fromJSON({
   id: "food-001",
@@ -72,29 +81,33 @@ const food = FoodAnalysis.fromJSON({
   },
   ingredients: [
     { name: "Organic Peanuts", quantity: "30g" },
-    { name: "Sea Salt", quantity: "2g" }
+    { name: "Sea Salt", quantity: "2g" },
   ],
   warnings: ["Contains Peanuts"],
-  photos: [{
-    id: "photo-001",
-    timestamp: Date.now(),
-    imageUri: "/food/peanut-butter.jpg"
-  }]
+  photos: [
+    {
+      id: "photo-001",
+      timestamp: Date.now(),
+      imageUri: "/food/peanut-butter.jpg",
+    },
+  ],
 });
 ```
 
 ### Add additional photos to existing food analysis
+
 ```javascript
 const newPhoto = new Photo({
   id: "photo-002",
   timestamp: Date.now(),
-  imageUri: "/food/peanut-butter-back.jpg"
+  imageUri: "/food/peanut-butter-back.jpg",
 });
 
 food.addPhoto(newPhoto);
 ```
 
 ### Access photos
+
 ```javascript
 // Get all photos
 const allPhotos = food.photos;
@@ -105,7 +118,9 @@ const primaryImageUri = food.imageUri; // convenience getter
 ```
 
 ### Backwards Compatibility
+
 The `FoodAnalysis` class maintains backwards compatibility with legacy formats:
+
 - The `imageUri` property returns the primary photo URI
 - The `nutrients` getter returns nutritionInfo
 - `fromJSON()` handles legacy data format with imageUri at top level
