@@ -10,7 +10,7 @@ This project now includes a Node-based Vercel mock backend under `api/`:
 - `GET /api/foods` - list food history
 - `GET /api/foods/:id` - fetch a food analysis
 - `POST /api/foods` - save a food analysis
-- `POST /api/analyze` - mock photo analysis
+- `POST /api/analyze` - Gemini-powered photo analysis (with mock fallback)
 
 `FoodAPIClient` calls these endpoints over HTTP.
 
@@ -24,3 +24,12 @@ Run frontend and backend in separate terminals:
 If your frontend is not served from the same origin as Vercel backend, set:
 
 - `REACT_APP_API_BASE_URL=http://localhost:3001` (or your deployed backend URL)
+
+### Gemini setup
+
+Set these environment variables for the backend:
+
+- `GEMINI_API_KEY=your_api_key`
+- `GEMINI_MODEL=gemini-1.5-flash` (optional)
+
+For local development with `vercel dev`, add them in `.env.local` at repo root.
