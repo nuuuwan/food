@@ -303,6 +303,11 @@ const FoodPage = () => {
     return items;
   })();
 
+  const positiveInsights = insights.filter(
+    (insight) => insight.type === "positive",
+  );
+  const warningInsights = insights.filter((insight) => insight.type === "warning");
+
   const formatDateTime = (ts) => {
     const date = new Date(ts);
     const dateStr = date.toLocaleDateString("en-US", {
@@ -460,23 +465,64 @@ const FoodPage = () => {
             Insights
           </Typography>
           <Divider sx={{ mb: 2 }} />
-          <Box>
-            {insights.map((insight, index) => (
-              <Typography
-                key={index}
-                variant="body2"
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <Box
                 sx={{
-                  mb: 1,
-                  color:
-                    insight.type === "positive"
-                      ? "success.main"
-                      : "warning.main",
+                  p: 2,
+                  borderRadius: 1,
+                  backgroundColor: "action.hover",
+                  height: "100%",
                 }}
               >
-                {insight.type === "positive" ? "✓" : "✗"} {insight.text}
-              </Typography>
-            ))}
-          </Box>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ mb: 1, color: "success.main" }}
+                >
+                  Highlights
+                </Typography>
+                {positiveInsights.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    No standout positives detected.
+                  </Typography>
+                ) : (
+                  positiveInsights.map((insight, index) => (
+                    <Typography key={index} variant="body2" sx={{ mb: 0.75 }}>
+                      • {insight.text}
+                    </Typography>
+                  ))
+                )}
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Box
+                sx={{
+                  p: 2,
+                  borderRadius: 1,
+                  backgroundColor: "action.hover",
+                  height: "100%",
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{ mb: 1, color: "warning.main" }}
+                >
+                  Watch-outs
+                </Typography>
+                {warningInsights.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    No major concerns detected.
+                  </Typography>
+                ) : (
+                  warningInsights.map((insight, index) => (
+                    <Typography key={index} variant="body2" sx={{ mb: 0.75 }}>
+                      • {insight.text}
+                    </Typography>
+                  ))
+                )}
+              </Box>
+            </Grid>
+          </Grid>
         </CardContent>
       </Card>
 
