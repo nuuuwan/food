@@ -706,7 +706,6 @@ const FoodPage = () => {
           </Box>
         </CardContent>
       </Card>
-
     </Container>
   );
 };
