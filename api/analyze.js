@@ -27,9 +27,23 @@ const defaultNutrients = {
   protein: 0,
   carbs: 0,
   fat: 0,
+  saturatedFat: 0,
+  cholesterol: 0,
   fiber: 0,
   sodium: 0,
+  potassium: 0,
+  calcium: 0,
+  iron: 0,
+  magnesium: 0,
+  zinc: 0,
+  vitaminD: 0,
+  vitaminB12: 0,
+  folate: 0,
+  vitaminC: 0,
   sugar: 0,
+  addedSugar: 0,
+  caffeine: 0,
+  alcohol: 0,
 };
 
 const blobPaths = {
@@ -205,7 +219,7 @@ const requestGeminiAnalysis = async (imageData, parsedImage) => {
   );
 
   const prompt =
-    "Determine whether the image contains a food item or food packaging/label. Return only JSON with keys: isFood (boolean), nonFoodReason (string), productName (string), servingSize (string), nutrients (object with calories, protein, carbs, fat, fiber, sodium, sugar as numbers), ingredients (array of {name, quantity}), warnings (array of strings). If isFood is false, fill nonFoodReason and leave other fields empty/default. If isFood is true, fill analysis fields with conservative estimates and set unknown numeric values to 0.";
+    "Determine whether the image contains a food item or food packaging/label. Return only JSON with keys: isFood (boolean), nonFoodReason (string), productName (string), servingSize (string), nutrients (object with calories, protein, carbs, fat, saturatedFat, cholesterol, fiber, sodium, potassium, calcium, iron, magnesium, zinc, vitaminD, vitaminB12, folate, vitaminC, sugar, addedSugar, caffeine, alcohol as numbers), ingredients (array of {name, quantity}), warnings (array of strings). If isFood is false, fill nonFoodReason and leave other fields empty/default. If isFood is true, fill analysis fields with conservative estimates and set unknown numeric values to 0.";
 
   const parts = [{ text: prompt }];
   if (parsedImage) {

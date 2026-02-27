@@ -100,7 +100,7 @@ const ProcessingPage = () => {
         <Typography variant="h4" gutterBottom>
           {analysisState === "success"
             ? "Analysis Ready"
-            : "Analyzing Label..."}
+            : "Analyzing Photo..."}
         </Typography>
         <Box sx={{ width: "100%", maxWidth: 420, mb: 3 }}>
           <LinearProgress
