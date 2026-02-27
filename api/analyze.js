@@ -154,7 +154,9 @@ const persistAnalysisByHash = async ({ imageHash, parsedImage, analysis }) => {
     imageHash,
     photos: Array.isArray(analysis.photos)
       ? analysis.photos.map((photo, index) =>
-          index === 0 ? { ...photo, imageUri: imageUrl || photo.imageUri } : photo,
+          index === 0
+            ? { ...photo, imageUri: imageUrl || photo.imageUri }
+            : photo,
         )
       : analysis.photos,
   };
