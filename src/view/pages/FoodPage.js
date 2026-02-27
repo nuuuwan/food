@@ -198,17 +198,17 @@ const FoodPage = () => {
   const renderPhotoCollage = () => {
     if (!photos || photos.length === 0) return null;
 
-    const collageHeight = 400; // Fixed height for all collages
+    const collageHeight = { xs: 280, sm: 380, md: 460 };
 
     if (photos.length === 1) {
       return (
         <Paper
           elevation={2}
           sx={{
-            mb: 3,
             overflow: "hidden",
             position: "relative",
             height: collageHeight,
+            borderRadius: 0,
           }}
         >
           <img
@@ -251,10 +251,10 @@ const FoodPage = () => {
       <Paper
         elevation={2}
         sx={{
-          mb: 3,
           overflow: "hidden",
           position: "relative",
           height: collageHeight,
+          borderRadius: 0,
         }}
       >
         <Grid container spacing={0.5} sx={{ height: "100%" }}>
@@ -326,98 +326,112 @@ const FoodPage = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Photo Collage with Overlaid Title */}
-      {renderPhotoCollage()}
+    <>
+      <Box
+        sx={{
+          width: "100vw",
+          ml: "calc(50% - 50vw)",
+          mr: "calc(50% - 50vw)",
+          mt: 0,
+          mb: 3,
+        }}
+      >
+        {renderPhotoCollage()}
+      </Box>
 
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        Serving Size: {servingSize || "-"}
-      </Typography>
+      <Container maxWidth="lg" sx={{ pb: 4 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Serving Size: {servingSize || "-"}
+        </Typography>
 
-      {/* Nutrition Summary */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h5" gutterBottom>
-            Nutrition Facts
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
-          <Grid container spacing={3}>
-            {NUTRIENT_GROUPS.map((group) => (
-              <Grid item xs={12} md={6} lg={4} key={group.title}>
-                <Box
-                  sx={{
-                    p: 2.5,
-                    borderRadius: 1,
-                    backgroundColor: "action.hover",
-                    height: "100%",
-                  }}
-                >
-                  <Typography variant="h6" sx={{ mb: 1.5 }}>
-                    {group.title}
-                  </Typography>
-                  <Box>
-                    {group.fields.map((nutrient, index) => {
-                      const value = toNullableNumber(nutrients?.[nutrient.key]);
-                      const nutrientColor = getNutrientColor(
-                        nutrient.key,
-                        value,
-                      );
+        <Card sx={{ mb: 3 }}>
+          <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+            <Typography variant="h5" sx={{ mb: 1 }}>
+              Nutrition Facts
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Values per serving
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
+              {NUTRIENT_GROUPS.map((group) => (
+                <Grid item xs={12} sm={6} lg={4} key={group.title}>
+                  <Box
+                    sx={{
+                      p: { xs: 1.75, sm: 2.25 },
+                      borderRadius: 2,
+                      backgroundColor: "background.paper",
+                      border: "1px solid",
+                      borderColor: "divider",
+                      height: "100%",
+                    }}
+                  >
+                    <Typography variant="subtitle1" sx={{ mb: 1.25, fontWeight: 700 }}>
+                      {group.title}
+                    </Typography>
+                    <Box>
+                      {group.fields.map((nutrient, index) => {
+                        const value = toNullableNumber(nutrients?.[nutrient.key]);
+                        const nutrientColor = getNutrientColor(
+                          nutrient.key,
+                          value,
+                        );
 
-                      return (
-                        <Box key={nutrient.key}>
-                          <Box
-                            sx={{
-                              py: 1,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              gap: 2,
-                            }}
-                          >
-                            <Typography
-                              variant="body1"
-                              sx={{ color: nutrientColor }}
+                        return (
+                          <Box key={nutrient.key}>
+                            <Box
+                              sx={{
+                                py: { xs: 0.75, sm: 1 },
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                gap: 2,
+                              }}
                             >
-                              {nutrient.label}
-                            </Typography>
-                            <Typography
-                              variant="h6"
-                              sx={{ color: nutrientColor, fontWeight: 700 }}
-                            >
-                              {formatNutrientValue(value, nutrient.unit)}
-                            </Typography>
+                              <Typography
+                                variant="body2"
+                                sx={{ color: nutrientColor, fontSize: { xs: "0.9rem", sm: "1rem" } }}
+                              >
+                                {nutrient.label}
+                              </Typography>
+                              <Typography
+                                variant="subtitle1"
+                                sx={{ color: nutrientColor, fontWeight: 700, whiteSpace: "nowrap" }}
+                              >
+                                {formatNutrientValue(value, nutrient.unit)}
+                              </Typography>
+                            </Box>
+                            {index < group.fields.length - 1 && <Divider />}
                           </Box>
-                          {index < group.fields.length - 1 && <Divider />}
-                        </Box>
-                      );
-                    })}
+                        );
+                      })}
+                    </Box>
                   </Box>
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        </CardContent>
-      </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </CardContent>
+        </Card>
 
-      {/* Ingredients */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h5" gutterBottom>
-            Ingredients
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
-          <Box component="ol" sx={{ pl: 2 }}>
-            {ingredients.map((ingredient, index) => (
-              <li key={index}>
-                <Typography variant="body1">
-                  {ingredient.name} - {ingredient.quantity}
-                </Typography>
-              </li>
-            ))}
-          </Box>
-        </CardContent>
-      </Card>
-    </Container>
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Typography variant="h5" gutterBottom>
+              Ingredients
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Box component="ol" sx={{ pl: 2 }}>
+              {ingredients.map((ingredient, index) => (
+                <li key={index}>
+                  <Typography variant="body1">
+                    {ingredient.name} - {ingredient.quantity}
+                  </Typography>
+                </li>
+              ))}
+            </Box>
+          </CardContent>
+        </Card>
+      </Container>
+    </>
   );
 };
 
