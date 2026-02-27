@@ -54,6 +54,104 @@ const FoodPage = () => {
     photos,
   } = displayFood;
 
+  const toNumber = (value) => {
+    if (typeof value === "number") {
+      return value;
+    }
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
+  const insights = (() => {
+    const calories = toNumber(nutrients?.calories);
+    const protein = toNumber(nutrients?.protein);
+    const fat = toNumber(nutrients?.fat);
+    const fiber = toNumber(nutrients?.fiber);
+    const sodium = toNumber(nutrients?.sodium);
+    const sugar = toNumber(nutrients?.sugar);
+
+    const items = [];
+
+    if (protein >= 15) {
+      items.push({
+        type: "positive",
+        text: `High protein (${protein}g per serving)`,
+      });
+    } else if (protein >= 8) {
+      items.push({
+        type: "positive",
+        text: `Good source of protein (${protein}g per serving)`,
+      });
+    } else {
+      items.push({
+        type: "warning",
+        text: `Low protein content (${protein}g per serving)`,
+      });
+    }
+
+    if (fiber >= 5) {
+      items.push({
+        type: "positive",
+        text: `High in fiber (${fiber}g)`,
+      });
+    } else if (fiber <= 2) {
+      items.push({
+        type: "warning",
+        text: `Low fiber (${fiber}g)`,
+      });
+    }
+
+    if (sodium <= 140) {
+      items.push({
+        type: "positive",
+        text: `Low in sodium (${sodium}mg)`,
+      });
+    } else if (sodium >= 400) {
+      items.push({
+        type: "warning",
+        text: `High sodium (${sodium}mg)`,
+      });
+    }
+
+    if (sugar <= 5) {
+      items.push({
+        type: "positive",
+        text: `Low sugar (${sugar}g)`,
+      });
+    } else if (sugar >= 15) {
+      items.push({
+        type: "warning",
+        text: `High sugar (${sugar}g)`,
+      });
+    }
+
+    if (fat >= 10 && sugar <= 6) {
+      items.push({
+        type: "positive",
+        text: `Contains healthy fats (${fat}g)`,
+      });
+    } else if (fat >= 20) {
+      items.push({
+        type: "warning",
+        text: `High in fat (${fat}g)`,
+      });
+    }
+
+    if (calories >= 450) {
+      items.push({
+        type: "warning",
+        text: `High in calories (${calories}) — watch portion size`,
+      });
+    } else if (calories <= 180) {
+      items.push({
+        type: "positive",
+        text: `Lower-calorie option (${calories} calories)`,
+      });
+    }
+
+    return items.slice(0, 4);
+  })();
+
   const formatDateTime = (ts) => {
     const date = new Date(ts);
     const dateStr = date.toLocaleDateString("en-US", {
@@ -212,18 +310,19 @@ const FoodPage = () => {
           </Typography>
           <Divider sx={{ mb: 2 }} />
           <Box>
-            <Typography variant="body2" sx={{ mb: 1, color: "success.main" }}>
-              ✓ Good source of protein (8g per serving)
-            </Typography>
-            <Typography variant="body2" sx={{ mb: 1, color: "success.main" }}>
-              ✓ Contains healthy fats
-            </Typography>
-            <Typography variant="body2" sx={{ mb: 1, color: "success.main" }}>
-              ✓ Low in sodium
-            </Typography>
-            <Typography variant="body2" sx={{ mb: 1, color: "warning.main" }}>
-              ✗ High in calories - watch portion size
-            </Typography>
+            {insights.map((insight, index) => (
+              <Typography
+                key={index}
+                variant="body2"
+                sx={{
+                  mb: 1,
+                  color:
+                    insight.type === "positive" ? "success.main" : "warning.main",
+                }}
+              >
+                {insight.type === "positive" ? "✓" : "✗"} {insight.text}
+              </Typography>
+            ))}
           </Box>
         </CardContent>
       </Card>
