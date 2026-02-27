@@ -81,7 +81,9 @@ export const DataProvider = ({ children }) => {
         const realHistory = history.filter((item) => !isSeedMockFood(item));
         const loadedHistory = realHistory.map((item) => item.toJSON());
 
-        setFoodHistory((previousHistory) => mergeById(previousHistory, loadedHistory));
+        setFoodHistory((previousHistory) =>
+          mergeById(previousHistory, loadedHistory),
+        );
       } catch (error) {
         console.error("Failed to load initial data:", error);
       } finally {
@@ -98,7 +100,10 @@ export const DataProvider = ({ children }) => {
     }
 
     try {
-      window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(foodHistory));
+      window.localStorage.setItem(
+        HISTORY_STORAGE_KEY,
+        JSON.stringify(foodHistory),
+      );
     } catch {
       // Ignore storage quota errors
     }

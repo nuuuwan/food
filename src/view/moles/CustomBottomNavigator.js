@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import HistoryIcon from "@mui/icons-material/History";
-import FastfoodIcon from "@mui/icons-material/Fastfood";
 
 const CustomBottomNavigator = () => {
   const navigate = useNavigate();
@@ -15,10 +14,10 @@ const CustomBottomNavigator = () => {
     const path = location.pathname;
     if (path === "/" || path === "/camera") {
       setValue(0);
-    } else if (path.startsWith("/item")) {
-      setValue(1);
     } else if (path === "/list") {
-      setValue(2);
+      setValue(1);
+    } else {
+      setValue(-1);
     }
   }, [location]);
 
@@ -29,9 +28,6 @@ const CustomBottomNavigator = () => {
         navigate("/camera");
         break;
       case 1:
-        navigate("/item/food-001");
-        break;
-      case 2:
         navigate("/list");
         break;
       default:
@@ -46,7 +42,6 @@ const CustomBottomNavigator = () => {
     >
       <BottomNavigation value={value} onChange={handleChange} showLabels>
         <BottomNavigationAction label="Camera" icon={<CameraAltIcon />} />
-        <BottomNavigationAction label="Food" icon={<FastfoodIcon />} />
         <BottomNavigationAction label="History" icon={<HistoryIcon />} />
       </BottomNavigation>
     </Paper>
