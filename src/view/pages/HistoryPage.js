@@ -132,10 +132,10 @@ const HistoryPage = () => {
             No scans yet
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            Start scanning food labels to build your history
+            Start scanning food images to build your history
           </Typography>
           <Button variant="contained" onClick={openUploader}>
-            Scan Your First Label
+            Scan Your First Food Image
           </Button>
         </Box>
       ) : (

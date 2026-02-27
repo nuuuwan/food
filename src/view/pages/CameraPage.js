@@ -104,10 +104,10 @@ const CameraPage = () => {
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Box sx={{ textAlign: "center" }}>
         <Typography variant="h3" gutterBottom>
-          Food Label Scanner
+          Food Image Scanner
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-          Scan nutrition labels to get instant AI-powered insights
+          Scan food images to get instant AI-powered insights
         </Typography>
 
         <Paper
@@ -126,7 +126,7 @@ const CameraPage = () => {
           {previewImage ? (
             <img
               src={previewImage}
-              alt="Selected food label"
+              alt="Selected food image"
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           ) : (
@@ -135,7 +135,7 @@ const CameraPage = () => {
                 sx={{ fontSize: 80, color: "text.secondary", mb: 2 }}
               />
               <Typography variant="h6" color="text.secondary">
-                Upload Label Photo
+                Upload Food Image
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Select an image to analyze
@@ -165,7 +165,7 @@ const CameraPage = () => {
           disabled={isUploading}
           sx={{ px: 6, py: 1.5 }}
         >
-          {isUploading ? "Uploading..." : "Scan Label"}
+          {isUploading ? "Uploading..." : "Scan Food Image"}
         </Button>
         <input
           ref={fileInputRef}
