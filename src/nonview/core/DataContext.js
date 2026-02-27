@@ -116,61 +116,75 @@ export const DataProvider = ({ children }) => {
   }, [foodHistory]);
 
   const startScan = async (imageData) => {
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
     setCurrentScan(imageData);
     setAnalysisState("scanning");
     setProcessingStatus({
-      title: "Image extracted",
-      detail: "Preparing upload payload...",
+      title: "Preparing image",
+      detail: "",
     });
 
     try {
       const stageToStatus = {
         "cache-check": {
-          title: "Checking local cache",
-          detail: "Looking for previous analysis in localStorage...",
+          title: "Checking cache",
+          detail: "",
         },
         uploading: {
-          title: "Uploading image",
-          detail: "Sending image for analysis...",
+          title: "Uploading",
+          detail: "",
         },
         computing: {
-          title: "Computing results",
-          detail: "Model is generating nutrition insights...",
+          title: "Analyzing",
+          detail: "",
         },
+      };
+
+      let statusQueue = Promise.resolve();
+      const enqueueStatus = (status, delayMs = 800) => {
+        statusQueue = statusQueue.then(async () => {
+          await sleep(delayMs);
+          setProcessingStatus(status);
+        });
       };
 
       const { analysis, meta } = await foodAPIClient.analyzeFoodPhotoWithMeta(
         imageData,
         (stage) => {
           if (stageToStatus[stage]) {
-            setProcessingStatus(stageToStatus[stage]);
+            enqueueStatus(stageToStatus[stage]);
           }
         },
       );
 
+      await statusQueue;
+
       if (meta?.cacheSource === "localStorage") {
-        setProcessingStatus({
-          title: "Found in localStorage",
-          detail: "Analysis already cached locally. Skipping model analysis.",
+        enqueueStatus({
+          title: "Cached local",
+          detail: "Analysis skipped",
         });
       } else if (meta?.cacheSource === "backend") {
-        setProcessingStatus({
-          title: "Using cached analysis",
-          detail: "Image was previously analyzed. Reusing stored results.",
+        enqueueStatus({
+          title: "Cached remote",
+          detail: "Reusing previous result",
         });
       } else {
-        setProcessingStatus({
-          title: "Analysis complete",
-          detail: "Results computed successfully.",
+        enqueueStatus({
+          title: "Done",
+          detail: "",
         });
       }
+
+      await statusQueue;
 
       completeAnalysis(analysis.toJSON());
     } catch (error) {
       console.error("Failed to analyze food photo:", error);
       setProcessingStatus({
-        title: "Analysis failed",
-        detail: "Unable to process this image.",
+        title: "Failed",
+        detail: "Could not process image",
       });
       setAnalysisState("error");
     }
