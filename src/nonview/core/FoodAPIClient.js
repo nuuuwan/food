@@ -26,7 +26,6 @@ export class FoodAPIClient {
     const mockData = {
       id: foodId,
       timestamp: Date.now(),
-      imageUri: "/food/peanut-butter.jpg",
       productName: "Organic Peanut Butter",
       servingSize: "32g (2 tbsp)",
       nutrients: {
@@ -43,6 +42,23 @@ export class FoodAPIClient {
         { name: "Sea Salt", quantity: "2g" },
       ],
       warnings: ["Contains Peanuts", "May contain tree nuts"],
+      photos: [
+        {
+          id: `${foodId}-photo-1`,
+          timestamp: Date.now(),
+          imageUri: "/food/peanut-butter.jpg",
+        },
+        {
+          id: `${foodId}-photo-2`,
+          timestamp: Date.now() - 1000,
+          imageUri: "/food/peanut-butter.jpg",
+        },
+        {
+          id: `${foodId}-photo-3`,
+          timestamp: Date.now() - 2000,
+          imageUri: "/food/peanut-butter.jpg",
+        },
+      ],
     };
 
     return FoodAnalysis.fromJSON(mockData);
@@ -65,7 +81,6 @@ export class FoodAPIClient {
       {
         id: "food-001",
         timestamp: Date.now() - 86400000, // 1 day ago
-        imageUri: "/food/peanut-butter.jpg",
         productName: "Organic Peanut Butter",
         servingSize: "32g (2 tbsp)",
         nutrients: {
@@ -82,11 +97,22 @@ export class FoodAPIClient {
           { name: "Sea Salt", quantity: "2g" },
         ],
         warnings: ["Contains Peanuts", "May contain tree nuts"],
+        photos: [
+          {
+            id: "food-001-photo-1",
+            timestamp: Date.now() - 86400000,
+            imageUri: "/food/peanut-butter.jpg",
+          },
+          {
+            id: "food-001-photo-2",
+            timestamp: Date.now() - 86401000,
+            imageUri: "/food/peanut-butter.jpg",
+          },
+        ],
       },
       {
         id: "food-002",
         timestamp: Date.now() - 172800000, // 2 days ago
-        imageUri: "/food/peanut-butter.jpg",
         productName: "Whole Grain Bread",
         servingSize: "50g (1 slice)",
         nutrients: {
@@ -104,11 +130,32 @@ export class FoodAPIClient {
           { name: "Yeast", quantity: "2g" },
         ],
         warnings: ["Contains Gluten"],
+        photos: [
+          {
+            id: "food-002-photo-1",
+            timestamp: Date.now() - 172800000,
+            imageUri: "/food/peanut-butter.jpg",
+          },
+          {
+            id: "food-002-photo-2",
+            timestamp: Date.now() - 172801000,
+            imageUri: "/food/peanut-butter.jpg",
+          },
+          {
+            id: "food-002-photo-3",
+            timestamp: Date.now() - 172802000,
+            imageUri: "/food/peanut-butter.jpg",
+          },
+          {
+            id: "food-002-photo-4",
+            timestamp: Date.now() - 172803000,
+            imageUri: "/food/peanut-butter.jpg",
+          },
+        ],
       },
       {
         id: "food-003",
         timestamp: Date.now() - 259200000, // 3 days ago
-        imageUri: "/food/peanut-butter.jpg",
         productName: "Greek Yogurt",
         servingSize: "170g (1 container)",
         nutrients: {
@@ -125,6 +172,13 @@ export class FoodAPIClient {
           { name: "Live Active Cultures", quantity: "5g" },
         ],
         warnings: ["Contains Milk"],
+        photos: [
+          {
+            id: "food-003-photo-1",
+            timestamp: Date.now() - 259200000,
+            imageUri: "/food/peanut-butter.jpg",
+          },
+        ],
       },
     ];
 
@@ -153,7 +207,6 @@ export class FoodAPIClient {
     const mockAnalysis = {
       id: `food-${Date.now()}`,
       timestamp: Date.now(),
-      imageUri: imageData || "/food/peanut-butter.jpg",
       productName: "Analyzed Food Product",
       servingSize: "100g",
       nutrients: {
@@ -170,6 +223,13 @@ export class FoodAPIClient {
         { name: "Secondary Ingredient", quantity: "20g" },
       ],
       warnings: [],
+      photos: [
+        {
+          id: `food-${Date.now()}-photo-1`,
+          timestamp: Date.now(),
+          imageUri: imageData || "/food/peanut-butter.jpg",
+        },
+      ],
     };
 
     return FoodAnalysis.fromJSON(mockAnalysis);
