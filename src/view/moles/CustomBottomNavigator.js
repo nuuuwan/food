@@ -15,9 +15,9 @@ const CustomBottomNavigator = () => {
     const path = location.pathname;
     if (path === "/" || path === "/camera") {
       setValue(0);
-    } else if (path.startsWith("/food")) {
+    } else if (path.startsWith("/item")) {
       setValue(1);
-    } else if (path === "/foods") {
+    } else if (path === "/list") {
       setValue(2);
     }
   }, [location]);
@@ -29,10 +29,10 @@ const CustomBottomNavigator = () => {
         navigate("/camera");
         break;
       case 1:
-        navigate("/food/food-001");
+        navigate("/item/food-001");
         break;
       case 2:
-        navigate("/foods");
+        navigate("/list");
         break;
       default:
         break;

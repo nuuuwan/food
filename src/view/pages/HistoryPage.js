@@ -137,7 +137,7 @@ const HistoryPage = () => {
           {foodHistory.map((food) => (
             <Grid item xs={12} sm={6} md={4} key={food.id}>
               <Card elevation={2}>
-                <CardActionArea onClick={() => navigate(`/food/${food.id}`)}>
+                <CardActionArea onClick={() => navigate(`/item/${food.id}`)}>
                   {renderCardImage(food)}
                   <CardContent>
                     <Typography variant="h6" gutterBottom noWrap>
