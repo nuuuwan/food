@@ -7,6 +7,13 @@ const {
 const crypto = require("crypto");
 const { head, put } = require("@vercel/blob");
 
+class NonFoodImageError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "NonFoodImageError";
+  }
+}
+
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
 const GEMINI_API_VERSIONS = ["v1beta", "v1"];
 const GEMINI_FALLBACK_MODELS = [
@@ -113,7 +120,7 @@ const putBlobDeterministic = async (pathname, body, options) => {
 
 const persistAnalysisByHash = async ({ imageHash, analysis }) => {
   if (!imageHash) {
-    return;
+    return analysis;
   }
 
   const persistedAnalysis = {
@@ -131,6 +138,8 @@ const persistAnalysisByHash = async ({ imageHash, analysis }) => {
     access: "public",
     contentType: "application/json",
   });
+
+  return persistedAnalysis;
 };
 
 const extractJsonObject = (text) => {
@@ -196,7 +205,7 @@ const requestGeminiAnalysis = async (imageData, parsedImage) => {
   );
 
   const prompt =
-    "Identify what food or packaged product is likely shown in this image. Return only JSON with keys: productName (string), servingSize (string), nutrients (object with calories, protein, carbs, fat, fiber, sodium, sugar as numbers), ingredients (array of {name, quantity}), warnings (array of strings). Use conservative estimates and set unknown numeric values to 0.";
+    "Determine whether the image contains a food item or food packaging/label. Return only JSON with keys: isFood (boolean), nonFoodReason (string), productName (string), servingSize (string), nutrients (object with calories, protein, carbs, fat, fiber, sodium, sugar as numbers), ingredients (array of {name, quantity}), warnings (array of strings). If isFood is false, fill nonFoodReason and leave other fields empty/default. If isFood is true, fill analysis fields with conservative estimates and set unknown numeric values to 0.";
 
   const parts = [{ text: prompt }];
   if (parsedImage) {
@@ -256,6 +265,12 @@ const requestGeminiAnalysis = async (imageData, parsedImage) => {
         continue;
       }
 
+      if (parsed?.isFood === false) {
+        throw new NonFoodImageError(
+          parsed?.nonFoodReason || "Image does not appear to contain food",
+        );
+      }
+
       return normalizeGeminiAnalysis(parsed, imageData);
     }
   }
@@ -297,6 +312,13 @@ module.exports = async function handler(req, res) {
   try {
     analysis = await requestGeminiAnalysis(imageData, parsedImage);
   } catch (error) {
+    if (error instanceof NonFoodImageError) {
+      res.status(422).json({
+        error: `Not a food image: ${error.message}`,
+      });
+      return;
+    }
+
     console.error("Gemini analysis failed, falling back to mock:", error);
     analysis = buildAnalysisFromImage(imageData);
     const reason = error?.message || "Unknown error";
