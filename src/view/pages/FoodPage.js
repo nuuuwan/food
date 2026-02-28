@@ -237,38 +237,6 @@ const FoodPage = () => {
     return (normalizedValue / dailyValue) * 100;
   };
 
-  const getWarningLevel = (percent) => {
-    if (
-      percent === null ||
-      percent === undefined ||
-      !Number.isFinite(percent)
-    ) {
-      return {
-        label: "Unknown",
-        color: "grey.500",
-      };
-    }
-
-    if (percent >= 20) {
-      return {
-        label: "High",
-        color: "error.main",
-      };
-    }
-
-    if (percent >= 10) {
-      return {
-        label: "Medium",
-        color: "warning.main",
-      };
-    }
-
-    return {
-      label: "Low",
-      color: "success.main",
-    };
-  };
-
   const protein = toNullableNumber(nutrients?.protein) || 0;
   const fat = toNullableNumber(nutrients?.fat) || 0;
   const carbs = toNullableNumber(nutrients?.carbs) || 0;
@@ -288,31 +256,27 @@ const FoodPage = () => {
       ? null
       : (sodiumMg / 1000) * 2.5;
 
-  const saltDvPercent = getDailyValuePercent(sodiumMg, "mg", 2300, "mg");
-  const fatDvPercent = getDailyValuePercent(fatGrams, "g", 78, "g");
-  const sugarDvPercent = getDailyValuePercent(sugarGrams, "g", 50, "g");
-
   const warningBadges = [
+    {
+      key: "sugar",
+      label: "Sugar",
+      value: sugarGrams,
+      unit: "g",
+      panelColor: theme.palette.error.main,
+    },
     {
       key: "salt",
       label: "Salt",
       value: saltGrams,
       unit: "g",
-      percent: saltDvPercent,
+      panelColor: theme.palette.warning.main,
     },
     {
       key: "fat",
       label: "Fat",
       value: fatGrams,
       unit: "g",
-      percent: fatDvPercent,
-    },
-    {
-      key: "sugar",
-      label: "Sugar",
-      value: sugarGrams,
-      unit: "g",
-      percent: sugarDvPercent,
+      panelColor: theme.palette.success.main,
     },
   ];
 
@@ -423,7 +387,6 @@ const FoodPage = () => {
       );
     }
 
-    // Multiple photos - create collage
     return (
       <Paper
         elevation={2}
@@ -529,6 +492,7 @@ const FoodPage = () => {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               Values per serving
             </Typography>
+
             <Box
               sx={{
                 mb: 3,
@@ -542,52 +506,70 @@ const FoodPage = () => {
               <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
                 Front-of-pack Warning
               </Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mb: 1.5 }}
-              >
-                Sri Lanka style salt, fat and sugar indicator (per serving)
-              </Typography>
-              <Grid container spacing={1}>
+              <Grid container spacing={1.5}>
                 {warningBadges.map((item) => {
-                  const level = getWarningLevel(item.percent);
+                  const valueLabel =
+                    item.value === null || item.value === undefined
+                      ? `...${item.unit}/100g`
+                      : `${formatNumber(item.value, 2)}${item.unit}/100g`;
 
                   return (
-                    <Grid item xs={12} sm={4} key={item.key}>
+                    <Grid
+                      item
+                      xs={12}
+                      sm={4}
+                      key={item.key}
+                      sx={{ display: "flex" }}
+                    >
                       <Box
                         sx={{
-                          p: 1.25,
-                          borderRadius: 1.5,
-                          border: "1px solid",
-                          borderColor: "divider",
-                          backgroundColor: "background.paper",
+                          width: "100%",
+                          maxWidth: 150,
+                          mx: { xs: "auto", sm: 0 },
+                          minHeight: 150,
+                          borderRadius: 2,
+                          border: "2px solid",
+                          borderColor: "common.black",
+                          backgroundColor: item.panelColor,
                           display: "flex",
-                          alignItems: "center",
-                          gap: 1,
+                          flexDirection: "column",
+                          justifyContent: "space-between",
+                          overflow: "hidden",
                         }}
                       >
                         <Box
                           sx={{
-                            minWidth: 64,
-                            px: 1,
-                            py: 0.5,
-                            borderRadius: 999,
+                            pt: 2,
+                            pb: 1,
+                            px: 1.5,
                             textAlign: "center",
-                            fontSize: "0.75rem",
-                            fontWeight: 700,
                             color: "common.white",
-                            backgroundColor: level.color,
                           }}
                         >
-                          {level.label}
-                        </Box>
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography
+                            variant="subtitle1"
+                            sx={{ fontWeight: 700, lineHeight: 1.1 }}
+                          >
                             {item.label}
                           </Typography>
-                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                            {formatNumber(item.value, 2)} {item.unit}
+                        </Box>
+                        <Box
+                          sx={{
+                            m: 1,
+                            px: 1,
+                            py: 1,
+                            borderRadius: 1.25,
+                            border: "2px solid",
+                            borderColor: "grey.400",
+                            backgroundColor: "common.white",
+                            textAlign: "center",
+                          }}
+                        >
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 700, color: "text.primary" }}
+                          >
+                            {valueLabel}
                           </Typography>
                         </Box>
                       </Box>
@@ -596,6 +578,7 @@ const FoodPage = () => {
                 })}
               </Grid>
             </Box>
+
             <Box
               sx={{
                 mb: 3,
