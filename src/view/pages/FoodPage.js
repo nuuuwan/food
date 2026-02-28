@@ -8,7 +8,6 @@ import {
   Container,
   Paper,
   Grid,
-  Divider,
   Card,
   CardContent,
   useTheme,
@@ -789,6 +788,24 @@ const FoodPage = () => {
       </Box>
 
       <Container maxWidth="lg" sx={{ pb: 4 }}>
+        <Box sx={{ mb: 2.5 }}>
+          <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.4 }}>
+            Ingredients
+          </Typography>
+          <Box component="ul" sx={{ pl: 2.25, m: 0 }}>
+            {(ingredients || []).map((ingredient, index) => (
+              <Box component="li" key={index} sx={{ mb: 0.15 }}>
+                <Typography variant="body2" sx={{ fontStyle: "italic" }}>
+                  {ingredient.name}
+                  {!isUnknownQuantity(ingredient.quantity)
+                    ? ` — ${ingredient.quantity}`
+                    : ""}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Serving Size: {servingSize || "-"}
           {effectiveServingSizeGrams !== null
@@ -831,7 +848,7 @@ const FoodPage = () => {
                       <Box
                         sx={{
                           width: "100%",
-                          minHeight: 136,
+                          minHeight: 109,
                           borderRadius: 2,
                           border: "2px solid",
                           borderColor: "common.black",
@@ -843,9 +860,9 @@ const FoodPage = () => {
                       >
                         <Box
                           sx={{
-                            pt: 1.1,
-                            pb: 0.5,
-                            px: 1,
+                            pt: 0.9,
+                            pb: 0.4,
+                            px: 0.8,
                             flex: 1,
                             textAlign: "center",
                             color: "common.white",
@@ -885,10 +902,10 @@ const FoodPage = () => {
                         </Box>
                         <Box
                           sx={{
-                            mx: 0.8,
-                            mb: 0.8,
-                            px: 1,
-                            py: 0.65,
+                            mx: 0.65,
+                            mb: 0.65,
+                            px: 0.8,
+                            py: 0.5,
                             borderRadius: 1,
                             borderTop: "1px solid",
                             border: "1px solid",
@@ -1508,30 +1525,6 @@ const FoodPage = () => {
           </CardContent>
         </Card>
 
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Typography variant="h5" gutterBottom>
-              Ingredients
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Box component="ol" sx={{ pl: 2 }}>
-              {(ingredients || []).map((ingredient, index) => (
-                <li key={index}>
-                  <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
-                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                      {ingredient.name}
-                    </Typography>
-                    {!isUnknownQuantity(ingredient.quantity) && (
-                      <Typography variant="body2" color="text.secondary">
-                        {ingredient.quantity}
-                      </Typography>
-                    )}
-                  </Box>
-                </li>
-              ))}
-            </Box>
-          </CardContent>
-        </Card>
       </Container>
     </>
   );
