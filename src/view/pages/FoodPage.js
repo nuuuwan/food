@@ -278,19 +278,27 @@ const FoodPage = () => {
       ? null
       : (sodiumMg / 1000) * 2.5;
   const servingSizeGrams = getServingSizeGrams(servingSize);
+  const nutrientMassLowerBound = [protein, fat, carbs].reduce(
+    (total, value) => total + (Number.isFinite(value) ? value : 0),
+    0,
+  );
   const effectiveServingSizeGrams =
-    servingSizeGrams && servingSizeGrams > 0 ? servingSizeGrams : 100;
+    servingSizeGrams && servingSizeGrams > 0
+      ? Math.max(servingSizeGrams, nutrientMassLowerBound)
+      : nutrientMassLowerBound > 0
+        ? nutrientMassLowerBound
+        : null;
 
   const toPer100g = (valueInGrams) => {
     if (valueInGrams === null || valueInGrams === undefined) {
       return null;
     }
 
-    if (!servingSizeGrams || servingSizeGrams <= 0) {
+    if (!effectiveServingSizeGrams || effectiveServingSizeGrams <= 0) {
       return valueInGrams;
     }
 
-    return (valueInGrams / servingSizeGrams) * 100;
+    return (valueInGrams / effectiveServingSizeGrams) * 100;
   };
 
   const sugarPer100g = toPer100g(sugarGrams);
@@ -636,8 +644,10 @@ const FoodPage = () => {
 
       <Container maxWidth="lg" sx={{ pb: 4 }}>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Serving Size: {servingSize || "-"} •{" "}
-          {`${formatNumber(effectiveServingSizeGrams, 1)} g`}
+          Serving Size: {servingSize || "-"}
+          {effectiveServingSizeGrams !== null
+            ? ` • ${formatNumber(effectiveServingSizeGrams, 1)} g`
+            : ""}
         </Typography>
 
         <Card sx={{ mb: 3 }}>
@@ -675,8 +685,6 @@ const FoodPage = () => {
                       <Box
                         sx={{
                           width: "100%",
-                          maxWidth: 150,
-                          mx: { xs: "auto", sm: 0 },
                           minHeight: 128,
                           borderRadius: 2,
                           border: "2px solid",
@@ -689,8 +697,8 @@ const FoodPage = () => {
                       >
                         <Box
                           sx={{
-                            pt: 1.5,
-                            pb: 0.5,
+                            pt: 1,
+                            pb: 0.25,
                             px: 1.5,
                             textAlign: "center",
                             color: "common.white",
@@ -698,19 +706,19 @@ const FoodPage = () => {
                         >
                           <Typography
                             variant="body2"
-                            sx={{ display: "block", opacity: 0.95 }}
+                            sx={{ display: "block", opacity: 0.95, lineHeight: 1.02 }}
                           >
                             {item.sinhalaLabel}
                           </Typography>
                           <Typography
                             variant="caption"
-                            sx={{ display: "block", opacity: 0.95 }}
+                            sx={{ display: "block", opacity: 0.95, lineHeight: 1.02 }}
                           >
                             {item.tamilLabel}
                           </Typography>
                           <Typography
                             variant="subtitle1"
-                            sx={{ fontWeight: 700, lineHeight: 1.1 }}
+                            sx={{ fontWeight: 700, lineHeight: 1.02 }}
                           >
                             {item.label}
                           </Typography>
@@ -745,10 +753,18 @@ const FoodPage = () => {
                 color="text.secondary"
                 sx={{ display: "block", mt: 1.25 }}
               >
-                This traffic-light system shows sugar, salt, and fat per 100g
-                (green = low, amber = medium, red = high), aligned to Sri
+                🇱🇰 This traffic-light system shows sugar, salt, and fat per
+                100g (green = low, amber = medium, red = high), aligned to Sri
                 Lanka Food (Color Coding for Sugar, Salt and Fat) Regulations,
                 2019 under Food Act No. 26 of 1980.
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", mt: 0.5 }}
+              >
+                🇸🇬 Singapore: Nutri-Grade labels for beverages (A–D). 🇬🇧 UK:
+                front-of-pack traffic-light nutrition labels per 100g.
               </Typography>
             </Box>
 
@@ -897,10 +913,6 @@ const FoodPage = () => {
                           p: 1.25,
                           borderRadius: 1.5,
                           backgroundColor: "background.paper",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "baseline",
-                          gap: 1,
                         }}
                       >
                         <Box>
@@ -913,7 +925,7 @@ const FoodPage = () => {
                         </Box>
                         <Typography
                           variant="body2"
-                          sx={{ fontWeight: 600, color: "text.secondary" }}
+                          sx={{ fontWeight: 600, color: "text.secondary", mt: 0.5 }}
                         >
                           {percent === null
                             ? "-"
@@ -959,10 +971,6 @@ const FoodPage = () => {
                             p: 1.25,
                             borderRadius: 1.5,
                             backgroundColor: "background.paper",
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "baseline",
-                            gap: 1,
                           }}
                         >
                           <Box>
@@ -986,7 +994,7 @@ const FoodPage = () => {
                           </Box>
                           <Typography
                             variant="body2"
-                            sx={{ fontWeight: 600, color: "text.secondary" }}
+                            sx={{ fontWeight: 600, color: "text.secondary", mt: 0.5 }}
                           >
                             {percent === null
                               ? "-"
@@ -1032,10 +1040,6 @@ const FoodPage = () => {
                             p: 1.25,
                             borderRadius: 1.5,
                             backgroundColor: "background.paper",
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "baseline",
-                            gap: 1,
                           }}
                         >
                           <Box>
@@ -1057,7 +1061,7 @@ const FoodPage = () => {
                           </Box>
                           <Typography
                             variant="body2"
-                            sx={{ fontWeight: 600, color: "text.secondary" }}
+                            sx={{ fontWeight: 600, color: "text.secondary", mt: 0.5 }}
                           >
                             {percent === null
                               ? "-"
