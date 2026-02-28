@@ -7,59 +7,12 @@ import {
   Container,
   CircularProgress,
   LinearProgress,
-  Paper,
 } from "@mui/material";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
-import SkipNextIcon from "@mui/icons-material/SkipNext";
-
-const PROCESS_STEPS = [
-  { key: "Preparing image", label: "Image prepared" },
-  { key: "Checking cache", label: "Cache checked" },
-  { key: "Uploading", label: "Image uploaded" },
-  { key: "Analyzing", label: "Analysis complete" },
-  { key: "Reviewing result", label: "Interim result ready" },
-  { key: "Done", label: "Results ready" },
-  { key: "Cached local", label: "Results ready" },
-  { key: "Cached remote", label: "Results ready" },
-];
-
-const getCurrentStepIndex = (title) => {
-  const normalizedTitle = title || "";
-
-  if (
-    normalizedTitle === "Cached local" ||
-    normalizedTitle === "Cached remote"
-  ) {
-    return 5;
-  }
-
-  if (normalizedTitle === "Done") {
-    return 5;
-  }
-
-  if (normalizedTitle === "Reviewing result") {
-    return 4;
-  }
-
-  if (normalizedTitle === "Analyzing") {
-    return 3;
-  }
-
-  if (normalizedTitle === "Uploading") {
-    return 2;
-  }
-
-  if (normalizedTitle === "Checking cache") {
-    return 1;
-  }
-
-  if (normalizedTitle === "Preparing image") {
-    return 0;
-  }
-
-  return 0;
-};
+import ProcessingStepList, {
+  getCurrentStepIndex,
+} from "../moles/ProcessingStepList";
+import ProcessingPreviewCard from "../atoms/ProcessingPreviewCard";
+import InterimAnalysisCard from "../atoms/InterimAnalysisCard";
 
 const ProcessingPage = () => {
   const navigate = useNavigate();
@@ -126,107 +79,15 @@ const ProcessingPage = () => {
             sx={{ height: 8, borderRadius: 999 }}
           />
         </Box>
-        <Box sx={{ width: "100%", maxWidth: 420, textAlign: "left", mb: 2 }}>
-          {PROCESS_STEPS.slice(0, totalProgressSteps).map((step, index) => {
-            const isComplete =
-              currentStepIndex > index || analysisState === "success";
-            const isActive =
-              currentStepIndex === index && analysisState !== "success";
-            const isSkipped =
-              isLocalCacheHit &&
-              (step.label === "Image uploaded" ||
-                step.label === "Analysis complete");
-
-            return (
-              <Box
-                key={step.label}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  mb: 0.5,
-                  color: isSkipped
-                    ? "warning.main"
-                    : isComplete
-                      ? "success.main"
-                      : isActive
-                        ? "text.primary"
-                        : "text.secondary",
-                }}
-              >
-                {isSkipped ? (
-                  <SkipNextIcon fontSize="small" />
-                ) : isComplete ? (
-                  <CheckCircleIcon fontSize="small" />
-                ) : (
-                  <RadioButtonUncheckedIcon fontSize="small" />
-                )}
-                <Typography variant="body2">{step.label}</Typography>
-              </Box>
-            );
-          })}
-        </Box>
-        {(processingSnapshot?.previewImage || currentScan) && (
-          <Paper
-            elevation={0}
-            sx={{
-              width: "100%",
-              maxWidth: 420,
-              p: 1,
-              mb: 2,
-              bgcolor: "action.hover",
-            }}
-          >
-            <Box
-              component="img"
-              src={processingSnapshot?.previewImage || currentScan}
-              alt="Processing preview"
-              sx={{
-                width: "100%",
-                height: 180,
-                objectFit: "cover",
-                borderRadius: 1,
-              }}
-            />
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ display: "block", mt: 0.75 }}
-            >
-              Optimized preview used for upload and analysis
-            </Typography>
-          </Paper>
-        )}
-        {analysisPreview && (
-          <Paper
-            elevation={0}
-            sx={{
-              width: "100%",
-              maxWidth: 420,
-              p: 1.25,
-              mb: 2,
-              bgcolor: "action.hover",
-              textAlign: "left",
-            }}
-          >
-            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-              Interim analysis
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {analysisPreview.productName}
-            </Typography>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ display: "block", mt: 0.5 }}
-            >
-              Calories: {analysisPreview.calories ?? "-"} kcal
-              {analysisPreview.servingSize
-                ? ` • Serving: ${analysisPreview.servingSize}`
-                : ""}
-            </Typography>
-          </Paper>
-        )}
+        <ProcessingStepList
+          currentStepIndex={currentStepIndex}
+          analysisState={analysisState}
+          isLocalCacheHit={isLocalCacheHit}
+        />
+        <ProcessingPreviewCard
+          imageUri={processingSnapshot?.previewImage || currentScan}
+        />
+        <InterimAnalysisCard preview={analysisPreview} />
         <Typography variant="body1" color="text.secondary">
           {statusMessage || "Working..."}
         </Typography>

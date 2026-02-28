@@ -62,79 +62,14 @@ The main class representing a food item with its complete analysis including mul
 }
 ```
 
-## Usage Examples
+## Examples
 
-### Create a new food analysis with single photo
+See [README.examples.md](./README.examples.md) for complete usage examples.
 
-```javascript
-import { FoodAnalysis, Photo } from "./nonview/core";
-
-const food = FoodAnalysis.fromJSON({
-  id: "food-001",
-  productName: "Organic Peanut Butter",
-  timestamp: Date.now(),
-  servingSize: "32g (2 tbsp)",
-  nutrients: {
-    calories: 190,
-    protein: 8,
-    // ...
-  },
-  ingredients: [
-    { name: "Organic Peanuts", quantity: "30g" },
-    { name: "Sea Salt", quantity: "2g" },
-  ],
-  warnings: ["Contains Peanuts"],
-  photos: [
-    {
-      id: "photo-001",
-      timestamp: Date.now(),
-      imageUri: "/food/peanut-butter.jpg",
-    },
-  ],
-});
-```
-
-### Add additional photos to existing food analysis
-
-```javascript
-const newPhoto = new Photo({
-  id: "photo-002",
-  timestamp: Date.now(),
-  imageUri: "/food/peanut-butter-back.jpg",
-});
-
-food.addPhoto(newPhoto);
-```
-
-### Access photos
-
-```javascript
-// Get all photos
-const allPhotos = food.photos;
-
-// Get primary (first) photo
-const primaryPhoto = food.primaryPhoto;
-const primaryImageUri = food.imageUri; // convenience getter
-```
-
-### Backwards Compatibility
+## Backwards Compatibility
 
 The `FoodAnalysis` class maintains backwards compatibility with legacy formats:
 
 - The `imageUri` property returns the primary photo URI
 - The `nutrients` getter returns nutritionInfo
 - `fromJSON()` handles legacy data format with imageUri at top level
-
-```javascript
-// Legacy format still works
-const food = FoodAnalysis.fromJSON({
-  id: "food-001",
-  productName: "Peanut Butter",
-  imageUri: "/food/pb.jpg",
-  nutrients: { calories: 190, ... },
-  ingredients: [...]
-});
-
-// Automatically creates a photo from the imageUri
-console.log(food.photos.length); // 1
-```
