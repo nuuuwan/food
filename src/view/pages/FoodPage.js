@@ -358,8 +358,11 @@ const FoodPage = () => {
       label: "Salt",
       sinhalaLabel: "ලුණු",
       tamilLabel: "உப்பு",
-      value: saltPer100g,
-      unit: "g",
+      value:
+        saltPer100g === null || saltPer100g === undefined
+          ? null
+          : saltPer100g * 1000,
+      unit: "mg",
       panelColor: getTrafficLightPanelColor("salt", saltPer100g),
     },
     {
@@ -771,9 +774,90 @@ const FoodPage = () => {
                 color="text.secondary"
                 sx={{ display: "block", mt: 0.5 }}
               >
-                🇸🇬 Singapore: Nutri-Grade labels for beverages (A–D). 🇬🇧 UK:
-                front-of-pack traffic-light nutrition labels per 100g.
+                Global examples:
               </Typography>
+              <Grid container spacing={1} sx={{ mt: 0.5 }}>
+                <Grid item xs={12} sm={6}>
+                  <Box
+                    sx={{
+                      borderRadius: 1.5,
+                      backgroundColor: "action.hover",
+                      p: 1,
+                    }}
+                  >
+                    <Typography variant="caption" color="text.secondary">
+                      🇸🇬 Singapore
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      Nutri-Grade (A–D)
+                    </Typography>
+                    <Box sx={{ display: "flex", gap: 0.5, mt: 0.5 }}>
+                      {[
+                        ["A", "#1b5e20"],
+                        ["B", "#2e7d32"],
+                        ["C", "#f9a825"],
+                        ["D", "#c62828"],
+                      ].map(([grade, color]) => (
+                        <Box
+                          key={grade}
+                          sx={{
+                            width: 22,
+                            height: 22,
+                            borderRadius: 0.75,
+                            backgroundColor: color,
+                            color: "common.white",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "0.72rem",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {grade}
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Box
+                    sx={{
+                      borderRadius: 1.5,
+                      backgroundColor: "action.hover",
+                      p: 1,
+                    }}
+                  >
+                    <Typography variant="caption" color="text.secondary">
+                      🇬🇧 United Kingdom
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      Front-of-pack traffic light
+                    </Typography>
+                    <Box sx={{ display: "flex", gap: 0.5, mt: 0.5 }}>
+                      {[
+                        ["Low", "#2e7d32"],
+                        ["Med", "#f9a825"],
+                        ["High", "#c62828"],
+                      ].map(([level, color]) => (
+                        <Box
+                          key={level}
+                          sx={{
+                            px: 0.6,
+                            py: 0.2,
+                            borderRadius: 0.75,
+                            backgroundColor: color,
+                            color: "common.white",
+                            fontSize: "0.68rem",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {level}
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                </Grid>
+              </Grid>
             </Box>
 
             <Box
@@ -920,7 +1004,7 @@ const FoodPage = () => {
                         sx={{
                           p: 1.25,
                           borderRadius: 1.5,
-                          backgroundColor: "background.paper",
+                          backgroundColor: "action.hover",
                         }}
                       >
                         <Box>
@@ -982,7 +1066,7 @@ const FoodPage = () => {
                           sx={{
                             p: 1.25,
                             borderRadius: 1.5,
-                            backgroundColor: "background.paper",
+                            backgroundColor: "action.hover",
                           }}
                         >
                           <Box>
@@ -1055,7 +1139,7 @@ const FoodPage = () => {
                           sx={{
                             p: 1.25,
                             borderRadius: 1.5,
-                            backgroundColor: "background.paper",
+                            backgroundColor: "action.hover",
                           }}
                         >
                           <Box>
