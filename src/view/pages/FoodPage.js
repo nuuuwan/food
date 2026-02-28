@@ -13,6 +13,7 @@ import {
   CardContent,
   useTheme,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 
 const DAILY_VALUE_FIELDS = [
   {
@@ -380,57 +381,55 @@ const FoodPage = () => {
       ? null
       : Math.max(0, Math.round(sugarPer100g));
 
-  const getUkTrafficLevel = (nutrientKey, valuePer100g) => {
-    if (valuePer100g === null || valuePer100g === undefined) {
-      return { label: "-", color: theme.palette.grey[500] };
+  const inferNOVAClass = () => {
+    const normalizedIngredients = (ingredients || [])
+      .map((ingredient) => String(ingredient?.name || "").toLowerCase())
+      .filter(Boolean);
+    const ingredientCount = normalizedIngredients.length;
+
+    if (ingredientCount === 0) {
+      return { code: "-", label: "Unknown" };
     }
 
-    if (nutrientKey === "sugar") {
-      if (valuePer100g <= 5) {
-        return { label: "Low", color: "#2e7d32" };
-      }
-      if (valuePer100g > 22.5) {
-        return { label: "High", color: "#c62828" };
-      }
-      return { label: "Med", color: "#f9a825" };
+    const additiveKeywords = [
+      "flavour",
+      "flavor",
+      "emulsifier",
+      "stabilizer",
+      "stabiliser",
+      "preservative",
+      "sweetener",
+      "colour",
+      "color",
+      "maltodextrin",
+      "hydrogenated",
+      "modified starch",
+      "high fructose",
+    ];
+
+    const hasAdditiveSignals = normalizedIngredients.some((name) =>
+      additiveKeywords.some((keyword) => name.includes(keyword)),
+    );
+
+    const hasAddedSugar = (toNullableNumber(nutrients?.addedSugar) || 0) > 0;
+    const hasManyIngredients = ingredientCount >= 5;
+
+    if (hasAdditiveSignals || (hasManyIngredients && hasAddedSugar)) {
+      return { code: "NOVA 4", label: "Ultra-processed food" };
     }
 
-    if (nutrientKey === "fat") {
-      if (valuePer100g <= 3) {
-        return { label: "Low", color: "#2e7d32" };
-      }
-      if (valuePer100g > 17.5) {
-        return { label: "High", color: "#c62828" };
-      }
-      return { label: "Med", color: "#f9a825" };
+    if (hasManyIngredients || hasAddedSugar) {
+      return { code: "NOVA 3", label: "Processed food" };
     }
 
-    if (nutrientKey === "salt") {
-      if (valuePer100g <= 0.3) {
-        return { label: "Low", color: "#2e7d32" };
-      }
-      if (valuePer100g > 1.5) {
-        return { label: "High", color: "#c62828" };
-      }
-      return { label: "Med", color: "#f9a825" };
+    if (ingredientCount >= 2) {
+      return { code: "NOVA 2", label: "Processed culinary ingredient" };
     }
 
-    return { label: "-", color: theme.palette.grey[500] };
+    return { code: "NOVA 1", label: "Unprocessed or minimally processed" };
   };
 
-  const ukTrafficLevels = [
-    {
-      key: "sugar",
-      label: "Sugar",
-      level: getUkTrafficLevel("sugar", sugarPer100g),
-    },
-    {
-      key: "salt",
-      label: "Salt",
-      level: getUkTrafficLevel("salt", saltPer100g),
-    },
-    { key: "fat", label: "Fat", level: getUkTrafficLevel("fat", fatPer100g) },
-  ];
+  const novaClass = inferNOVAClass();
 
   const getTrafficLightPanelColor = (key, valuePer100g) => {
     if (valuePer100g === null || valuePer100g === undefined) {
@@ -984,18 +983,13 @@ const FoodPage = () => {
                     }}
                   >
                     <Typography variant="caption" color="text.secondary">
-                      🇬🇧 United Kingdom
+                      🌍 NOVA System
                     </Typography>
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      Front-of-pack traffic light
+                      Processing classification
                     </Typography>
                     <Typography variant="body2" sx={{ mt: 0.5 }}>
-                      {ukTrafficLevels
-                        .map(
-                          (itemLevel) =>
-                            `${itemLevel.label}: ${itemLevel.level.label}`,
-                        )
-                        .join(" • ")}
+                      {novaClass.code} • {novaClass.label}
                     </Typography>
                   </Box>
                 </Grid>
@@ -1083,7 +1077,7 @@ const FoodPage = () => {
                         sx={{
                           p: 1,
                           borderRadius: 1.5,
-                          backgroundColor: "background.paper",
+                          backgroundColor: alpha(segment.color, 0.1),
                         }}
                       >
                         <Typography
