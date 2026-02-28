@@ -44,7 +44,7 @@ const DAILY_VALUE_FIELDS = [
 const VITAMIN_DV_FIELDS = [
   {
     key: "vitaminD",
-    label: "Vitamin D",
+    label: "D",
     alternativeName: "Calciferol",
     sourceUnit: "mcg",
     dailyValue: 20,
@@ -52,7 +52,7 @@ const VITAMIN_DV_FIELDS = [
   },
   {
     key: "vitaminB12",
-    label: "Vitamin B12",
+    label: "B12",
     alternativeName: "Cobalamin",
     sourceUnit: "mcg",
     dailyValue: 2.4,
@@ -60,7 +60,7 @@ const VITAMIN_DV_FIELDS = [
   },
   {
     key: "folate",
-    label: "Vitamin B9",
+    label: "B9",
     alternativeName: "Folate",
     sourceUnit: "mcg",
     dailyValue: 400,
@@ -68,7 +68,7 @@ const VITAMIN_DV_FIELDS = [
   },
   {
     key: "vitaminC",
-    label: "Vitamin C",
+    label: "C",
     alternativeName: "Ascorbic Acid",
     sourceUnit: "mg",
     dailyValue: 90,
@@ -329,19 +329,19 @@ const FoodPage = () => {
       key: "protein",
       label: "Protein",
       calories: proteinCalories,
-      color: theme.palette.success.main,
+      color: "#1e3a8a",
     },
     {
       key: "fat",
       label: "Fat",
       calories: fatCalories,
-      color: theme.palette.warning.main,
+      color: "#6d28d9",
     },
     {
       key: "carbs",
       label: "Carbs",
       calories: carbsCalories,
-      color: theme.palette.error.main,
+      color: "#be185d",
     },
   ];
 
@@ -396,6 +396,10 @@ const FoodPage = () => {
   };
 
   const primaryImageSizeKB = getImageSizeKB(photos?.[0]?.imageUri);
+  const imageSizeLabel =
+    primaryImageSizeKB === null
+      ? "Unavailable"
+      : `${formatNumber(primaryImageSizeKB, 1)} KB`;
 
   const isUnknownQuantity = (quantity) => {
     if (quantity === null || quantity === undefined) {
@@ -451,6 +455,9 @@ const FoodPage = () => {
             </Typography>
             <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
               {formatDateTime(timestamp)}
+            </Typography>
+            <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
+              {imageSizeLabel}
             </Typography>
           </Box>
         </Paper>
@@ -530,6 +537,9 @@ const FoodPage = () => {
             {formatDateTime(timestamp)} • {photos.length} photo
             {photos.length !== 1 ? "s" : ""}
           </Typography>
+          <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
+            {imageSizeLabel}
+          </Typography>
         </Box>
       </Paper>
     );
@@ -550,12 +560,6 @@ const FoodPage = () => {
       </Box>
 
       <Container maxWidth="lg" sx={{ pb: 4 }}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-          Image size:{" "}
-          {primaryImageSizeKB === null
-            ? "Unavailable"
-            : `${formatNumber(primaryImageSizeKB, 1)} KB`}
-        </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Serving Size: {servingSize || "-"}
         </Typography>
@@ -579,15 +583,12 @@ const FoodPage = () => {
                 borderColor: "divider",
               }}
             >
-              <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
-                Traffic light warning
-              </Typography>
               <Grid container spacing={1.5}>
                 {warningBadges.map((item) => {
                   const valueLabel =
                     item.value === null || item.value === undefined
-                      ? `...${item.unit}/100g`
-                      : `${formatNumber(item.value, 2)}${item.unit}/100g`;
+                      ? `...${item.unit}`
+                      : `${formatNumber(item.value, 2)}${item.unit}`;
 
                   return (
                     <Grid
@@ -602,21 +603,20 @@ const FoodPage = () => {
                           width: "100%",
                           maxWidth: 150,
                           mx: { xs: "auto", sm: 0 },
-                          minHeight: 150,
+                          minHeight: 128,
                           borderRadius: 2,
                           border: "2px solid",
                           borderColor: "common.black",
                           backgroundColor: item.panelColor,
                           display: "flex",
                           flexDirection: "column",
-                          justifyContent: "space-between",
                           overflow: "hidden",
                         }}
                       >
                         <Box
                           sx={{
-                            pt: 2,
-                            pb: 1,
+                            pt: 1.5,
+                            pb: 0.5,
                             px: 1.5,
                             textAlign: "center",
                             color: "common.white",
@@ -631,9 +631,10 @@ const FoodPage = () => {
                         </Box>
                         <Box
                           sx={{
-                            m: 1,
+                            mx: 1,
+                            mb: 1,
                             px: 1,
-                            py: 1,
+                            py: 0.75,
                             borderRadius: 1.25,
                             border: "2px solid",
                             borderColor: "grey.400",
@@ -852,13 +853,19 @@ const FoodPage = () => {
                         >
                           <Box>
                             <Typography
-                              variant="caption"
-                              color="text.secondary"
+                              variant="body2"
+                              sx={{ fontWeight: 600 }}
                             >
-                              {item.alternativeName
-                                ? `${item.label} (${item.alternativeName})`
-                                : item.label}
+                              {item.label}
                             </Typography>
+                            {item.alternativeName && (
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                {item.alternativeName}
+                              </Typography>
+                            )}
                             <Typography variant="body2">
                               {formatNumber(rawValue)} {item.sourceUnit}
                             </Typography>
@@ -923,13 +930,19 @@ const FoodPage = () => {
                         >
                           <Box>
                             <Typography
-                              variant="caption"
-                              color="text.secondary"
+                              variant="body2"
+                              sx={{ fontWeight: 600 }}
                             >
-                              {item.alternativeName
-                                ? `${item.label} (${item.alternativeName})`
-                                : item.label}
+                              {item.label}
                             </Typography>
+                            {item.alternativeName && (
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                {item.alternativeName}
+                              </Typography>
+                            )}
                             <Typography variant="body2">
                               {formatNumber(rawValue)} {item.sourceUnit}
                             </Typography>
@@ -957,7 +970,8 @@ const FoodPage = () => {
             >
               Results are estimated from label text extracted from the uploaded
               image and model-based nutrient inference. Prompt and analysis
-              logic (requestGeminiAnalysis):{" "}
+              logic (requestGeminiAnalysis, Google Gemini gemini-2.0-flash by
+              Google):{" "}
               <a
                 href="https://github.com/nuuuwan/food/blob/main/api/analyze.js"
                 target="_blank"

@@ -72,14 +72,6 @@ const CustomAppBar = () => {
         </Typography>
         <IconButton
           size="large"
-          color="inherit"
-          aria-label="github"
-          onClick={handleGitHubClick}
-        >
-          <GitHubIcon />
-        </IconButton>
-        <IconButton
-          size="large"
           edge="end"
           color="inherit"
           aria-label="menu"
