@@ -669,6 +669,43 @@ const FoodPage = () => {
                   No macro calorie breakdown available.
                 </Typography>
               )}
+
+              <Grid container spacing={1}>
+                {calorieSegments.map((segment) => {
+                  const pct =
+                    totalMacroCalories > 0
+                      ? (segment.calories / totalMacroCalories) * 100
+                      : 0;
+
+                  return (
+                    <Grid item xs={12} sm={4} key={segment.key}>
+                      <Box
+                        sx={{
+                          p: 1,
+                          borderRadius: 1.5,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          backgroundColor: "background.paper",
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          sx={{ color: segment.color, fontWeight: 600 }}
+                        >
+                          {segment.label}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: 600, color: segment.color }}
+                        >
+                          {formatNumber(segment.calories, 0)} kcal (
+                          {formatNumber(pct, 0)}%)
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  );
+                })}
+              </Grid>
             </Box>
 
             <Box
