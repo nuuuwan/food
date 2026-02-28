@@ -41,7 +41,7 @@ const DAILY_VALUE_FIELDS = [
   },
 ];
 
-const VITAMIN_MINERAL_DV_FIELDS = [
+const VITAMIN_DV_FIELDS = [
   {
     key: "vitaminD",
     label: "Vitamin D",
@@ -74,6 +74,9 @@ const VITAMIN_MINERAL_DV_FIELDS = [
     dailyValue: 90,
     dailyValueUnit: "mg",
   },
+];
+
+const MINERAL_DV_FIELDS = [
   {
     key: "sodium",
     label: "Sodium",
@@ -234,6 +237,38 @@ const FoodPage = () => {
     return (normalizedValue / dailyValue) * 100;
   };
 
+  const getWarningLevel = (percent) => {
+    if (
+      percent === null ||
+      percent === undefined ||
+      !Number.isFinite(percent)
+    ) {
+      return {
+        label: "Unknown",
+        color: "grey.500",
+      };
+    }
+
+    if (percent >= 20) {
+      return {
+        label: "High",
+        color: "error.main",
+      };
+    }
+
+    if (percent >= 10) {
+      return {
+        label: "Medium",
+        color: "warning.main",
+      };
+    }
+
+    return {
+      label: "Low",
+      color: "success.main",
+    };
+  };
+
   const protein = toNullableNumber(nutrients?.protein) || 0;
   const fat = toNullableNumber(nutrients?.fat) || 0;
   const carbs = toNullableNumber(nutrients?.carbs) || 0;
@@ -244,6 +279,42 @@ const FoodPage = () => {
   const totalMacroCalories = proteinCalories + fatCalories + carbsCalories;
   const totalCalories =
     toNullableNumber(nutrients?.calories) || totalMacroCalories;
+
+  const sodiumMg = toNullableNumber(nutrients?.sodium);
+  const fatGrams = toNullableNumber(nutrients?.fat);
+  const sugarGrams = toNullableNumber(nutrients?.sugar);
+  const saltGrams =
+    sodiumMg === null || sodiumMg === undefined
+      ? null
+      : (sodiumMg / 1000) * 2.5;
+
+  const saltDvPercent = getDailyValuePercent(sodiumMg, "mg", 2300, "mg");
+  const fatDvPercent = getDailyValuePercent(fatGrams, "g", 78, "g");
+  const sugarDvPercent = getDailyValuePercent(sugarGrams, "g", 50, "g");
+
+  const warningBadges = [
+    {
+      key: "salt",
+      label: "Salt",
+      value: saltGrams,
+      unit: "g",
+      percent: saltDvPercent,
+    },
+    {
+      key: "fat",
+      label: "Fat",
+      value: fatGrams,
+      unit: "g",
+      percent: fatDvPercent,
+    },
+    {
+      key: "sugar",
+      label: "Sugar",
+      value: sugarGrams,
+      unit: "g",
+      percent: sugarDvPercent,
+    },
+  ];
 
   const calorieSegments = [
     {
@@ -266,8 +337,8 @@ const FoodPage = () => {
     },
   ];
 
-  const visibleVitaminMineralFields = VITAMIN_MINERAL_DV_FIELDS.filter(
-    (item) => {
+  const getVisibleDailyValueFields = (fields) =>
+    fields.filter((item) => {
       const rawValue = toNullableNumber(nutrients?.[item.key]);
       const percent = getDailyValuePercent(
         rawValue,
@@ -281,8 +352,10 @@ const FoodPage = () => {
       }
 
       return percent >= 0.5;
-    },
-  );
+    });
+
+  const visibleVitaminFields = getVisibleDailyValueFields(VITAMIN_DV_FIELDS);
+  const visibleMineralFields = getVisibleDailyValueFields(MINERAL_DV_FIELDS);
 
   const formatDateTime = (ts) => {
     const date = new Date(ts);
@@ -466,6 +539,73 @@ const FoodPage = () => {
                 borderColor: "divider",
               }}
             >
+              <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
+                Front-of-pack Warning
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 1.5 }}
+              >
+                Sri Lanka style salt, fat and sugar indicator (per serving)
+              </Typography>
+              <Grid container spacing={1}>
+                {warningBadges.map((item) => {
+                  const level = getWarningLevel(item.percent);
+
+                  return (
+                    <Grid item xs={12} sm={4} key={item.key}>
+                      <Box
+                        sx={{
+                          p: 1.25,
+                          borderRadius: 1.5,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          backgroundColor: "background.paper",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            minWidth: 64,
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: 999,
+                            textAlign: "center",
+                            fontSize: "0.75rem",
+                            fontWeight: 700,
+                            color: "common.white",
+                            backgroundColor: level.color,
+                          }}
+                        >
+                          {level.label}
+                        </Box>
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">
+                            {item.label}
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {formatNumber(item.value, 2)} {item.unit}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            </Box>
+            <Box
+              sx={{
+                mb: 3,
+                p: { xs: 1.75, sm: 2.25 },
+                borderRadius: 2,
+                backgroundColor: "background.default",
+                border: "1px solid",
+                borderColor: "divider",
+              }}
+            >
               <Typography variant="subtitle1" sx={{ mb: 0.5, fontWeight: 600 }}>
                 Calories Breakdown
               </Typography>
@@ -506,7 +646,11 @@ const FoodPage = () => {
                   />
                 </Box>
               ) : (
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1.5 }}
+                >
                   No macro calorie breakdown available.
                 </Typography>
               )}
@@ -529,10 +673,16 @@ const FoodPage = () => {
                           backgroundColor: "background.paper",
                         }}
                       >
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography
+                          variant="caption"
+                          sx={{ color: segment.color, fontWeight: 600 }}
+                        >
                           {segment.label}
                         </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: 600, color: segment.color }}
+                        >
                           {formatNumber(segment.calories, 0)} kcal (
                           {formatNumber(pct, 0)}%)
                         </Typography>
@@ -602,6 +752,7 @@ const FoodPage = () => {
 
             <Box
               sx={{
+                mb: 3,
                 p: { xs: 1.75, sm: 2.25 },
                 borderRadius: 2,
                 backgroundColor: "background.default",
@@ -610,56 +761,136 @@ const FoodPage = () => {
               }}
             >
               <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
-                Vitamins & Minerals (Daily Values)
+                Vitamins (Daily Values)
               </Typography>
-              <Grid container spacing={1}>
-                {visibleVitaminMineralFields.map((item) => {
-                  const rawValue = toNullableNumber(nutrients?.[item.key]);
-                  const percent = getDailyValuePercent(
-                    rawValue,
-                    item.sourceUnit,
-                    item.dailyValue,
-                    item.dailyValueUnit,
-                  );
+              {visibleVitaminFields.length === 0 ? (
+                <Typography variant="body2" color="text.secondary">
+                  No vitamin daily values are available for this item.
+                </Typography>
+              ) : (
+                <Grid container spacing={1}>
+                  {visibleVitaminFields.map((item) => {
+                    const rawValue = toNullableNumber(nutrients?.[item.key]);
+                    const percent = getDailyValuePercent(
+                      rawValue,
+                      item.sourceUnit,
+                      item.dailyValue,
+                      item.dailyValueUnit,
+                    );
 
-                  return (
-                    <Grid item xs={12} sm={6} md={4} key={item.key}>
-                      <Box
-                        sx={{
-                          p: 1.25,
-                          borderRadius: 1.5,
-                          border: "1px solid",
-                          borderColor: "divider",
-                          backgroundColor: "background.paper",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "baseline",
-                          gap: 1,
-                        }}
-                      >
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">
-                            {item.alternativeName
-                              ? `${item.label} (${item.alternativeName})`
-                              : item.label}
-                          </Typography>
-                          <Typography variant="body2">
-                            {formatNumber(rawValue)} {item.sourceUnit}
+                    return (
+                      <Grid item xs={12} sm={6} md={4} key={item.key}>
+                        <Box
+                          sx={{
+                            p: 1.25,
+                            borderRadius: 1.5,
+                            border: "1px solid",
+                            borderColor: "divider",
+                            backgroundColor: "background.paper",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "baseline",
+                            gap: 1,
+                          }}
+                        >
+                          <Box>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              {item.alternativeName
+                                ? `${item.label} (${item.alternativeName})`
+                                : item.label}
+                            </Typography>
+                            <Typography variant="body2">
+                              {formatNumber(rawValue)} {item.sourceUnit}
+                            </Typography>
+                          </Box>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600, color: "text.secondary" }}
+                          >
+                            {percent === null
+                              ? "-"
+                              : `${formatNumber(percent, 0)}% DV`}
                           </Typography>
                         </Box>
-                        <Typography
-                          variant="body2"
-                          sx={{ fontWeight: 600, color: "primary.main" }}
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+              )}
+            </Box>
+
+            <Box
+              sx={{
+                p: { xs: 1.75, sm: 2.25 },
+                borderRadius: 2,
+                backgroundColor: "background.default",
+                border: "1px solid",
+                borderColor: "divider",
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
+                Minerals (Daily Values)
+              </Typography>
+              {visibleMineralFields.length === 0 ? (
+                <Typography variant="body2" color="text.secondary">
+                  No mineral daily values are available for this item.
+                </Typography>
+              ) : (
+                <Grid container spacing={1}>
+                  {visibleMineralFields.map((item) => {
+                    const rawValue = toNullableNumber(nutrients?.[item.key]);
+                    const percent = getDailyValuePercent(
+                      rawValue,
+                      item.sourceUnit,
+                      item.dailyValue,
+                      item.dailyValueUnit,
+                    );
+
+                    return (
+                      <Grid item xs={12} sm={6} md={4} key={item.key}>
+                        <Box
+                          sx={{
+                            p: 1.25,
+                            borderRadius: 1.5,
+                            border: "1px solid",
+                            borderColor: "divider",
+                            backgroundColor: "background.paper",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "baseline",
+                            gap: 1,
+                          }}
                         >
-                          {percent === null
-                            ? "-"
-                            : `${formatNumber(percent, 0)}% DV`}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                  );
-                })}
-              </Grid>
+                          <Box>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              {item.alternativeName
+                                ? `${item.label} (${item.alternativeName})`
+                                : item.label}
+                            </Typography>
+                            <Typography variant="body2">
+                              {formatNumber(rawValue)} {item.sourceUnit}
+                            </Typography>
+                          </Box>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600, color: "text.secondary" }}
+                          >
+                            {percent === null
+                              ? "-"
+                              : `${formatNumber(percent, 0)}% DV`}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+              )}
             </Box>
           </CardContent>
         </Card>
