@@ -1070,7 +1070,8 @@ const ProcessingPage = () => {
               )}
             </Paper>
 
-            <Box
+            <Paper
+              elevation={0}
               sx={{
                 mt: 3,
                 p: { xs: 1.75, sm: 2.25 },
@@ -1112,7 +1113,7 @@ const ProcessingPage = () => {
                   Ultra-processed trigger item(s): {novaSpecificItemText}
                 </Typography>
               )}
-            </Box>
+            </Paper>
 
             <Typography
               variant="caption"
