@@ -16,6 +16,9 @@ jobs:
 
       - run: npm install
       - run: npm run build
+        env:
+          REACT_APP_VERCEL_TARGET: remote
+          REACT_APP_REMOTE_API_BASE_URL: https://food-nuwans-projects-4c6606c6.vercel.app
 
       - uses: actions/upload-artifact@v4
         with:

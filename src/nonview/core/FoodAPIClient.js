@@ -21,18 +21,26 @@ export class FoodAPIClient {
     }
 
     const target = (
-      process.env.REACT_APP_VERCEL_TARGET || "local"
+      process.env.REACT_APP_VERCEL_TARGET || "auto"
     ).toLowerCase();
     const localBaseURL =
       process.env.REACT_APP_LOCAL_API_BASE_URL || "http://localhost:3001";
     const remoteBaseURL = process.env.REACT_APP_REMOTE_API_BASE_URL || "";
 
     if (target === "remote") {
-      return remoteBaseURL;
+      return remoteBaseURL || this._getDefaultBaseURLForEnvironment();
     }
 
     if (target === "local") {
       return localBaseURL;
+    }
+
+    if (target === "auto") {
+      if (this._isLocalFrontend()) {
+        return localBaseURL;
+      }
+
+      return remoteBaseURL || this._getDefaultBaseURLForEnvironment();
     }
 
     return this._getDefaultBaseURLForEnvironment();

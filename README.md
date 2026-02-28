@@ -47,6 +47,19 @@ Examples for `.env.local`:
   - `REACT_APP_VERCEL_TARGET=remote`
   - `REACT_APP_REMOTE_API_BASE_URL=https://<your-project>.vercel.app`
 
+### GitHub Pages deployment
+
+`nuuuwan.github.io/food` is static hosting, so it cannot run `api/` routes itself.
+Point the frontend to a deployed backend (for example Vercel):
+
+- `REACT_APP_VERCEL_TARGET=remote`
+- `REACT_APP_REMOTE_API_BASE_URL=https://<your-project>.vercel.app`
+
+If your GitHub Actions build does not set these vars, `FoodAPIClient` now uses `auto` mode by default:
+
+- local frontend (`localhost:3000`) → `http://localhost:3001`
+- non-local frontend (e.g. GitHub Pages) → remote base URL if provided, otherwise relative `/api`
+
 ### Gemini setup
 
 Set these environment variables for the backend:
