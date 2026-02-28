@@ -1,21 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useData } from "../../nonview/core/DataContext";
-import {
-  Box,
-  Typography,
-  Container,
-  CircularProgress,
-  LinearProgress,
-  Card,
-  CardContent,
-  Paper,
-} from "@mui/material";
-import ProcessingStepList, {
-  getCurrentStepIndex,
-} from "../moles/ProcessingStepList";
-import ProcessingPreviewCard from "../atoms/ProcessingPreviewCard";
-import InterimAnalysisCard from "../atoms/InterimAnalysisCard";
+import { Box, Typography, Container, Card, CardContent, Paper } from "@mui/material";
 
 const ProcessingPage = () => {
   const navigate = useNavigate();
@@ -27,22 +13,18 @@ const ProcessingPage = () => {
     processingSnapshot,
     analysisPreview,
   } = useData();
-  const isLocalCacheHit = processingStatus.title === "Cached local";
   const statusMessage = processingStatus.detail || processingStatus.title;
-  const currentStepIndex = getCurrentStepIndex(processingStatus.title);
-  const totalProgressSteps = 6;
-  const progressValue =
-    analysisState === "success"
-      ? 100
-      : Math.max(
-          8,
-          Math.round(((currentStepIndex + 1) / totalProgressSteps) * 100),
-        );
   const previewImage = processingSnapshot?.previewImage || currentScan;
-  const stageIndex =
-    analysisState === "success" ? totalProgressSteps : currentStepIndex;
-  const getStageSx = (threshold) => ({
-    opacity: stageIndex >= threshold ? 1 : 0.32,
+  const resolvedFood = currentFood || null;
+  const resolvedName = resolvedFood?.productName || analysisPreview?.productName || "";
+  const resolvedIngredients = Array.isArray(resolvedFood?.ingredients)
+    ? resolvedFood.ingredients
+    : [];
+  const resolvedClassifications = resolvedFood?.classifications || null;
+  const resolvedNutrients = resolvedFood?.nutrients || null;
+
+  const getSectionSx = (isAvailable) => ({
+    opacity: isAvailable ? 1 : 0.3,
     transition: "opacity 260ms ease",
   });
 
@@ -125,63 +107,16 @@ const ProcessingPage = () => {
       )}
 
       <Container maxWidth="lg" sx={{ pb: 4 }}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2.25 }}>
-          Serving Size: {analysisPreview?.servingSize || "..."}
-        </Typography>
-
         <Card sx={{ mb: 3 }}>
           <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
-            <Typography variant="h5" sx={{ mb: 1 }}>
-              Nutrition Facts
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Building your result card...
-            </Typography>
-
-            <Box sx={{ width: "100%", mb: 2.25 }}>
-              <LinearProgress
-                variant="determinate"
-                value={progressValue}
-                sx={{ height: 8, borderRadius: 999 }}
-              />
-            </Box>
-
-            <Box
-              sx={{
-                mb: 2,
-                p: { xs: 1.75, sm: 2.25 },
-                borderRadius: 2,
-                backgroundColor: "background.default",
-                ...getStageSx(1),
-              }}
-            >
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
-              >
-                {analysisState !== "success" && <CircularProgress size={18} />}
-                <Typography variant="body2" color="text.secondary">
-                  {statusMessage || "Working..."}
-                </Typography>
-              </Box>
-              <ProcessingStepList
-                currentStepIndex={currentStepIndex}
-                analysisState={analysisState}
-                isLocalCacheHit={isLocalCacheHit}
-              />
-            </Box>
-
-            <Box
-              sx={{
-                mb: 2,
-                p: { xs: 1.75, sm: 2.25 },
-                borderRadius: 2,
-                backgroundColor: "background.default",
-                ...getStageSx(2),
-              }}
-            >
-              <InterimAnalysisCard preview={analysisPreview} />
-              <Typography variant="caption" color="text.secondary">
-                Product, serving, and calories appear first.
+            <Box sx={{ mb: 2.25, ...getSectionSx(Boolean(resolvedName)) }}>
+              <Typography variant="h5" sx={{ mb: 0.5 }}>
+                {resolvedName || "Building item name..."}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {analysisPreview?.servingSize
+                  ? `Serving Size: ${analysisPreview.servingSize}`
+                  : "Serving size pending..."}
               </Typography>
             </Box>
 
@@ -191,37 +126,78 @@ const ProcessingPage = () => {
                 p: { xs: 1.75, sm: 2.25 },
                 borderRadius: 2,
                 backgroundColor: "background.default",
-                ...getStageSx(3),
+                ...getSectionSx(resolvedIngredients.length > 0),
               }}
             >
-              <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
-                Labels (building)
+              <Typography variant="subtitle1" sx={{ mb: 0.8, fontWeight: 600 }}>
+                Ingredients
               </Typography>
-              <Box sx={{ display: "flex", gap: 1 }}>
-                {["Sugar", "Salt", "Fat"].map((label) => (
-                  <Box
-                    key={label}
-                    sx={{
-                      flex: 1,
-                      borderRadius: 1,
-                      border: "1px dashed",
-                      borderColor: "divider",
-                      p: 1,
-                      backgroundColor: "background.paper",
-                    }}
-                  >
-                    <Typography variant="caption" color="text.secondary">
-                      {label}
-                    </Typography>
-                    <Typography variant="body2">...</Typography>
-                  </Box>
-                ))}
-              </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic" }}>
+                {resolvedIngredients.length > 0
+                  ? resolvedIngredients
+                      .map((ingredient) => {
+                        const name = String(ingredient?.name || "").trim();
+                        const quantity = String(ingredient?.quantity || "").trim();
+                        if (!name) {
+                          return "";
+                        }
+                        if (!quantity || quantity.toLowerCase() === "unknown") {
+                          return name;
+                        }
+                        return `${name} (${quantity})`;
+                      })
+                      .filter(Boolean)
+                      .join(", ")
+                  : "Building ingredient list..."}
+              </Typography>
             </Box>
 
-            <Box sx={{ ...getStageSx(4) }}>
-              <ProcessingPreviewCard imageUri={previewImage} />
+            <Box
+              sx={{
+                mb: 2,
+                p: { xs: 1.75, sm: 2.25 },
+                borderRadius: 2,
+                backgroundColor: "background.default",
+                ...getSectionSx(Boolean(resolvedClassifications)),
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ mb: 0.8, fontWeight: 600 }}>
+                Ratings / Classifications
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Nutri-Grade: {resolvedClassifications?.singaporeNutriGrade || "..."}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                NOVA: {resolvedClassifications?.novaClassCode || "..."}
+              </Typography>
             </Box>
+
+            <Box
+              sx={{
+                p: { xs: 1.75, sm: 2.25 },
+                borderRadius: 2,
+                backgroundColor: "background.default",
+                ...getSectionSx(Boolean(resolvedNutrients)),
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ mb: 0.8, fontWeight: 600 }}>
+                Nutrition Details
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Calories: {resolvedNutrients?.calories ?? "..."} kcal
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Protein: {resolvedNutrients?.protein ?? "..."} g • Carbs: {resolvedNutrients?.carbs ?? "..."} g • Fat: {resolvedNutrients?.fat ?? "..."} g
+              </Typography>
+            </Box>
+
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: "block", mt: 1.25 }}
+            >
+              {statusMessage || "Building your result..."}
+            </Typography>
           </CardContent>
         </Card>
       </Container>
