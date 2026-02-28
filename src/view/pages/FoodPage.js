@@ -80,6 +80,7 @@ const MINERAL_DV_FIELDS = [
   {
     key: "sodium",
     label: "Sodium",
+    alternativeName: "Na",
     sourceUnit: "mg",
     dailyValue: 2300,
     dailyValueUnit: "mg",
@@ -87,6 +88,7 @@ const MINERAL_DV_FIELDS = [
   {
     key: "potassium",
     label: "Potassium",
+    alternativeName: "K",
     sourceUnit: "mg",
     dailyValue: 4700,
     dailyValueUnit: "mg",
@@ -94,6 +96,7 @@ const MINERAL_DV_FIELDS = [
   {
     key: "calcium",
     label: "Calcium",
+    alternativeName: "Ca",
     sourceUnit: "mg",
     dailyValue: 1300,
     dailyValueUnit: "mg",
@@ -101,6 +104,7 @@ const MINERAL_DV_FIELDS = [
   {
     key: "iron",
     label: "Iron",
+    alternativeName: "Fe",
     sourceUnit: "mg",
     dailyValue: 18,
     dailyValueUnit: "mg",
@@ -108,6 +112,7 @@ const MINERAL_DV_FIELDS = [
   {
     key: "magnesium",
     label: "Magnesium",
+    alternativeName: "Mg",
     sourceUnit: "mg",
     dailyValue: 420,
     dailyValueUnit: "mg",
@@ -115,6 +120,7 @@ const MINERAL_DV_FIELDS = [
   {
     key: "zinc",
     label: "Zinc",
+    alternativeName: "Zn",
     sourceUnit: "mg",
     dailyValue: 11,
     dailyValueUnit: "mg",
@@ -256,27 +262,65 @@ const FoodPage = () => {
       ? null
       : (sodiumMg / 1000) * 2.5;
 
+  const getTrafficLightPanelColor = (key, valuePer100g) => {
+    if (valuePer100g === null || valuePer100g === undefined) {
+      return theme.palette.grey[500];
+    }
+
+    if (key === "sugar") {
+      if (valuePer100g > 22) {
+        return theme.palette.error.main;
+      }
+      if (valuePer100g >= 5) {
+        return theme.palette.warning.main;
+      }
+      return theme.palette.success.main;
+    }
+
+    if (key === "salt") {
+      if (valuePer100g > 1.25) {
+        return theme.palette.error.main;
+      }
+      if (valuePer100g >= 0.25) {
+        return theme.palette.warning.main;
+      }
+      return theme.palette.success.main;
+    }
+
+    if (key === "fat") {
+      if (valuePer100g > 17.5) {
+        return theme.palette.error.main;
+      }
+      if (valuePer100g >= 3) {
+        return theme.palette.warning.main;
+      }
+      return theme.palette.success.main;
+    }
+
+    return theme.palette.grey[500];
+  };
+
   const warningBadges = [
     {
       key: "sugar",
       label: "Sugar",
       value: sugarGrams,
       unit: "g",
-      panelColor: theme.palette.error.main,
+      panelColor: getTrafficLightPanelColor("sugar", sugarGrams),
     },
     {
       key: "salt",
       label: "Salt",
       value: saltGrams,
       unit: "g",
-      panelColor: theme.palette.warning.main,
+      panelColor: getTrafficLightPanelColor("salt", saltGrams),
     },
     {
       key: "fat",
       label: "Fat",
       value: fatGrams,
       unit: "g",
-      panelColor: theme.palette.success.main,
+      panelColor: getTrafficLightPanelColor("fat", fatGrams),
     },
   ];
 
@@ -536,7 +580,7 @@ const FoodPage = () => {
               }}
             >
               <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
-                Front-of-pack Warning
+                Traffic light warning
               </Typography>
               <Grid container spacing={1.5}>
                 {warningBadges.map((item) => {
@@ -641,6 +685,7 @@ const FoodPage = () => {
                 >
                   <PieChart
                     height={180}
+                    hideLegend
                     series={[
                       {
                         innerRadius: 36,
@@ -655,9 +700,6 @@ const FoodPage = () => {
                         })),
                       },
                     ]}
-                    slotProps={{
-                      legend: { hidden: true },
-                    }}
                   />
                 </Box>
               ) : (
@@ -915,7 +957,7 @@ const FoodPage = () => {
             >
               Results are estimated from label text extracted from the uploaded
               image and model-based nutrient inference. Prompt and analysis
-              logic:{" "}
+              logic (requestGeminiAnalysis):{" "}
               <a
                 href="https://github.com/nuuuwan/food/blob/main/api/analyze.js"
                 target="_blank"
