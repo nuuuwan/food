@@ -806,17 +806,17 @@ const FoodPage = () => {
                 {warningBadges.map((item) => {
                   const valueLabel =
                     item.value === null || item.value === undefined
-                      ? `...${item.unit}`
-                      : `${formatNumber(item.value, 0)}${item.unit}`;
+                      ? `...${item.unit}/100g`
+                      : `${formatNumber(item.value, 0)}${item.unit}/100g`;
 
                   return (
                     <Box key={item.key} sx={{ display: "flex" }}>
                       <Box
                         sx={{
                           width: "100%",
-                          minHeight: 128,
-                          borderRadius: 0,
-                          border: "1px solid",
+                          minHeight: 136,
+                          borderRadius: 2,
+                          border: "2px solid",
                           borderColor: "common.black",
                           backgroundColor: item.panelColor,
                           display: "flex",
@@ -826,19 +826,24 @@ const FoodPage = () => {
                       >
                         <Box
                           sx={{
-                            pt: 1,
-                            pb: 0.25,
-                            px: 1.5,
+                            pt: 1.1,
+                            pb: 0.5,
+                            px: 1,
+                            flex: 1,
                             textAlign: "center",
                             color: "common.white",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
                           }}
                         >
                           <Typography
                             variant="body2"
                             sx={{
                               display: "block",
-                              opacity: 0.95,
-                              lineHeight: 1.02,
+                              opacity: 0.96,
+                              lineHeight: 1.05,
+                              fontWeight: 700,
                             }}
                           >
                             {item.sinhalaLabel}
@@ -847,28 +852,30 @@ const FoodPage = () => {
                             variant="caption"
                             sx={{
                               display: "block",
-                              opacity: 0.95,
-                              lineHeight: 1.02,
+                              opacity: 0.96,
+                              lineHeight: 1.05,
+                              fontWeight: 600,
                             }}
                           >
                             {item.tamilLabel}
                           </Typography>
                           <Typography
                             variant="subtitle1"
-                            sx={{ fontWeight: 700, lineHeight: 1.02 }}
+                            sx={{ fontWeight: 800, lineHeight: 1.05, mt: 0.15 }}
                           >
                             {item.label}
                           </Typography>
                         </Box>
                         <Box
                           sx={{
-                            mx: 0,
-                            mb: 0,
+                            mx: 0.8,
+                            mb: 0.8,
                             px: 1,
-                            py: 0.75,
-                            borderRadius: 0,
+                            py: 0.65,
+                            borderRadius: 1,
                             borderTop: "1px solid",
-                            borderColor: "grey.400",
+                            border: "1px solid",
+                            borderColor: "grey.500",
                             backgroundColor: "common.white",
                             textAlign: "center",
                           }}
