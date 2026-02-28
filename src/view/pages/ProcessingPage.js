@@ -248,26 +248,24 @@ const ProcessingPage = () => {
           <Box
             sx={{
               position: "absolute",
-              top: 12,
-              left: 0,
-              right: 0,
-              px: 1,
+              top: 8,
+              right: 8,
+              width: { xs: 198, sm: 208 },
               display: "flex",
-              gap: 1,
-              justifyContent: "center",
+              gap: 0.5,
+              justifyContent: "flex-end",
               alignItems: "stretch",
-              overflowX: "auto",
             }}
           >
             <Box
               sx={{
-                minWidth: 210,
-                p: 0.6,
-                borderRadius: 1.5,
+                flex: 1,
+                p: 0.35,
+                borderRadius: 1.2,
                 backgroundColor: "rgba(255,255,255,0.88)",
                 display: "grid",
                 gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-                gap: 0.5,
+                gap: 0.35,
               }}
             >
               {trafficFigures.map((item) => (
@@ -285,21 +283,35 @@ const ProcessingPage = () => {
                       backgroundColor: item.color,
                       color: "common.white",
                       textAlign: "center",
-                      py: 0.35,
+                      py: 0.2,
                     }}
                   >
-                    <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: "0.54rem",
+                        lineHeight: 1,
+                      }}
+                    >
                       {item.label}
                     </Typography>
                   </Box>
                   <Box
                     sx={{
-                      p: 0.35,
+                      p: 0.2,
                       textAlign: "center",
                       bgcolor: "common.white",
                     }}
                   >
-                    <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: "0.52rem",
+                        lineHeight: 1,
+                      }}
+                    >
                       {formatNutrientValue(item.value, item.unit)}
                     </Typography>
                   </Box>
@@ -309,9 +321,9 @@ const ProcessingPage = () => {
 
             <Box
               sx={{
-                minWidth: 170,
-                p: 0.6,
-                borderRadius: 1.5,
+                width: { xs: 72, sm: 76 },
+                p: 0.35,
+                borderRadius: 1.2,
                 backgroundColor: "rgba(255,255,255,0.88)",
               }}
             >
@@ -320,7 +332,8 @@ const ProcessingPage = () => {
                   fontWeight: 900,
                   textAlign: "center",
                   lineHeight: 1,
-                  mb: 0.35,
+                  mb: 0.2,
+                  fontSize: "0.5rem",
                 }}
               >
                 NUTRI-GRADE
@@ -339,15 +352,16 @@ const ProcessingPage = () => {
                   <Box
                     key={gradeItem.grade}
                     sx={{
-                      py: 0.45,
+                      py: 0.2,
                       textAlign: "center",
                       color: "common.white",
                       backgroundColor: gradeItem.color,
                       fontWeight:
                         singaporeNutriGrade === gradeItem.grade ? 900 : 500,
+                      fontSize: "0.6rem",
                       outline:
                         singaporeNutriGrade === gradeItem.grade
-                          ? "2px solid #000"
+                          ? "1.5px solid #000"
                           : "none",
                     }}
                   >
@@ -359,10 +373,10 @@ const ProcessingPage = () => {
 
             <Box
               sx={{
-                minWidth: 82,
-                borderRadius: 1.5,
+                width: { xs: 34, sm: 36 },
+                borderRadius: 1.2,
                 backgroundColor: "rgba(255,255,255,0.88)",
-                p: 0.45,
+                p: 0.3,
               }}
             >
               <Typography
@@ -371,21 +385,22 @@ const ProcessingPage = () => {
                   color: "text.secondary",
                   fontWeight: 900,
                   lineHeight: 1,
-                  mb: 0.2,
+                  mb: 0.1,
+                  fontSize: "0.5rem",
                 }}
               >
                 NOVA
               </Typography>
               <Box
                 sx={{
-                  minHeight: 52,
-                  borderRadius: 0.7,
+                  minHeight: 33,
+                  borderRadius: 0.5,
                   backgroundColor: novaBadgeColor,
                   color: "common.white",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "2rem",
+                  fontSize: "1.2rem",
                   fontWeight: 900,
                   lineHeight: 1,
                 }}
@@ -534,20 +549,20 @@ const ProcessingPage = () => {
                 color="text.secondary"
                 sx={{ mb: 0.35 }}
               >
-                Sri Lanka Traffic Light: Based on estimated sugar, salt, and fat
-                per 100g.
+                🇱🇰 Sri Lanka Traffic Light: Based on estimated sugar, salt, and
+                fat per 100g.
               </Typography>
               <Typography
                 variant="body2"
                 color="text.secondary"
                 sx={{ mb: 0.35 }}
               >
-                Singapore Nutri-Grade:{" "}
+                🇸🇬 Singapore Nutri-Grade:{" "}
                 {resolvedClassifications?.singaporeNutriGradeReason ||
                   "Reason pending..."}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                NOVA:{" "}
+                🇧🇷 NOVA (Brazil):{" "}
                 {resolvedClassifications?.novaClassReason ||
                   "Reason pending..."}
               </Typography>
