@@ -570,7 +570,7 @@ const FoodPage = () => {
       dailyValue: 50,
       dailyValueUnit: "g",
       calories: proteinCalories,
-      color: "#1e3a8a",
+      color: "#2e7d32",
     },
     {
       key: "fat",
@@ -580,7 +580,7 @@ const FoodPage = () => {
       dailyValue: 78,
       dailyValueUnit: "g",
       calories: fatCalories,
-      color: "#6d28d9",
+      color: "#ef6c00",
     },
     {
       key: "carbs",
@@ -590,7 +590,7 @@ const FoodPage = () => {
       dailyValue: 275,
       dailyValueUnit: "g",
       calories: carbsCalories,
-      color: "#be185d",
+      color: "#c62828",
     },
   ];
 
@@ -1026,11 +1026,8 @@ const FoodPage = () => {
 
         <Card sx={{ mb: 3 }}>
           <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
-            <Typography variant="h5" sx={{ mb: 1 }}>
-              Nutrition Facts
-            </Typography>
-
-            <Box
+            <Paper
+              elevation={0}
               sx={{
                 mb: 3,
                 p: { xs: 1.75, sm: 2.25 },
@@ -1039,7 +1036,7 @@ const FoodPage = () => {
               }}
             >
               <Typography variant="subtitle1" sx={{ mb: 0.5, fontWeight: 600 }}>
-                Calories Breakdown
+                Calorie Breakdown
               </Typography>
               <Typography
                 variant="body2"
@@ -1140,9 +1137,10 @@ const FoodPage = () => {
                   );
                 })}
               </Grid>
-            </Box>
+            </Paper>
 
-            <Box
+            <Paper
+              elevation={0}
               sx={{
                 mb: 3,
                 p: { xs: 1.75, sm: 2.25 },
@@ -1210,9 +1208,10 @@ const FoodPage = () => {
                   );
                 })}
               </Grid>
-            </Box>
+            </Paper>
 
-            <Box
+            <Paper
+              elevation={0}
               sx={{
                 mb: 3,
                 p: { xs: 1.75, sm: 2.25 },
@@ -1292,9 +1291,10 @@ const FoodPage = () => {
                   })}
                 </Grid>
               )}
-            </Box>
+            </Paper>
 
-            <Box
+            <Paper
+              elevation={0}
               sx={{
                 p: { xs: 1.75, sm: 2.25 },
                 borderRadius: 2,
@@ -1371,7 +1371,7 @@ const FoodPage = () => {
                   })}
                 </Grid>
               )}
-            </Box>
+            </Paper>
 
             <Box
               sx={{
