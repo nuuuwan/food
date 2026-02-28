@@ -158,7 +158,9 @@ const getIngredientNames = (ingredients) =>
 const getNovaSignalIngredients = (ingredients) => {
   const names = getIngredientNames(ingredients);
   return names.filter((name) =>
-    NOVA_SIGNAL_KEYWORDS.some((keyword) => name.toLowerCase().includes(keyword)),
+    NOVA_SIGNAL_KEYWORDS.some((keyword) =>
+      name.toLowerCase().includes(keyword),
+    ),
   );
 };
 
