@@ -375,8 +375,16 @@ const FoodPage = () => {
   };
 
   const ukTrafficLevels = [
-    { key: "sugar", label: "Sugar", level: getUkTrafficLevel("sugar", sugarPer100g) },
-    { key: "salt", label: "Salt", level: getUkTrafficLevel("salt", saltPer100g) },
+    {
+      key: "sugar",
+      label: "Sugar",
+      level: getUkTrafficLevel("sugar", sugarPer100g),
+    },
+    {
+      key: "salt",
+      label: "Salt",
+      level: getUkTrafficLevel("salt", saltPer100g),
+    },
     { key: "fat", label: "Fat", level: getUkTrafficLevel("fat", fatPer100g) },
   ];
 
@@ -745,7 +753,13 @@ const FoodPage = () => {
                 backgroundColor: "background.default",
               }}
             >
-              <Grid container spacing={1.5}>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                  gap: 0,
+                }}
+              >
                 {warningBadges.map((item) => {
                   const valueLabel =
                     item.value === null || item.value === undefined
@@ -753,19 +767,13 @@ const FoodPage = () => {
                       : `${formatNumber(item.value, 2)}${item.unit}`;
 
                   return (
-                    <Grid
-                      item
-                      xs={12}
-                      sm={4}
-                      key={item.key}
-                      sx={{ display: "flex" }}
-                    >
+                    <Box key={item.key} sx={{ display: "flex" }}>
                       <Box
                         sx={{
                           width: "100%",
                           minHeight: 128,
-                          borderRadius: 2,
-                          border: "2px solid",
+                          borderRadius: 0,
+                          border: "1px solid",
                           borderColor: "common.black",
                           backgroundColor: item.panelColor,
                           display: "flex",
@@ -811,12 +819,12 @@ const FoodPage = () => {
                         </Box>
                         <Box
                           sx={{
-                            mx: 1,
-                            mb: 1,
+                            mx: 0,
+                            mb: 0,
                             px: 1,
                             py: 0.75,
-                            borderRadius: 1.25,
-                            border: "2px solid",
+                            borderRadius: 0,
+                            borderTop: "1px solid",
                             borderColor: "grey.400",
                             backgroundColor: "common.white",
                             textAlign: "center",
@@ -830,10 +838,10 @@ const FoodPage = () => {
                           </Typography>
                         </Box>
                       </Box>
-                    </Grid>
+                    </Box>
                   );
                 })}
-              </Grid>
+              </Box>
               <Typography
                 variant="caption"
                 color="text.secondary"
@@ -849,7 +857,7 @@ const FoodPage = () => {
                 color="text.secondary"
                 sx={{ display: "block", mt: 0.5 }}
               >
-                Global examples:
+                Estimated labels:
               </Typography>
               <Grid container spacing={1} sx={{ mt: 0.5 }}>
                 <Grid item xs={12} sm={6}>
@@ -866,40 +874,14 @@ const FoodPage = () => {
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
                       Nutri-Grade (A–D)
                     </Typography>
-                    <Box sx={{ display: "flex", gap: 0.5, mt: 0.5 }}>
-                      {[
-                        ["A", "#1b5e20"],
-                        ["B", "#2e7d32"],
-                        ["C", "#f9a825"],
-                        ["D", "#c62828"],
-                      ].map(([grade, color]) => (
-                        <Box
-                          key={grade}
-                          sx={{
-                            width: 22,
-                            height: 22,
-                            borderRadius: 0.75,
-                            backgroundColor: color,
-                            color:
-                              singaporeNutriGrade === grade
-                                ? "common.white"
-                                : "rgba(255,255,255,0.6)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: "0.72rem",
-                            fontWeight: singaporeNutriGrade === grade ? 800 : 600,
-                            border:
-                              singaporeNutriGrade === grade
-                                ? "2px solid #000"
-                                : "1px solid rgba(255,255,255,0.4)",
-                          }}
-                        >
-                          {grade}
-                        </Box>
-                      ))}
-                    </Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
+                    <Typography variant="body2" sx={{ mt: 0.5 }}>
+                      {singaporeNutriGrade}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: "block", mt: 0.5 }}
+                    >
                       Estimated grade for this food: {singaporeNutriGrade}
                     </Typography>
                   </Box>
@@ -918,24 +900,14 @@ const FoodPage = () => {
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
                       Front-of-pack traffic light
                     </Typography>
-                    <Box sx={{ display: "flex", gap: 0.5, mt: 0.5 }}>
-                      {ukTrafficLevels.map((itemLevel) => (
-                        <Box
-                          key={itemLevel.key}
-                          sx={{
-                            px: 0.6,
-                            py: 0.2,
-                            borderRadius: 0.75,
-                            backgroundColor: itemLevel.level.color,
-                            color: "common.white",
-                            fontSize: "0.68rem",
-                            fontWeight: 700,
-                          }}
-                        >
-                          {itemLevel.label}: {itemLevel.level.label}
-                        </Box>
-                      ))}
-                    </Box>
+                    <Typography variant="body2" sx={{ mt: 0.5 }}>
+                      {ukTrafficLevels
+                        .map(
+                          (itemLevel) =>
+                            `${itemLevel.label}: ${itemLevel.level.label}`,
+                        )
+                        .join(" • ")}
+                    </Typography>
                   </Box>
                 </Grid>
               </Grid>
@@ -1086,6 +1058,11 @@ const FoodPage = () => {
                           p: 1.25,
                           borderRadius: 1.5,
                           backgroundColor: "action.hover",
+                          minHeight: 128,
+                          aspectRatio: "1 / 1",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
                         }}
                       >
                         <Box>
@@ -1148,6 +1125,11 @@ const FoodPage = () => {
                             p: 1.25,
                             borderRadius: 1.5,
                             backgroundColor: "action.hover",
+                            minHeight: 128,
+                            aspectRatio: "1 / 1",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "space-between",
                           }}
                         >
                           <Box>
@@ -1221,6 +1203,11 @@ const FoodPage = () => {
                             p: 1.25,
                             borderRadius: 1.5,
                             backgroundColor: "action.hover",
+                            minHeight: 128,
+                            aspectRatio: "1 / 1",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "space-between",
                           }}
                         >
                           <Box>

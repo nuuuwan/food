@@ -210,7 +210,11 @@ const requestGeminiAnalysis = async (imageData, parsedImage) => {
         );
       }
 
-      return normalizeGeminiAnalysis(parsed, imageData, hashImageInput(imageData, parsedImage));
+      return normalizeGeminiAnalysis(
+        parsed,
+        imageData,
+        hashImageInput(imageData, parsedImage),
+      );
     }
   }
 

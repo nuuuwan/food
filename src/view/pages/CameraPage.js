@@ -85,8 +85,13 @@ const CameraPage = () => {
       setIsUploading(true);
       const imageDataUrl = await readFileAsDataUrl(file);
       const compressedImageDataUrl = await compressImageDataUrl(imageDataUrl);
+      const compressedBytes = estimateDataUrlBytes(compressedImageDataUrl);
       setPreviewImage(compressedImageDataUrl);
-      await startScan(compressedImageDataUrl);
+      startScan(compressedImageDataUrl, {
+        originalBytes: file.size,
+        compressedBytes,
+      });
+      navigate("/processing");
     } catch (error) {
       console.error("Failed to process selected image:", error);
       return;
@@ -96,8 +101,6 @@ const CameraPage = () => {
         event.target.value = "";
       }
     }
-
-    navigate("/processing");
   };
 
   return (

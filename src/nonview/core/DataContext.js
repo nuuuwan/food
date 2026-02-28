@@ -22,6 +22,8 @@ export const DataProvider = ({ children }) => {
     title: "",
     detail: "",
   });
+  const [processingSnapshot, setProcessingSnapshot] = useState(null);
+  const [analysisPreview, setAnalysisPreview] = useState(null);
   // Load initial data on mount
   useEffect(() => {
     const sortByTimestampDesc = (items) =>
@@ -115,29 +117,54 @@ export const DataProvider = ({ children }) => {
     }
   }, [foodHistory]);
 
-  const startScan = async (imageData) => {
+  const startScan = async (imageData, scanMeta = {}) => {
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const formatBytes = (bytes) => {
+      if (!Number.isFinite(bytes) || bytes <= 0) {
+        return null;
+      }
+
+      if (bytes >= 1024 * 1024) {
+        return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+      }
+
+      return `${Math.round(bytes / 1024)} KB`;
+    };
+    const originalSizeLabel = formatBytes(scanMeta.originalBytes);
+    const compressedSizeLabel = formatBytes(scanMeta.compressedBytes);
+    const compressionDetail =
+      originalSizeLabel && compressedSizeLabel
+        ? `Optimized ${originalSizeLabel} → ${compressedSizeLabel}`
+        : "Optimizing for upload";
 
     setCurrentScan(imageData);
+    setProcessingSnapshot({
+      previewImage: imageData,
+      originalBytes: scanMeta.originalBytes || null,
+      compressedBytes: scanMeta.compressedBytes || null,
+    });
+    setAnalysisPreview(null);
     setAnalysisState("scanning");
     setProcessingStatus({
       title: "Preparing image",
-      detail: "",
+      detail: compressionDetail,
     });
 
     try {
       const stageToStatus = {
         "cache-check": {
           title: "Checking cache",
-          detail: "",
+          detail: "Looking for previous analysis",
         },
         uploading: {
           title: "Uploading",
-          detail: "",
+          detail: compressedSizeLabel
+            ? `Uploading ${compressedSizeLabel}`
+            : "Uploading image",
         },
         computing: {
           title: "Analyzing",
-          detail: "",
+          detail: "Extracting nutrition and ingredients",
         },
       };
 
@@ -159,6 +186,18 @@ export const DataProvider = ({ children }) => {
       );
 
       await statusQueue;
+
+      const preview = {
+        productName: analysis?.productName || "Food item",
+        calories: analysis?.nutrients?.calories ?? null,
+        servingSize: analysis?.servingSize || null,
+      };
+      setAnalysisPreview(preview);
+      setProcessingStatus({
+        title: "Reviewing result",
+        detail: `Detected: ${preview.productName}`,
+      });
+      await sleep(700);
 
       if (meta?.cacheHit && meta?.cacheSource === "localStorage") {
         enqueueStatus({
@@ -204,6 +243,8 @@ export const DataProvider = ({ children }) => {
     setCurrentScan(null);
     setAnalysisState("idle");
     setProcessingStatus({ title: "", detail: "" });
+    setProcessingSnapshot(null);
+    setAnalysisPreview(null);
   };
 
   const loadFoodById = async (foodId) => {
@@ -227,6 +268,8 @@ export const DataProvider = ({ children }) => {
     foodHistory,
     isLoading,
     processingStatus,
+    processingSnapshot,
+    analysisPreview,
     startScan,
     completeAnalysis,
     resetScan,

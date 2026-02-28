@@ -24,7 +24,10 @@ module.exports = function handler(req, res) {
       ...payload,
       id:
         payload.id ||
-        buildFoodIdentifier(payload.productName || "food", payload.imageHash || ""),
+        buildFoodIdentifier(
+          payload.productName || "food",
+          payload.imageHash || "",
+        ),
       timestamp: payload.timestamp || Date.now(),
       nutrients: payload.nutrients || payload.nutritionInfo || {},
       ingredients: payload.ingredients || [],
