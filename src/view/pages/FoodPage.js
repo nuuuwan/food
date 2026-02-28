@@ -949,7 +949,11 @@ const FoodPage = () => {
                       <Box sx={{ px: 1, py: 0.6, flex: 1 }}>
                         <Typography
                           variant="caption"
-                          sx={{ display: "block", fontWeight: 700, lineHeight: 1.1 }}
+                          sx={{
+                            display: "block",
+                            fontWeight: 700,
+                            lineHeight: 1.1,
+                          }}
                         >
                           NUTRI-GRADE
                         </Typography>
