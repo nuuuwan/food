@@ -8,6 +8,10 @@ const TopRatingsOverlay = ({
   novaBadgeColor,
   novaClassNumber,
 }) => {
+  const activeNutriGrade = singaporeGradeScale.find(
+    (item) => item.grade === singaporeNutriGrade,
+  );
+
   const formatOverlayValue = (value, unit) => {
     if (value === null || value === undefined || !Number.isFinite(value)) {
       return `...${unit}/100g`;
@@ -78,7 +82,7 @@ const TopRatingsOverlay = ({
 
       <Box
         sx={{
-          width: { xs: 72, sm: 76 },
+          width: { xs: 44, sm: 48 },
           p: 0.35,
           borderRadius: 1.2,
           backgroundColor: "rgba(255,255,255,0.88)",
@@ -97,42 +101,31 @@ const TopRatingsOverlay = ({
         </Typography>
         <Box
           sx={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+            minHeight: 33,
+            borderRadius: 0.5,
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "common.white",
+            fontWeight: 900,
+            fontSize: "1rem",
+            lineHeight: 1,
+            backgroundColor: activeNutriGrade?.color || "#9e9e9e",
             border: "1px solid",
             borderColor: "common.black",
-            borderRadius: 999,
-            overflow: "hidden",
           }}
         >
-          {singaporeGradeScale.map((gradeItem) => (
-            <Box
-              key={gradeItem.grade}
-              sx={{
-                py: 0.2,
-                textAlign: "center",
-                color: "common.white",
-                backgroundColor: gradeItem.color,
-                fontWeight: singaporeNutriGrade === gradeItem.grade ? 900 : 500,
-                fontSize: "0.6rem",
-                outline:
-                  singaporeNutriGrade === gradeItem.grade
-                    ? "1.5px solid #000"
-                    : "none",
-              }}
-            >
-              {gradeItem.grade}
-            </Box>
-          ))}
+          {activeNutriGrade?.grade || "-"}
         </Box>
       </Box>
 
       <Box
         sx={{
-          width: { xs: 34, sm: 36 },
+          width: { xs: 44, sm: 48 },
           borderRadius: 1.2,
           backgroundColor: "rgba(255,255,255,0.88)",
-          p: 0.3,
+          p: 0.35,
         }}
       >
         <Typography
@@ -141,7 +134,7 @@ const TopRatingsOverlay = ({
             color: "text.secondary",
             fontWeight: 900,
             lineHeight: 1,
-            mb: 0.1,
+            mb: 0.2,
             fontSize: "0.5rem",
           }}
         >
@@ -151,12 +144,14 @@ const TopRatingsOverlay = ({
           sx={{
             minHeight: 33,
             borderRadius: 0.5,
+            border: "1px solid",
+            borderColor: "common.black",
             backgroundColor: novaBadgeColor,
             color: "common.white",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "1.2rem",
+            fontSize: "1rem",
             fontWeight: 900,
             lineHeight: 1,
           }}
