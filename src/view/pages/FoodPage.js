@@ -380,6 +380,15 @@ const FoodPage = () => {
     sugarPer100g === null || sugarPer100g === undefined
       ? null
       : Math.max(0, Math.round(sugarPer100g));
+  const singaporeGradeScale = [
+    { grade: "A", color: "#1f8b43" },
+    { grade: "B", color: "#8abf2f" },
+    { grade: "C", color: "#f0a128" },
+    { grade: "D", color: "#c71c22" },
+  ];
+  const activeSingaporeGrade =
+    singaporeGradeScale.find((item) => item.grade === singaporeNutriGrade) ||
+    null;
 
   const inferNOVAClass = () => {
     const normalizedIngredients = (ingredients || [])
@@ -915,61 +924,129 @@ const FoodPage = () => {
                     sx={{
                       borderRadius: 1.5,
                       backgroundColor: "action.hover",
-                      p: 1,
+                      px: 1.5,
+                      py: 1,
                     }}
                   >
                     <Typography variant="caption" color="text.secondary">
                       🇸🇬 Singapore
                     </Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      Nutri-Grade (A–D)
-                    </Typography>
                     <Box
                       sx={{
-                        mt: 0.75,
-                        display: "flex",
-                        alignItems: "stretch",
+                        mt: 0.6,
                         width: "100%",
-                        maxWidth: 260,
-                        borderRadius: 1,
-                        overflow: "hidden",
-                        border: "1px solid",
-                        borderColor: "divider",
-                        bgcolor: "background.paper",
+                        maxWidth: 360,
+                        mx: "auto",
+                        px: 1,
                       }}
                     >
                       <Box
                         sx={{
-                          width: 54,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          bgcolor: singaporeNutriGradeColor,
-                          color: "common.white",
-                          fontWeight: 800,
-                          fontSize: "1.35rem",
+                          fontSize: "2rem",
+                          fontWeight: 900,
+                          letterSpacing: 0.5,
+                          lineHeight: 1,
+                          mb: 0.6,
+                          textAlign: "center",
                         }}
                       >
-                        {singaporeNutriGrade}
+                        NUTRI-GRADE
                       </Box>
-                      <Box sx={{ px: 1, py: 0.6, flex: 1 }}>
-                        <Typography
-                          variant="caption"
+                      <Box sx={{ position: "relative" }}>
+                        <Box
                           sx={{
-                            display: "block",
-                            fontWeight: 700,
-                            lineHeight: 1.1,
+                            display: "grid",
+                            gridTemplateColumns: "repeat(4, minmax(0, 1fr)) auto",
+                            borderRadius: 999,
+                            overflow: "visible",
+                            border: "2px solid",
+                            borderColor: "common.black",
+                            backgroundColor: "background.paper",
+                            minHeight: 72,
                           }}
                         >
-                          NUTRI-GRADE
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ display: "block", mt: 0.25, lineHeight: 1.1 }}
-                        >
-                          Sugar {singaporeSugarPctEstimate ?? "-"}% (est.)
-                        </Typography>
+                          {singaporeGradeScale.map((gradeItem) => (
+                            <Box
+                              key={gradeItem.grade}
+                              sx={{
+                                position: "relative",
+                                overflow: "visible",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: gradeItem.color,
+                                color: "common.white",
+                                fontSize: "2.1rem",
+                                fontWeight: 500,
+                                lineHeight: 1,
+                              }}
+                            >
+                              {gradeItem.grade}
+                              {singaporeNutriGrade === gradeItem.grade && (
+                                <Box
+                                  sx={{
+                                    position: "absolute",
+                                    width: 88,
+                                    height: 88,
+                                    top: "50%",
+                                    left: "50%",
+                                    transform: "translate(-50%, -50%)",
+                                    borderRadius: "50%",
+                                    border: "6px solid",
+                                    borderColor: "common.black",
+                                    backgroundColor:
+                                      activeSingaporeGrade?.color ||
+                                      singaporeNutriGradeColor,
+                                    color: "common.white",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    fontSize: "3.1rem",
+                                    fontWeight: 700,
+                                    lineHeight: 1,
+                                    boxShadow: 2,
+                                    zIndex: 3,
+                                  }}
+                                >
+                                  {singaporeNutriGrade}
+                                </Box>
+                              )}
+                            </Box>
+                          ))}
+                          <Box
+                            sx={{
+                              minWidth: 86,
+                              px: 1,
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              backgroundColor: "common.white",
+                              borderLeft: "2px solid",
+                              borderColor: "common.black",
+                              color: "common.black",
+                            }}
+                          >
+                            <Typography
+                              variant="h4"
+                              sx={{ fontWeight: 900, lineHeight: 1 }}
+                            >
+                              {singaporeSugarPctEstimate ?? "-"}
+                              <Typography
+                                component="span"
+                                sx={{ fontSize: "0.55em", fontWeight: 800 }}
+                              >
+                                %
+                              </Typography>
+                            </Typography>
+                            <Typography
+                              variant="body1"
+                              sx={{ fontWeight: 800, lineHeight: 1 }}
+                            >
+                              sugar
+                            </Typography>
+                          </Box>
+                        </Box>
                       </Box>
                     </Box>
                     <Typography
