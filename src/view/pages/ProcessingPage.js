@@ -1,7 +1,14 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useData } from "../../nonview/core/DataContext";
-import { Box, Typography, Container, Card, CardContent, Paper } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Container,
+  Card,
+  CardContent,
+  Paper,
+} from "@mui/material";
 
 const ProcessingPage = () => {
   const navigate = useNavigate();
@@ -16,7 +23,8 @@ const ProcessingPage = () => {
   const statusMessage = processingStatus.detail || processingStatus.title;
   const previewImage = processingSnapshot?.previewImage || currentScan;
   const resolvedFood = currentFood || null;
-  const resolvedName = resolvedFood?.productName || analysisPreview?.productName || "";
+  const resolvedName =
+    resolvedFood?.productName || analysisPreview?.productName || "";
   const resolvedIngredients = Array.isArray(resolvedFood?.ingredients)
     ? resolvedFood.ingredients
     : [];
@@ -132,12 +140,18 @@ const ProcessingPage = () => {
               <Typography variant="subtitle1" sx={{ mb: 0.8, fontWeight: 600 }}>
                 Ingredients
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic" }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontStyle: "italic" }}
+              >
                 {resolvedIngredients.length > 0
                   ? resolvedIngredients
                       .map((ingredient) => {
                         const name = String(ingredient?.name || "").trim();
-                        const quantity = String(ingredient?.quantity || "").trim();
+                        const quantity = String(
+                          ingredient?.quantity || "",
+                        ).trim();
                         if (!name) {
                           return "";
                         }
@@ -165,7 +179,8 @@ const ProcessingPage = () => {
                 Ratings / Classifications
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Nutri-Grade: {resolvedClassifications?.singaporeNutriGrade || "..."}
+                Nutri-Grade:{" "}
+                {resolvedClassifications?.singaporeNutriGrade || "..."}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 NOVA: {resolvedClassifications?.novaClassCode || "..."}
@@ -187,7 +202,9 @@ const ProcessingPage = () => {
                 Calories: {resolvedNutrients?.calories ?? "..."} kcal
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Protein: {resolvedNutrients?.protein ?? "..."} g • Carbs: {resolvedNutrients?.carbs ?? "..."} g • Fat: {resolvedNutrients?.fat ?? "..."} g
+                Protein: {resolvedNutrients?.protein ?? "..."} g • Carbs:{" "}
+                {resolvedNutrients?.carbs ?? "..."} g • Fat:{" "}
+                {resolvedNutrients?.fat ?? "..."} g
               </Typography>
             </Box>
 
