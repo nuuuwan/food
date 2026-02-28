@@ -439,6 +439,14 @@ const FoodPage = () => {
   };
 
   const novaClass = inferNOVAClass();
+  const novaClassNumber = (novaClass.code.match(/(\d+)/) || [])[1] || "-";
+  const novaBadgeColor =
+    {
+      1: "#38b000",
+      2: "#8abf2f",
+      3: "#f0a128",
+      4: "#c71c22",
+    }[novaClassNumber] || theme.palette.grey[500];
 
   const getTrafficLightPanelColor = (key, valuePer100g) => {
     if (valuePer100g === null || valuePer100g === undefined) {
@@ -956,7 +964,8 @@ const FoodPage = () => {
                         <Box
                           sx={{
                             display: "grid",
-                            gridTemplateColumns: "repeat(4, minmax(0, 1fr)) auto",
+                            gridTemplateColumns:
+                              "repeat(4, minmax(0, 1fr)) auto",
                             borderRadius: 999,
                             overflow: "visible",
                             border: "2px solid",
@@ -1066,15 +1075,70 @@ const FoodPage = () => {
                       p: 1,
                     }}
                   >
-                    <Typography variant="caption" color="text.secondary">
-                      🌍 NOVA System
-                    </Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      Processing classification
-                    </Typography>
-                    <Typography variant="body2" sx={{ mt: 0.5 }}>
-                      {novaClass.code} • {novaClass.label}
-                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        gap: 1.25,
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 96,
+                          border: "1px solid",
+                          borderColor: "grey.400",
+                          backgroundColor: "grey.100",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            textAlign: "center",
+                            color: "text.secondary",
+                            fontWeight: 900,
+                            fontSize: "2rem",
+                            lineHeight: 1,
+                            py: 0.4,
+                            letterSpacing: 0.5,
+                          }}
+                        >
+                          NOVA
+                        </Typography>
+                        <Box
+                          sx={{
+                            mx: 0.35,
+                            mb: 0.35,
+                            minHeight: 112,
+                            backgroundColor: novaBadgeColor,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              color: "common.white",
+                              fontWeight: 800,
+                              fontSize: "5rem",
+                              lineHeight: 0.95,
+                            }}
+                          >
+                            {novaClassNumber}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Box sx={{ pt: 0.5 }}>
+                        <Typography variant="caption" color="text.secondary">
+                          🌍 NOVA System
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                          {novaClass.code}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mt: 0.25 }}>
+                          {novaClass.label}
+                        </Typography>
+                      </Box>
+                    </Box>
                   </Box>
                 </Grid>
               </Grid>
