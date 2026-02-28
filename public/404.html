@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting...</title>
+    <script>
+      (function () {
+        var locationObj = window.location;
+        var segments = locationObj.pathname.split("/").filter(Boolean);
+        var baseSegment = segments.length > 0 ? segments[0] : "";
+        var basePath = baseSegment ? "/" + baseSegment : "";
+        var routePath = locationObj.pathname.slice(basePath.length) || "/";
+        var redirectPath =
+          basePath +
+          "/?p=" +
+          encodeURIComponent(routePath + locationObj.search + locationObj.hash);
+
+        locationObj.replace(redirectPath);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

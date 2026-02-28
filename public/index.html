@@ -15,6 +15,27 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <script>
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var encodedPath = params.get("p");
+
+        if (!encodedPath) {
+          return;
+        }
+
+        params.delete("p");
+
+        var decodedPath = decodeURIComponent(encodedPath);
+        var trailingQuery = params.toString();
+        var newUrl =
+          window.location.pathname +
+          decodedPath +
+          (trailingQuery ? "?" + trailingQuery : "");
+
+        window.history.replaceState(null, "", newUrl);
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
