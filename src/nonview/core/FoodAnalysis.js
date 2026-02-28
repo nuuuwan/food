@@ -10,6 +10,7 @@ export class FoodAnalysis {
     nutritionInfo = null,
     ingredients = [],
     warnings = [],
+    classifications = {},
     servingSize = "",
     photos = [],
   } = {}) {
@@ -24,6 +25,11 @@ export class FoodAnalysis {
       ing instanceof Ingredient ? ing : Ingredient.fromJSON(ing),
     );
     this.warnings = warnings;
+    this.classifications = {
+      singaporeNutriGrade: classifications?.singaporeNutriGrade || "-",
+      novaClassCode: classifications?.novaClassCode || "-",
+      novaClassLabel: classifications?.novaClassLabel || "Unknown",
+    };
     this.servingSize = servingSize;
     this.photos = photos.map((photo) =>
       photo instanceof Photo ? photo : Photo.fromJSON(photo),
@@ -40,6 +46,7 @@ export class FoodAnalysis {
         Ingredient.fromJSON(ing),
       ),
       warnings: data.warnings || [],
+      classifications: data.classifications || {},
       servingSize: data.servingSize || "",
       photos: (data.photos || []).map((photo) => Photo.fromJSON(photo)),
     });
@@ -54,6 +61,7 @@ export class FoodAnalysis {
       nutrients: this.nutritionInfo.toJSON(), // backwards compatibility
       ingredients: this.ingredients.map((ing) => ing.toJSON()),
       warnings: this.warnings,
+      classifications: this.classifications,
       servingSize: this.servingSize,
       photos: this.photos.map((photo) => photo.toJSON()),
       imageUri: this.primaryPhoto?.imageUri || "", // backwards compatibility

@@ -364,10 +364,18 @@ const FoodPage = () => {
       : satFatGrade;
   };
 
-  const singaporeNutriGrade = getSingaporeNutriGrade(
+  const modelNutriGrade = String(
+    displayFood?.classifications?.singaporeNutriGrade || "",
+  )
+    .trim()
+    .toUpperCase();
+  const inferredSingaporeNutriGrade = getSingaporeNutriGrade(
     sugarPer100g,
     saturatedFatPer100g,
   );
+  const singaporeNutriGrade = ["A", "B", "C", "D"].includes(modelNutriGrade)
+    ? modelNutriGrade
+    : inferredSingaporeNutriGrade;
   const singaporeNutriGradeColor =
     {
       A: "#2e7d32",
@@ -388,6 +396,14 @@ const FoodPage = () => {
   const activeSingaporeGrade =
     singaporeGradeScale.find((item) => item.grade === singaporeNutriGrade) ||
     null;
+
+  const getNovaLabelByCode = (code) =>
+    ({
+      "NOVA 1": "Unprocessed or minimally processed",
+      "NOVA 2": "Processed culinary ingredient",
+      "NOVA 3": "Processed food",
+      "NOVA 4": "Ultra-processed food",
+    })[code] || "Unknown";
 
   const inferNOVAClass = () => {
     const normalizedIngredients = (ingredients || [])
@@ -437,7 +453,29 @@ const FoodPage = () => {
     return { code: "NOVA 1", label: "Unprocessed or minimally processed" };
   };
 
-  const novaClass = inferNOVAClass();
+  const inferNormalizedNovaCode = (rawValue) => {
+    const normalized = String(rawValue || "")
+      .trim()
+      .toUpperCase();
+    const match = normalized.match(/([1-4])/);
+    return match ? `NOVA ${match[1]}` : "-";
+  };
+
+  const modelNovaClassCode = inferNormalizedNovaCode(
+    displayFood?.classifications?.novaClassCode ||
+      displayFood?.classifications?.novaClass,
+  );
+  const modelNovaClassLabel = String(
+    displayFood?.classifications?.novaClassLabel || "",
+  ).trim();
+  const inferredNovaClass = inferNOVAClass();
+  const novaClass =
+    modelNovaClassCode !== "-"
+      ? {
+          code: modelNovaClassCode,
+          label: modelNovaClassLabel || getNovaLabelByCode(modelNovaClassCode),
+        }
+      : inferredNovaClass;
   const novaClassNumber = (novaClass.code.match(/(\d+)/) || [])[1] || "-";
   const novaBadgeColor =
     {
