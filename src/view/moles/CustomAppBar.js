@@ -14,12 +14,9 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import { BarChart } from "@mui/x-charts/BarChart";
-import { useTheme } from "@mui/material/styles";
 import VERSION from "../../nonview/cons/VERSION";
 
 const CustomAppBar = () => {
-  const theme = useTheme();
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
 
@@ -41,6 +38,7 @@ const CustomAppBar = () => {
     return {
       usedKB: usedBytes / 1024,
       remainingKB: remainingBytes / 1024,
+      usedPct: (usedBytes / assumedCapacityBytes) * 100,
     };
   };
 
@@ -88,13 +86,6 @@ const CustomAppBar = () => {
           transformOrigin={{ vertical: "top", horizontal: "right" }}
           PaperProps={{ sx: { width: 300, p: 0.5 } }}
         >
-          <Box sx={{ px: 1.5, py: 1 }}>
-            <Typography variant="caption" color="text.secondary">
-              Version
-            </Typography>
-            <Typography variant="body2">{VERSION.DATETIME_STR}</Typography>
-          </Box>
-          <Divider />
           <MenuItem onClick={handleGitHubClick}>
             <GitHubIcon fontSize="small" sx={{ mr: 1 }} />
             <Typography variant="body2" sx={{ flexGrow: 1 }}>
@@ -112,35 +103,15 @@ const CustomAppBar = () => {
               Local storage usage
             </Typography>
             <Typography variant="body2" sx={{ mb: 0.5 }}>
-              Used {storageStats.usedKB.toFixed(1)} KB • Remaining{" "}
-              {storageStats.remainingKB.toFixed(1)} KB
+              {storageStats.usedPct.toFixed(1)}% used
             </Typography>
-            <BarChart
-              height={130}
-              xAxis={[
-                {
-                  data: ["Storage"],
-                  scaleType: "band",
-                },
-              ]}
-              yAxis={[{ min: 0 }]}
-              series={[
-                {
-                  label: "Used KB",
-                  data: [storageStats.usedKB],
-                  color: theme.palette.error.main,
-                  stack: "total",
-                },
-                {
-                  label: "Remaining KB",
-                  data: [storageStats.remainingKB],
-                  color: theme.palette.success.main,
-                  stack: "total",
-                },
-              ]}
-              slotProps={{ legend: { hidden: true } }}
-              margin={{ left: 40, right: 10, top: 10, bottom: 30 }}
-            />
+          </Box>
+          <Divider />
+          <Box sx={{ px: 1.5, py: 1 }}>
+            <Typography variant="caption" color="text.secondary">
+              Version
+            </Typography>
+            <Typography variant="body2">{VERSION.DATETIME_STR}</Typography>
           </Box>
         </Menu>
       </Toolbar>

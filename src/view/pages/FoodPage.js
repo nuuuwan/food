@@ -278,6 +278,8 @@ const FoodPage = () => {
       ? null
       : (sodiumMg / 1000) * 2.5;
   const servingSizeGrams = getServingSizeGrams(servingSize);
+  const effectiveServingSizeGrams =
+    servingSizeGrams && servingSizeGrams > 0 ? servingSizeGrams : 100;
 
   const toPer100g = (valueInGrams) => {
     if (valueInGrams === null || valueInGrams === undefined) {
@@ -635,9 +637,7 @@ const FoodPage = () => {
       <Container maxWidth="lg" sx={{ pb: 4 }}>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Serving Size: {servingSize || "-"} •{" "}
-          {servingSizeGrams === null
-            ? "grams not specified"
-            : `${formatNumber(servingSizeGrams, 1)} g`}
+          {`${formatNumber(effectiveServingSizeGrams, 1)} g`}
         </Typography>
 
         <Card sx={{ mb: 3 }}>
@@ -655,18 +655,8 @@ const FoodPage = () => {
                 p: { xs: 1.75, sm: 2.25 },
                 borderRadius: 2,
                 backgroundColor: "background.default",
-                border: "1px solid",
-                borderColor: "divider",
               }}
             >
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ display: "block", mb: 1.25 }}
-              >
-                Traffic light colors indicate sugar, salt and fat levels per
-                100g (green = low, amber = medium, red = high).
-              </Typography>
               <Grid container spacing={1.5}>
                 {warningBadges.map((item) => {
                   const valueLabel =
@@ -750,6 +740,16 @@ const FoodPage = () => {
                   );
                 })}
               </Grid>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", mt: 1.25 }}
+              >
+                This traffic-light system shows sugar, salt, and fat per 100g
+                (green = low, amber = medium, red = high), aligned to Sri
+                Lanka Food (Color Coding for Sugar, Salt and Fat) Regulations,
+                2019 under Food Act No. 26 of 1980.
+              </Typography>
             </Box>
 
             <Box
@@ -758,8 +758,6 @@ const FoodPage = () => {
                 p: { xs: 1.75, sm: 2.25 },
                 borderRadius: 2,
                 backgroundColor: "background.default",
-                border: "1px solid",
-                borderColor: "divider",
               }}
             >
               <Typography variant="subtitle1" sx={{ mb: 0.5, fontWeight: 600 }}>
@@ -835,8 +833,6 @@ const FoodPage = () => {
                         sx={{
                           p: 1,
                           borderRadius: 1.5,
-                          border: "1px solid",
-                          borderColor: "divider",
                           backgroundColor: "background.paper",
                         }}
                       >
@@ -874,8 +870,6 @@ const FoodPage = () => {
                 p: { xs: 1.75, sm: 2.25 },
                 borderRadius: 2,
                 backgroundColor: "background.default",
-                border: "1px solid",
-                borderColor: "divider",
               }}
             >
               <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
@@ -902,8 +896,6 @@ const FoodPage = () => {
                         sx={{
                           p: 1.25,
                           borderRadius: 1.5,
-                          border: "1px solid",
-                          borderColor: "divider",
                           backgroundColor: "background.paper",
                           display: "flex",
                           justifyContent: "space-between",
@@ -940,8 +932,6 @@ const FoodPage = () => {
                 p: { xs: 1.75, sm: 2.25 },
                 borderRadius: 2,
                 backgroundColor: "background.default",
-                border: "1px solid",
-                borderColor: "divider",
               }}
             >
               <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
@@ -968,8 +958,6 @@ const FoodPage = () => {
                           sx={{
                             p: 1.25,
                             borderRadius: 1.5,
-                            border: "1px solid",
-                            borderColor: "divider",
                             backgroundColor: "background.paper",
                             display: "flex",
                             justifyContent: "space-between",
@@ -1017,8 +1005,6 @@ const FoodPage = () => {
                 p: { xs: 1.75, sm: 2.25 },
                 borderRadius: 2,
                 backgroundColor: "background.default",
-                border: "1px solid",
-                borderColor: "divider",
               }}
             >
               <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
@@ -1045,8 +1031,6 @@ const FoodPage = () => {
                           sx={{
                             p: 1.25,
                             borderRadius: 1.5,
-                            border: "1px solid",
-                            borderColor: "divider",
                             backgroundColor: "background.paper",
                             display: "flex",
                             justifyContent: "space-between",
