@@ -28,7 +28,7 @@ const DAILY_VALUE_FIELDS = [
     label: "Sugar",
     sourceUnit: "g",
     displayUnit: "g",
-    dailyValue: 50,
+    dailyValue: 25,
     dailyValueUnit: "g",
   },
   {
@@ -169,6 +169,22 @@ const FoodPage = () => {
     photos,
   } = displayFood;
 
+  const getServingSizeGrams = (servingSizeValue) => {
+    if (!servingSizeValue) {
+      return null;
+    }
+
+    const match = String(servingSizeValue).match(
+      /(\d+(?:\.\d+)?)\s*(g|gram|grams)\b/i,
+    );
+    if (!match) {
+      return null;
+    }
+
+    const parsed = Number(match[1]);
+    return Number.isFinite(parsed) ? parsed : null;
+  };
+
   const toNullableNumber = (value) => {
     if (value === null || value === undefined || value === "") {
       return null;
@@ -261,6 +277,23 @@ const FoodPage = () => {
     sodiumMg === null || sodiumMg === undefined
       ? null
       : (sodiumMg / 1000) * 2.5;
+  const servingSizeGrams = getServingSizeGrams(servingSize);
+
+  const toPer100g = (valueInGrams) => {
+    if (valueInGrams === null || valueInGrams === undefined) {
+      return null;
+    }
+
+    if (!servingSizeGrams || servingSizeGrams <= 0) {
+      return valueInGrams;
+    }
+
+    return (valueInGrams / servingSizeGrams) * 100;
+  };
+
+  const sugarPer100g = toPer100g(sugarGrams);
+  const saltPer100g = toPer100g(saltGrams);
+  const fatPer100g = toPer100g(fatGrams);
 
   const getTrafficLightPanelColor = (key, valuePer100g) => {
     if (valuePer100g === null || valuePer100g === undefined) {
@@ -306,27 +339,27 @@ const FoodPage = () => {
       label: "Sugar",
       sinhalaLabel: "සීනි",
       tamilLabel: "சர்க்கரை",
-      value: sugarGrams,
+      value: sugarPer100g,
       unit: "g",
-      panelColor: getTrafficLightPanelColor("sugar", sugarGrams),
+      panelColor: getTrafficLightPanelColor("sugar", sugarPer100g),
     },
     {
       key: "salt",
       label: "Salt",
       sinhalaLabel: "ලුණු",
       tamilLabel: "உப்பு",
-      value: saltGrams,
+      value: saltPer100g,
       unit: "g",
-      panelColor: getTrafficLightPanelColor("salt", saltGrams),
+      panelColor: getTrafficLightPanelColor("salt", saltPer100g),
     },
     {
       key: "fat",
       label: "Fat",
       sinhalaLabel: "මේද",
       tamilLabel: "கொழுப்பு",
-      value: fatGrams,
+      value: fatPer100g,
       unit: "g",
-      panelColor: getTrafficLightPanelColor("fat", fatGrams),
+      panelColor: getTrafficLightPanelColor("fat", fatPer100g),
     },
   ];
 
@@ -601,7 +634,10 @@ const FoodPage = () => {
 
       <Container maxWidth="lg" sx={{ pb: 4 }}>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Serving Size: {servingSize || "-"}
+          Serving Size: {servingSize || "-"} •{" "}
+          {servingSizeGrams === null
+            ? "grams not specified"
+            : `${formatNumber(servingSizeGrams, 1)} g`}
         </Typography>
 
         <Card sx={{ mb: 3 }}>
@@ -623,6 +659,14 @@ const FoodPage = () => {
                 borderColor: "divider",
               }}
             >
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", mb: 1.25 }}
+              >
+                Traffic light colors indicate sugar, salt and fat levels per
+                100g (green = low, amber = medium, red = high).
+              </Typography>
               <Grid container spacing={1.5}>
                 {warningBadges.map((item) => {
                   const valueLabel =
@@ -728,7 +772,11 @@ const FoodPage = () => {
               >
                 Total calories: {formatNumber(totalCalories, 0)} kcal
               </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1.5 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", mb: 1.5 }}
+              >
                 DV means Daily Value based on a 2,000 kcal adult diet.
               </Typography>
               {totalMacroCalories > 0 ? (
