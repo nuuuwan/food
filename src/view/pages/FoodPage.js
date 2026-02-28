@@ -1372,11 +1372,21 @@ const FoodPage = () => {
               <Typography variant="subtitle1" sx={{ mb: 0.8, fontWeight: 600 }}>
                 Classification Explanations
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.35 }}>
-                Sri Lanka Traffic Light: Based on estimated sugar, salt, and fat per 100g.
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 0.35 }}
+              >
+                Sri Lanka Traffic Light: Based on estimated sugar, salt, and fat
+                per 100g.
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.35 }}>
-                Singapore Nutri-Grade: {singaporeNutriGrade} — {singaporeNutriGradeReason}
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 0.35 }}
+              >
+                Singapore Nutri-Grade: {singaporeNutriGrade} —{" "}
+                {singaporeNutriGradeReason}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 NOVA: {novaClass.code} — {novaClassReason}
