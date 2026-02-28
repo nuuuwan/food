@@ -32,6 +32,9 @@ export class FoodAnalysis {
       novaClassCode: classifications?.novaClassCode || "-",
       novaClassLabel: classifications?.novaClassLabel || "Unknown",
       novaClassReason: classifications?.novaClassReason || "",
+      novaTriggerItems: Array.isArray(classifications?.novaTriggerItems)
+        ? classifications.novaTriggerItems
+        : [],
     };
     this.servingSize = servingSize;
     this.photos = photos.map((photo) =>

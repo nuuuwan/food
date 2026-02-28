@@ -38,6 +38,7 @@ const DEFAULT_CLASSIFICATIONS = {
   novaClassCode: "-",
   novaClassLabel: "Unknown",
   novaClassReason: "",
+  novaTriggerItems: [],
 };
 
 const NOVA_LABEL_BY_CODE = {
@@ -66,6 +67,15 @@ const NOVA_SIGNAL_KEYWORDS = [
   "glucose",
   "dextrose",
   "artificial",
+];
+
+const NOVA_EXTRA_TRIGGER_KEYWORDS = [
+  "sugar",
+  "invert",
+  "corn syrup",
+  "hfcs",
+  "maltose",
+  "glucose syrup",
 ];
 
 const toNonNegativeNumber = (value) => {
@@ -164,6 +174,23 @@ const getNovaSignalIngredients = (ingredients) => {
   );
 };
 
+const getNovaTriggerItems = (ingredients) => {
+  const names = getIngredientNames(ingredients);
+  const triggers = names.filter((name) => {
+    const lower = name.toLowerCase();
+    return (
+      NOVA_SIGNAL_KEYWORDS.some((keyword) => lower.includes(keyword)) ||
+      NOVA_EXTRA_TRIGGER_KEYWORDS.some((keyword) => lower.includes(keyword))
+    );
+  });
+
+  if (triggers.length > 0) {
+    return Array.from(new Set(triggers)).slice(0, 4);
+  }
+
+  return names.slice(0, 2);
+};
+
 const containsNamedIngredient = (reason, ingredients) => {
   const reasonText = String(reason || "").toLowerCase();
   if (!reasonText) {
@@ -227,10 +254,10 @@ const ensureSpecificNovaReason = (reason, novaClassCode, ingredients) => {
     return normalizedReason;
   }
 
-  const signalIngredients = getNovaSignalIngredients(ingredients).slice(0, 3);
-  if (signalIngredients.length > 0) {
+  const triggerItems = getNovaTriggerItems(ingredients);
+  if (triggerItems.length > 0) {
     return normalizeShortReason(
-      `${normalizedReason || "Classified NOVA 4."} Specific ultra-processed ingredient(s): ${signalIngredients.join(", ")}.`,
+      `${normalizedReason || "Classified NOVA 4."} Specific ultra-processed ingredient(s): ${triggerItems.join(", ")}.`,
     );
   }
 
@@ -270,6 +297,15 @@ const normalizeClassifications = (analysis, nutrients, ingredients) => {
     normalizeShortReason(
       provided?.novaClassReason || analysis?.novaClassReason,
     ) || inferNovaReasonFromIngredients(ingredients, nutrients, novaClassCode);
+  const providedTriggerItems = Array.isArray(provided?.novaTriggerItems)
+    ? provided.novaTriggerItems
+        .map((item) => String(item || "").trim())
+        .filter(Boolean)
+        .slice(0, 4)
+    : [];
+  const inferredTriggerItems = getNovaTriggerItems(ingredients);
+  const novaTriggerItems =
+    providedTriggerItems.length > 0 ? providedTriggerItems : inferredTriggerItems;
   const novaClassReason = ensureSpecificNovaReason(
     rawNovaClassReason,
     novaClassCode,
@@ -283,6 +319,7 @@ const normalizeClassifications = (analysis, nutrients, ingredients) => {
     novaClassCode,
     novaClassLabel: NOVA_LABEL_BY_CODE[novaClassCode] || "Unknown",
     novaClassReason,
+    novaTriggerItems,
   };
 };
 
