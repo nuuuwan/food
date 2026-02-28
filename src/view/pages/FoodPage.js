@@ -304,6 +304,8 @@ const FoodPage = () => {
     {
       key: "sugar",
       label: "Sugar",
+      sinhalaLabel: "සීනි",
+      tamilLabel: "சர்க்கரை",
       value: sugarGrams,
       unit: "g",
       panelColor: getTrafficLightPanelColor("sugar", sugarGrams),
@@ -311,6 +313,8 @@ const FoodPage = () => {
     {
       key: "salt",
       label: "Salt",
+      sinhalaLabel: "ලුණු",
+      tamilLabel: "உப்பு",
       value: saltGrams,
       unit: "g",
       panelColor: getTrafficLightPanelColor("salt", saltGrams),
@@ -318,6 +322,8 @@ const FoodPage = () => {
     {
       key: "fat",
       label: "Fat",
+      sinhalaLabel: "මේද",
+      tamilLabel: "கொழுப்பு",
       value: fatGrams,
       unit: "g",
       panelColor: getTrafficLightPanelColor("fat", fatGrams),
@@ -364,6 +370,28 @@ const FoodPage = () => {
 
   const visibleVitaminFields = getVisibleDailyValueFields(VITAMIN_DV_FIELDS);
   const visibleMineralFields = getVisibleDailyValueFields(MINERAL_DV_FIELDS);
+
+  const getFieldDailyValuePercent = (field) => {
+    const rawValue = toNullableNumber(nutrients?.[field.key]);
+    const percent = getDailyValuePercent(
+      rawValue,
+      field.sourceUnit,
+      field.dailyValue,
+      field.dailyValueUnit,
+    );
+
+    return percent === null ? -1 : percent;
+  };
+
+  const sortedVisibleVitaminFields = [...visibleVitaminFields].sort(
+    (left, right) =>
+      getFieldDailyValuePercent(right) - getFieldDailyValuePercent(left),
+  );
+
+  const sortedVisibleMineralFields = [...visibleMineralFields].sort(
+    (left, right) =>
+      getFieldDailyValuePercent(right) - getFieldDailyValuePercent(left),
+  );
 
   const formatDateTime = (ts) => {
     const date = new Date(ts);
@@ -623,6 +651,18 @@ const FoodPage = () => {
                           }}
                         >
                           <Typography
+                            variant="caption"
+                            sx={{ display: "block", opacity: 0.95 }}
+                          >
+                            {item.sinhalaLabel}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{ display: "block", opacity: 0.95 }}
+                          >
+                            {item.tamilLabel}
+                          </Typography>
+                          <Typography
                             variant="subtitle1"
                             sx={{ fontWeight: 700, lineHeight: 1.1 }}
                           >
@@ -799,7 +839,7 @@ const FoodPage = () => {
                         <Typography variant="body2" color="text.secondary">
                           {percent === null
                             ? "-"
-                            : `${formatNumber(percent, 0)}% adult daily value`}
+                            : `${formatNumber(percent, 0)}% DV`}
                         </Typography>
                       </Box>
                     </Grid>
@@ -827,7 +867,7 @@ const FoodPage = () => {
                 </Typography>
               ) : (
                 <Grid container spacing={1}>
-                  {visibleVitaminFields.map((item) => {
+                  {sortedVisibleVitaminFields.map((item) => {
                     const rawValue = toNullableNumber(nutrients?.[item.key]);
                     const percent = getDailyValuePercent(
                       rawValue,
@@ -904,7 +944,7 @@ const FoodPage = () => {
                 </Typography>
               ) : (
                 <Grid container spacing={1}>
-                  {visibleMineralFields.map((item) => {
+                  {sortedVisibleMineralFields.map((item) => {
                     const rawValue = toNullableNumber(nutrients?.[item.key]);
                     const percent = getDailyValuePercent(
                       rawValue,
@@ -931,18 +971,16 @@ const FoodPage = () => {
                           <Box>
                             <Typography
                               variant="body2"
-                              sx={{ fontWeight: 600 }}
+                              sx={{ fontWeight: 700 }}
+                            >
+                              {item.alternativeName || item.label}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
                             >
                               {item.label}
                             </Typography>
-                            {item.alternativeName && (
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                              >
-                                {item.alternativeName}
-                              </Typography>
-                            )}
                             <Typography variant="body2">
                               {formatNumber(rawValue)} {item.sourceUnit}
                             </Typography>
