@@ -47,6 +47,27 @@ const NOVA_LABEL_BY_CODE = {
   "NOVA 4": "Ultra-processed food",
 };
 
+const NOVA_SIGNAL_KEYWORDS = [
+  "flavour",
+  "flavor",
+  "emulsifier",
+  "stabilizer",
+  "stabiliser",
+  "preservative",
+  "sweetener",
+  "colour",
+  "color",
+  "maltodextrin",
+  "hydrogenated",
+  "modified starch",
+  "high fructose",
+  "syrup",
+  "fructose",
+  "glucose",
+  "dextrose",
+  "artificial",
+];
+
 const toNonNegativeNumber = (value) => {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) {
@@ -111,23 +132,8 @@ const inferNovaCodeFromIngredients = (ingredients, nutrients) => {
     return "-";
   }
 
-  const additiveKeywords = [
-    "flavour",
-    "flavor",
-    "emulsifier",
-    "stabilizer",
-    "stabiliser",
-    "preservative",
-    "sweetener",
-    "colour",
-    "color",
-    "maltodextrin",
-    "hydrogenated",
-    "modified starch",
-    "high fructose",
-  ];
   const hasAdditiveSignals = normalizedIngredients.some((name) =>
-    additiveKeywords.some((keyword) => name.includes(keyword)),
+    NOVA_SIGNAL_KEYWORDS.some((keyword) => name.includes(keyword)),
   );
   const hasAddedSugar = toNonNegativeNumber(nutrients?.addedSugar) > 0;
   const hasManyIngredients = ingredientCount >= 5;
@@ -144,30 +150,96 @@ const inferNovaCodeFromIngredients = (ingredients, nutrients) => {
   return "NOVA 1";
 };
 
+const getIngredientNames = (ingredients) =>
+  (ingredients || [])
+    .map((ingredient) => String(ingredient?.name || "").trim())
+    .filter(Boolean);
+
+const getNovaSignalIngredients = (ingredients) => {
+  const names = getIngredientNames(ingredients);
+  return names.filter((name) =>
+    NOVA_SIGNAL_KEYWORDS.some((keyword) => name.toLowerCase().includes(keyword)),
+  );
+};
+
+const containsNamedIngredient = (reason, ingredients) => {
+  const reasonText = String(reason || "").toLowerCase();
+  if (!reasonText) {
+    return false;
+  }
+  return getIngredientNames(ingredients).some((name) =>
+    reasonText.includes(name.toLowerCase()),
+  );
+};
+
 const inferNovaReasonFromIngredients = (
   ingredients,
   nutrients,
   novaClassCode,
 ) => {
-  const ingredientCount = (ingredients || []).filter(
-    (ingredient) => String(ingredient?.name || "").trim() !== "",
-  ).length;
+  const ingredientNames = getIngredientNames(ingredients);
+  const ingredientCount = ingredientNames.length;
+  const signalIngredients = getNovaSignalIngredients(ingredients);
+  const topSignals = signalIngredients.slice(0, 3);
+  const topIngredients = ingredientNames.slice(0, 3);
   const addedSugar = toNonNegativeNumber(nutrients?.addedSugar).toFixed(1);
   const base = `${ingredientCount} listed ingredient${ingredientCount === 1 ? "" : "s"}`;
 
   if (novaClassCode === "NOVA 4") {
+    if (topSignals.length > 0) {
+      return `Classified NOVA 4 due to ultra-processed ingredients: ${topSignals.join(", ")}.`;
+    }
+    if (topIngredients.length > 0) {
+      return `Classified NOVA 4; likely ultra-processed based on ingredients including ${topIngredients.join(", ")}.`;
+    }
     return `${base} with additive/processing signals and added sugar (${addedSugar}g).`;
   }
   if (novaClassCode === "NOVA 3") {
+    if (topIngredients.length > 0) {
+      return `Classified NOVA 3 from processed profile with ingredients like ${topIngredients.join(", ")}.`;
+    }
     return `${base} with processing indicators or added sugar (${addedSugar}g).`;
   }
   if (novaClassCode === "NOVA 2") {
+    if (topIngredients.length > 0) {
+      return `Classified NOVA 2 from simple processed ingredients such as ${topIngredients.join(", ")}.`;
+    }
     return `${base} suggests processed culinary ingredient profile.`;
   }
   if (novaClassCode === "NOVA 1") {
+    if (topIngredients.length > 0) {
+      return `Classified NOVA 1; ingredients appear minimally processed (${topIngredients.join(", ")}).`;
+    }
     return `${base} suggests minimal processing profile.`;
   }
   return "Insufficient evidence for a confident NOVA explanation.";
+};
+
+const ensureSpecificNovaReason = (reason, novaClassCode, ingredients) => {
+  const normalizedReason = normalizeShortReason(reason);
+  if (novaClassCode !== "NOVA 4") {
+    return normalizedReason;
+  }
+
+  if (containsNamedIngredient(normalizedReason, ingredients)) {
+    return normalizedReason;
+  }
+
+  const signalIngredients = getNovaSignalIngredients(ingredients).slice(0, 3);
+  if (signalIngredients.length > 0) {
+    return normalizeShortReason(
+      `${normalizedReason || "Classified NOVA 4."} Specific ultra-processed ingredient(s): ${signalIngredients.join(", ")}.`,
+    );
+  }
+
+  const topIngredients = getIngredientNames(ingredients).slice(0, 2);
+  if (topIngredients.length > 0) {
+    return normalizeShortReason(
+      `${normalizedReason || "Classified NOVA 4."} Noted ingredient(s): ${topIngredients.join(", ")}.`,
+    );
+  }
+
+  return normalizedReason;
 };
 
 const normalizeClassifications = (analysis, nutrients, ingredients) => {
@@ -192,10 +264,15 @@ const normalizeClassifications = (analysis, nutrients, ingredients) => {
     normalizeShortReason(
       provided?.singaporeNutriGradeReason || analysis?.nutriGradeReason,
     ) || inferNutriGradeReasonFromNutrients(nutrients);
-  const novaClassReason =
+  const rawNovaClassReason =
     normalizeShortReason(
       provided?.novaClassReason || analysis?.novaClassReason,
     ) || inferNovaReasonFromIngredients(ingredients, nutrients, novaClassCode);
+  const novaClassReason = ensureSpecificNovaReason(
+    rawNovaClassReason,
+    novaClassCode,
+    ingredients,
+  );
 
   return {
     ...DEFAULT_CLASSIFICATIONS,
