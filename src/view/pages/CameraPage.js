@@ -126,7 +126,7 @@ const CameraPage = () => {
           {previewImage ? (
             <img
               src={previewImage}
-              alt="Selected food image"
+              alt="Selected food"
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           ) : (
