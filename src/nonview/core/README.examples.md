@@ -16,7 +16,13 @@ const food = FoodAnalysis.fromJSON({
     { name: "Sea Salt", quantity: "2g" },
   ],
   warnings: ["Contains Peanuts"],
-  photos: [{ id: "photo-001", timestamp: Date.now(), imageUri: "/food/peanut-butter.jpg" }],
+  photos: [
+    {
+      id: "photo-001",
+      timestamp: Date.now(),
+      imageUri: "/food/peanut-butter.jpg",
+    },
+  ],
 });
 ```
 
