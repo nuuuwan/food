@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useData } from "../../nonview/core/DataContext";
+import { PieChart } from "@mui/x-charts/PieChart";
 import {
   Box,
   Typography,
@@ -10,95 +11,115 @@ import {
   Divider,
   Card,
   CardContent,
+  useTheme,
 } from "@mui/material";
 
-const NUTRIENT_GROUPS = [
+const DAILY_VALUE_FIELDS = [
   {
-    title: "Energy",
-    fields: [{ key: "calories", label: "Calories", unit: "" }],
+    key: "fiber",
+    label: "Fibre",
+    sourceUnit: "g",
+    displayUnit: "g",
+    dailyValue: 28,
+    dailyValueUnit: "g",
   },
   {
-    title: "Carbohydrates",
-    fields: [
-      { key: "carbs", label: "Carbs", unit: "g" },
-      { key: "sugar", label: "Sugar", unit: "g" },
-      { key: "addedSugar", label: "Added Sugar", unit: "g" },
-    ],
+    key: "sugar",
+    label: "Sugar",
+    sourceUnit: "g",
+    displayUnit: "g",
+    dailyValue: 50,
+    dailyValueUnit: "g",
   },
   {
-    title: "Protein & Fibre",
-    fields: [
-      { key: "protein", label: "Protein", unit: "g" },
-      { key: "fiber", label: "Fiber", unit: "g" },
-    ],
-  },
-  {
-    title: "Fats",
-    fields: [
-      { key: "fat", label: "Fat", unit: "g" },
-      { key: "saturatedFat", label: "Saturated Fat", unit: "g" },
-      { key: "cholesterol", label: "Cholesterol", unit: "mg" },
-    ],
-  },
-  {
-    title: "Electrolytes",
-    fields: [
-      { key: "sodium", label: "Sodium", unit: "mg" },
-      { key: "potassium", label: "Potassium", unit: "mg" },
-    ],
-  },
-  {
-    title: "Minerals",
-    fields: [
-      { key: "calcium", label: "Calcium", unit: "mg" },
-      { key: "iron", label: "Iron", unit: "mg" },
-      { key: "magnesium", label: "Magnesium", unit: "mg" },
-      { key: "zinc", label: "Zinc", unit: "mg" },
-    ],
-  },
-  {
-    title: "Vitamins",
-    fields: [
-      { key: "vitaminD", label: "Vitamin D", unit: "mcg" },
-      { key: "vitaminB12", label: "Vitamin B12", unit: "mcg" },
-      { key: "folate", label: "Folate", unit: "mcg" },
-      { key: "vitaminC", label: "Vitamin C", unit: "mg" },
-    ],
-  },
-  {
-    title: "Other",
-    fields: [
-      { key: "caffeine", label: "Caffeine", unit: "mg" },
-      { key: "alcohol", label: "Alcohol", unit: "g" },
-    ],
+    key: "cholesterol",
+    label: "Cholesterol",
+    sourceUnit: "mg",
+    displayUnit: "mg",
+    dailyValue: 300,
+    dailyValueUnit: "mg",
   },
 ];
 
-const NUTRIENT_TONES = {
-  calories: "neutral",
-  carbs: "neutral",
-  fat: "neutral",
-  caffeine: "neutral",
-  protein: "good",
-  fiber: "good",
-  potassium: "good",
-  calcium: "good",
-  iron: "good",
-  magnesium: "good",
-  zinc: "good",
-  vitaminD: "good",
-  vitaminB12: "good",
-  folate: "good",
-  vitaminC: "good",
-  sugar: "bad",
-  addedSugar: "bad",
-  saturatedFat: "bad",
-  cholesterol: "bad",
-  sodium: "bad",
-  alcohol: "bad",
-};
+const VITAMIN_MINERAL_DV_FIELDS = [
+  {
+    key: "vitaminD",
+    label: "Vitamin D",
+    alternativeName: "Calciferol",
+    sourceUnit: "mcg",
+    dailyValue: 20,
+    dailyValueUnit: "mcg",
+  },
+  {
+    key: "vitaminB12",
+    label: "Vitamin B12",
+    alternativeName: "Cobalamin",
+    sourceUnit: "mcg",
+    dailyValue: 2.4,
+    dailyValueUnit: "mcg",
+  },
+  {
+    key: "folate",
+    label: "Vitamin B9",
+    alternativeName: "Folate",
+    sourceUnit: "mcg",
+    dailyValue: 400,
+    dailyValueUnit: "mcg",
+  },
+  {
+    key: "vitaminC",
+    label: "Vitamin C",
+    alternativeName: "Ascorbic Acid",
+    sourceUnit: "mg",
+    dailyValue: 90,
+    dailyValueUnit: "mg",
+  },
+  {
+    key: "sodium",
+    label: "Sodium",
+    sourceUnit: "mg",
+    dailyValue: 2300,
+    dailyValueUnit: "mg",
+  },
+  {
+    key: "potassium",
+    label: "Potassium",
+    sourceUnit: "mg",
+    dailyValue: 4700,
+    dailyValueUnit: "mg",
+  },
+  {
+    key: "calcium",
+    label: "Calcium",
+    sourceUnit: "mg",
+    dailyValue: 1300,
+    dailyValueUnit: "mg",
+  },
+  {
+    key: "iron",
+    label: "Iron",
+    sourceUnit: "mg",
+    dailyValue: 18,
+    dailyValueUnit: "mg",
+  },
+  {
+    key: "magnesium",
+    label: "Magnesium",
+    sourceUnit: "mg",
+    dailyValue: 420,
+    dailyValueUnit: "mg",
+  },
+  {
+    key: "zinc",
+    label: "Zinc",
+    sourceUnit: "mg",
+    dailyValue: 11,
+    dailyValueUnit: "mg",
+  },
+];
 
 const FoodPage = () => {
+  const theme = useTheme();
   const { foodId } = useParams();
   const { currentFood, foodHistory, loadFoodById } = useData();
 
@@ -152,55 +173,116 @@ const FoodPage = () => {
     return Number.isFinite(parsed) ? parsed : null;
   };
 
-  const getNutrientDisplayParts = (value, unit = "") => {
-    if (value === null || value === undefined) {
-      return {
-        number: "-",
-        unit: "",
-      };
+  const formatNumber = (value, maximumFractionDigits = 1) => {
+    if (value === null || value === undefined || !Number.isFinite(value)) {
+      return "-";
     }
 
-    return {
-      number: `${value}`,
-      unit,
-    };
+    const maxDigits = Math.max(0, Number(maximumFractionDigits) || 0);
+    const minDigits = Math.min(maxDigits, value % 1 === 0 ? 0 : 1);
+
+    return value.toLocaleString("en-US", {
+      maximumFractionDigits: maxDigits,
+      minimumFractionDigits: minDigits,
+    });
   };
 
-  const getNutrientTone = (key) => NUTRIENT_TONES[key] || "neutral";
-
-  const getNutrientColor = (key, value) => {
-    if (value === null || value === undefined) {
-      return "text.disabled";
+  const convertUnit = (value, fromUnit, toUnit) => {
+    if (value === null || value === undefined || !Number.isFinite(value)) {
+      return null;
     }
 
-    const tone = getNutrientTone(key);
-
-    if (tone === "good") {
-      return "success.main";
+    if (fromUnit === toUnit) {
+      return value;
     }
 
-    if (tone === "bad") {
-      return "error.main";
+    if (fromUnit === "mg" && toUnit === "g") {
+      return value / 1000;
     }
 
-    return "text.secondary";
+    if (fromUnit === "mcg" && toUnit === "mg") {
+      return value / 1000;
+    }
+
+    if (fromUnit === "mg" && toUnit === "mcg") {
+      return value * 1000;
+    }
+
+    return value;
   };
 
-  const getLabelFontSize = (label) => {
-    if (!label) {
-      return { xs: "0.72rem", sm: "0.75rem" };
+  const getDailyValuePercent = (
+    rawValue,
+    sourceUnit,
+    dailyValue,
+    dailyValueUnit,
+  ) => {
+    if (rawValue === null || rawValue === undefined) {
+      return null;
     }
 
-    if (label.length >= 14) {
-      return { xs: "0.62rem", sm: "0.68rem" };
+    const normalizedValue = convertUnit(rawValue, sourceUnit, dailyValueUnit);
+    if (
+      normalizedValue === null ||
+      !Number.isFinite(normalizedValue) ||
+      !dailyValue ||
+      !Number.isFinite(dailyValue)
+    ) {
+      return null;
     }
 
-    if (label.length >= 10) {
-      return { xs: "0.66rem", sm: "0.72rem" };
-    }
-
-    return { xs: "0.72rem", sm: "0.75rem" };
+    return (normalizedValue / dailyValue) * 100;
   };
+
+  const protein = toNullableNumber(nutrients?.protein) || 0;
+  const fat = toNullableNumber(nutrients?.fat) || 0;
+  const carbs = toNullableNumber(nutrients?.carbs) || 0;
+
+  const proteinCalories = protein * 4;
+  const fatCalories = fat * 9;
+  const carbsCalories = carbs * 4;
+  const totalMacroCalories = proteinCalories + fatCalories + carbsCalories;
+  const totalCalories =
+    toNullableNumber(nutrients?.calories) || totalMacroCalories;
+
+  const calorieSegments = [
+    {
+      key: "protein",
+      label: "Protein",
+      calories: proteinCalories,
+      color: theme.palette.success.main,
+    },
+    {
+      key: "fat",
+      label: "Fat",
+      calories: fatCalories,
+      color: theme.palette.warning.main,
+    },
+    {
+      key: "carbs",
+      label: "Carbs",
+      calories: carbsCalories,
+      color: theme.palette.error.main,
+    },
+  ];
+
+  const visibleVitaminMineralFields = VITAMIN_MINERAL_DV_FIELDS.filter(
+    (item) => {
+      const rawValue = toNullableNumber(nutrients?.[item.key]);
+      const percent = getDailyValuePercent(
+        rawValue,
+        item.sourceUnit,
+        item.dailyValue,
+        item.dailyValueUnit,
+      );
+
+      if (percent === null) {
+        return true;
+      }
+
+      return percent >= 0.5;
+    },
+  );
 
   const formatDateTime = (ts) => {
     const date = new Date(ts);
@@ -374,120 +456,211 @@ const FoodPage = () => {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               Values per serving
             </Typography>
-            <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }}>
-              {NUTRIENT_GROUPS.map((group) => (
-                <Grid item xs={12} sm={6} lg={4} key={group.title}>
-                  <Box
-                    sx={{
-                      p: { xs: 1.75, sm: 2.25 },
-                      borderRadius: 2,
-                      backgroundColor: "background.default",
-                      border: "1px solid",
-                      borderColor: "divider",
-                      height: "100%",
+            <Box
+              sx={{
+                mb: 3,
+                p: { xs: 1.75, sm: 2.25 },
+                borderRadius: 2,
+                backgroundColor: "background.default",
+                border: "1px solid",
+                borderColor: "divider",
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ mb: 0.5, fontWeight: 600 }}>
+                Calories Breakdown
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mb: 1.5 }}
+              >
+                Total calories: {formatNumber(totalCalories, 0)} kcal
+              </Typography>
+              {totalMacroCalories > 0 ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    mb: 1.5,
+                  }}
+                >
+                  <PieChart
+                    height={180}
+                    series={[
+                      {
+                        innerRadius: 36,
+                        outerRadius: 70,
+                        paddingAngle: 2,
+                        cornerRadius: 3,
+                        data: calorieSegments.map((segment) => ({
+                          id: segment.key,
+                          value: segment.calories,
+                          label: segment.label,
+                          color: segment.color,
+                        })),
+                      },
+                    ]}
+                    slotProps={{
+                      legend: { hidden: true },
                     }}
-                  >
-                    <Typography
-                      variant="overline"
-                      sx={{ mb: 1.25, color: "text.secondary" }}
-                    >
-                      {group.title}
-                    </Typography>
-                    <Grid container spacing={1.25}>
-                      {group.fields.map((nutrient) => {
-                        const value = toNullableNumber(
-                          nutrients?.[nutrient.key],
-                        );
-                        const nutrientColor = getNutrientColor(
-                          nutrient.key,
-                          value,
-                        );
-                        const nutrientDisplay = getNutrientDisplayParts(
-                          value,
-                          nutrient.unit,
-                        );
+                  />
+                </Box>
+              ) : (
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                  No macro calorie breakdown available.
+                </Typography>
+              )}
 
-                        return (
-                          <Grid
-                            item
-                            xs={6}
-                            key={nutrient.key}
-                            sx={{ display: "flex", minWidth: 0 }}
-                          >
-                            <Box
-                              sx={{
-                                width: "100%",
-                                aspectRatio: "1 / 1",
-                                p: 1.25,
-                                borderRadius: 1.5,
-                                backgroundColor: "background.paper",
-                                border: "1px solid",
-                                borderColor: "divider",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                textAlign: "center",
-                                gap: 0.5,
-                                overflow: "hidden",
-                              }}
-                            >
-                              <Typography
-                                variant="caption"
-                                sx={{
-                                  color: nutrientColor,
-                                  fontSize: getLabelFontSize(nutrient.label),
-                                  minHeight: "2.4em",
-                                  lineHeight: 1.2,
-                                  display: "-webkit-box",
-                                  WebkitLineClamp: 2,
-                                  WebkitBoxOrient: "vertical",
-                                  overflow: "hidden",
-                                }}
-                              >
-                                {nutrient.label}
-                              </Typography>
-                              <Typography
-                                variant="subtitle2"
-                                sx={{
-                                  color: nutrientColor,
-                                  whiteSpace: "nowrap",
-                                  display: "flex",
-                                  alignItems: "baseline",
-                                  justifyContent: "center",
-                                }}
-                              >
-                                <Box
-                                  component="span"
-                                  sx={{
-                                    fontSize: { xs: "1.2rem", sm: "1.35rem" },
-                                    lineHeight: 1,
-                                  }}
-                                >
-                                  {nutrientDisplay.number}
-                                </Box>
-                                {nutrientDisplay.unit && (
-                                  <Box
-                                    component="span"
-                                    sx={{
-                                      ml: 0.25,
-                                      fontSize: "0.7rem",
-                                      color: "text.secondary",
-                                    }}
-                                  >
-                                    {nutrientDisplay.unit}
-                                  </Box>
-                                )}
-                              </Typography>
-                            </Box>
-                          </Grid>
-                        );
-                      })}
+              <Grid container spacing={1}>
+                {calorieSegments.map((segment) => {
+                  const pct =
+                    totalMacroCalories > 0
+                      ? (segment.calories / totalMacroCalories) * 100
+                      : 0;
+
+                  return (
+                    <Grid item xs={12} sm={4} key={segment.key}>
+                      <Box
+                        sx={{
+                          p: 1,
+                          borderRadius: 1.5,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          backgroundColor: "background.paper",
+                        }}
+                      >
+                        <Typography variant="caption" color="text.secondary">
+                          {segment.label}
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {formatNumber(segment.calories, 0)} kcal (
+                          {formatNumber(pct, 0)}%)
+                        </Typography>
+                      </Box>
                     </Grid>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
+                  );
+                })}
+              </Grid>
+            </Box>
+
+            <Box
+              sx={{
+                mb: 3,
+                p: { xs: 1.75, sm: 2.25 },
+                borderRadius: 2,
+                backgroundColor: "background.default",
+                border: "1px solid",
+                borderColor: "divider",
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
+                Fibre, Sugar & Cholesterol
+              </Typography>
+              <Grid container spacing={1}>
+                {DAILY_VALUE_FIELDS.map((item) => {
+                  const rawValue = toNullableNumber(nutrients?.[item.key]);
+                  const displayValue = convertUnit(
+                    rawValue,
+                    item.sourceUnit,
+                    item.displayUnit,
+                  );
+                  const percent = getDailyValuePercent(
+                    rawValue,
+                    item.sourceUnit,
+                    item.dailyValue,
+                    item.dailyValueUnit,
+                  );
+
+                  return (
+                    <Grid item xs={12} sm={4} key={item.key}>
+                      <Box
+                        sx={{
+                          p: 1.25,
+                          borderRadius: 1.5,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          backgroundColor: "background.paper",
+                        }}
+                      >
+                        <Typography variant="caption" color="text.secondary">
+                          {item.label}
+                        </Typography>
+                        <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                          {formatNumber(displayValue, 2)} {item.displayUnit}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {percent === null
+                            ? "-"
+                            : `${formatNumber(percent, 0)}% adult daily value`}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            </Box>
+
+            <Box
+              sx={{
+                p: { xs: 1.75, sm: 2.25 },
+                borderRadius: 2,
+                backgroundColor: "background.default",
+                border: "1px solid",
+                borderColor: "divider",
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
+                Vitamins & Minerals (Daily Values)
+              </Typography>
+              <Grid container spacing={1}>
+                {visibleVitaminMineralFields.map((item) => {
+                  const rawValue = toNullableNumber(nutrients?.[item.key]);
+                  const percent = getDailyValuePercent(
+                    rawValue,
+                    item.sourceUnit,
+                    item.dailyValue,
+                    item.dailyValueUnit,
+                  );
+
+                  return (
+                    <Grid item xs={12} sm={6} md={4} key={item.key}>
+                      <Box
+                        sx={{
+                          p: 1.25,
+                          borderRadius: 1.5,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          backgroundColor: "background.paper",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "baseline",
+                          gap: 1,
+                        }}
+                      >
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">
+                            {item.alternativeName
+                              ? `${item.label} (${item.alternativeName})`
+                              : item.label}
+                          </Typography>
+                          <Typography variant="body2">
+                            {formatNumber(rawValue)} {item.sourceUnit}
+                          </Typography>
+                        </Box>
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: 600, color: "primary.main" }}
+                        >
+                          {percent === null
+                            ? "-"
+                            : `${formatNumber(percent, 0)}% DV`}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            </Box>
           </CardContent>
         </Card>
 
@@ -498,7 +671,7 @@ const FoodPage = () => {
             </Typography>
             <Divider sx={{ mb: 2 }} />
             <Box component="ol" sx={{ pl: 2 }}>
-              {ingredients.map((ingredient, index) => (
+              {(ingredients || []).map((ingredient, index) => (
                 <li key={index}>
                   <Typography variant="body1">
                     {ingredient.name} - {ingredient.quantity}
