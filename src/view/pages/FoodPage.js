@@ -334,18 +334,30 @@ const FoodPage = () => {
     {
       key: "protein",
       label: "Protein",
+      grams: protein,
+      gramsUnit: "g",
+      dailyValue: 50,
+      dailyValueUnit: "g",
       calories: proteinCalories,
       color: "#1e3a8a",
     },
     {
       key: "fat",
       label: "Fat",
+      grams: fat,
+      gramsUnit: "g",
+      dailyValue: 78,
+      dailyValueUnit: "g",
       calories: fatCalories,
       color: "#6d28d9",
     },
     {
       key: "carbs",
       label: "Carbs",
+      grams: carbs,
+      gramsUnit: "g",
+      dailyValue: 275,
+      dailyValueUnit: "g",
       calories: carbsCalories,
       color: "#be185d",
     },
@@ -651,7 +663,7 @@ const FoodPage = () => {
                           }}
                         >
                           <Typography
-                            variant="caption"
+                            variant="body2"
                             sx={{ display: "block", opacity: 0.95 }}
                           >
                             {item.sinhalaLabel}
@@ -716,6 +728,9 @@ const FoodPage = () => {
               >
                 Total calories: {formatNumber(totalCalories, 0)} kcal
               </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1.5 }}>
+                DV means Daily Value based on a 2,000 kcal adult diet.
+              </Typography>
               {totalMacroCalories > 0 ? (
                 <Box
                   sx={{
@@ -759,6 +774,12 @@ const FoodPage = () => {
                     totalMacroCalories > 0
                       ? (segment.calories / totalMacroCalories) * 100
                       : 0;
+                  const gramsDvPct = getDailyValuePercent(
+                    segment.grams,
+                    segment.gramsUnit,
+                    segment.dailyValue,
+                    segment.dailyValueUnit,
+                  );
 
                   return (
                     <Grid item xs={12} sm={4} key={segment.key}>
@@ -783,6 +804,14 @@ const FoodPage = () => {
                         >
                           {formatNumber(segment.calories, 0)} kcal (
                           {formatNumber(pct, 0)}%)
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {formatNumber(segment.grams, 1)} {segment.gramsUnit}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {gramsDvPct === null
+                            ? "-"
+                            : `${formatNumber(gramsDvPct, 0)}% DV`}
                         </Typography>
                       </Box>
                     </Grid>
@@ -828,15 +857,24 @@ const FoodPage = () => {
                           border: "1px solid",
                           borderColor: "divider",
                           backgroundColor: "background.paper",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "baseline",
+                          gap: 1,
                         }}
                       >
-                        <Typography variant="caption" color="text.secondary">
-                          {item.label}
-                        </Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                          {formatNumber(displayValue, 2)} {item.displayUnit}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {item.label}
+                          </Typography>
+                          <Typography variant="body2">
+                            {formatNumber(displayValue, 2)} {item.displayUnit}
+                          </Typography>
+                        </Box>
+                        <Typography
+                          variant="body2"
+                          sx={{ fontWeight: 600, color: "text.secondary" }}
+                        >
                           {percent === null
                             ? "-"
                             : `${formatNumber(percent, 0)}% DV`}

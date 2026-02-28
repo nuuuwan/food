@@ -16,6 +16,7 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { useTheme } from "@mui/material/styles";
+import VERSION from "../../nonview/cons/VERSION";
 
 const CustomAppBar = () => {
   const theme = useTheme();
@@ -87,6 +88,13 @@ const CustomAppBar = () => {
           transformOrigin={{ vertical: "top", horizontal: "right" }}
           PaperProps={{ sx: { width: 300, p: 0.5 } }}
         >
+          <Box sx={{ px: 1.5, py: 1 }}>
+            <Typography variant="caption" color="text.secondary">
+              Version
+            </Typography>
+            <Typography variant="body2">{VERSION.DATETIME_STR}</Typography>
+          </Box>
+          <Divider />
           <MenuItem onClick={handleGitHubClick}>
             <GitHubIcon fontSize="small" sx={{ mr: 1 }} />
             <Typography variant="body2" sx={{ flexGrow: 1 }}>
