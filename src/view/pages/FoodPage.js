@@ -309,32 +309,76 @@ const FoodPage = () => {
   );
 
   const getSingaporeNutriGrade = (sugarValue, saturatedFatValue) => {
-    if (sugarValue === null && saturatedFatValue === null) {
+    const getSugarGrade = (value) => {
+      if (value === null || value === undefined) {
+        return null;
+      }
+
+      if (value <= 1) {
+        return "A";
+      }
+      if (value <= 5) {
+        return "B";
+      }
+      if (value <= 10) {
+        return "C";
+      }
+      return "D";
+    };
+
+    const getSaturatedFatGrade = (value) => {
+      if (value === null || value === undefined) {
+        return null;
+      }
+
+      if (value <= 0.7) {
+        return "A";
+      }
+      if (value <= 1.2) {
+        return "B";
+      }
+      if (value <= 2.8) {
+        return "C";
+      }
+      return "D";
+    };
+
+    const gradeRank = { A: 1, B: 2, C: 3, D: 4 };
+    const sugarGrade = getSugarGrade(sugarValue);
+    const satFatGrade = getSaturatedFatGrade(saturatedFatValue);
+
+    if (!sugarGrade && !satFatGrade) {
       return "-";
     }
 
-    const sugarForGrade = sugarValue ?? Number.POSITIVE_INFINITY;
-    const satFatForGrade = saturatedFatValue ?? Number.POSITIVE_INFINITY;
-
-    if (sugarForGrade <= 1 && satFatForGrade <= 0.7) {
-      return "A";
+    if (!sugarGrade) {
+      return satFatGrade;
     }
 
-    if (sugarForGrade <= 5 && satFatForGrade <= 1.2) {
-      return "B";
+    if (!satFatGrade) {
+      return sugarGrade;
     }
 
-    if (sugarForGrade <= 10 && satFatForGrade <= 2.8) {
-      return "C";
-    }
-
-    return "D";
+    return gradeRank[sugarGrade] >= gradeRank[satFatGrade]
+      ? sugarGrade
+      : satFatGrade;
   };
 
   const singaporeNutriGrade = getSingaporeNutriGrade(
     sugarPer100g,
     saturatedFatPer100g,
   );
+  const singaporeNutriGradeColor =
+    {
+      A: "#2e7d32",
+      B: "#558b2f",
+      C: "#f9a825",
+      D: "#c62828",
+    }[singaporeNutriGrade] || theme.palette.grey[500];
+  const singaporeSugarPctEstimate =
+    sugarPer100g === null || sugarPer100g === undefined
+      ? null
+      : Math.max(0, Math.round(sugarPer100g));
 
   const getUkTrafficLevel = (nutrientKey, valuePer100g) => {
     if (valuePer100g === null || valuePer100g === undefined) {
@@ -764,7 +808,7 @@ const FoodPage = () => {
                   const valueLabel =
                     item.value === null || item.value === undefined
                       ? `...${item.unit}`
-                      : `${formatNumber(item.value, 2)}${item.unit}`;
+                      : `${formatNumber(item.value, 0)}${item.unit}`;
 
                   return (
                     <Box key={item.key} sx={{ display: "flex" }}>
@@ -874,9 +918,50 @@ const FoodPage = () => {
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
                       Nutri-Grade (A–D)
                     </Typography>
-                    <Typography variant="body2" sx={{ mt: 0.5 }}>
-                      {singaporeNutriGrade}
-                    </Typography>
+                    <Box
+                      sx={{
+                        mt: 0.75,
+                        display: "flex",
+                        alignItems: "stretch",
+                        width: "100%",
+                        maxWidth: 260,
+                        borderRadius: 1,
+                        overflow: "hidden",
+                        border: "1px solid",
+                        borderColor: "divider",
+                        bgcolor: "background.paper",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 54,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          bgcolor: singaporeNutriGradeColor,
+                          color: "common.white",
+                          fontWeight: 800,
+                          fontSize: "1.35rem",
+                        }}
+                      >
+                        {singaporeNutriGrade}
+                      </Box>
+                      <Box sx={{ px: 1, py: 0.6, flex: 1 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ display: "block", fontWeight: 700, lineHeight: 1.1 }}
+                        >
+                          NUTRI-GRADE
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: "block", mt: 0.25, lineHeight: 1.1 }}
+                        >
+                          Sugar {singaporeSugarPctEstimate ?? "-"}% (est.)
+                        </Typography>
+                      </Box>
+                    </Box>
                     <Typography
                       variant="caption"
                       color="text.secondary"
@@ -1011,7 +1096,7 @@ const FoodPage = () => {
                           {formatNumber(pct, 0)}%)
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {formatNumber(segment.grams, 1)} {segment.gramsUnit}
+                          {formatNumber(segment.grams, 0)} {segment.gramsUnit}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           {gramsDvPct === null
@@ -1055,14 +1140,17 @@ const FoodPage = () => {
                     <Grid item xs={12} sm={4} key={item.key}>
                       <Box
                         sx={{
-                          p: 1.25,
+                          p: 1,
                           borderRadius: 1.5,
                           backgroundColor: "action.hover",
-                          minHeight: 128,
+                          minHeight: 96,
                           aspectRatio: "1 / 1",
                           display: "flex",
                           flexDirection: "column",
                           justifyContent: "space-between",
+                          width: "100%",
+                          maxWidth: 140,
+                          mx: "auto",
                         }}
                       >
                         <Box>
@@ -1070,7 +1158,7 @@ const FoodPage = () => {
                             {item.label}
                           </Typography>
                           <Typography variant="body2">
-                            {formatNumber(displayValue, 2)} {item.displayUnit}
+                            {formatNumber(displayValue, 0)} {item.displayUnit}
                           </Typography>
                         </Box>
                         <Typography
@@ -1122,14 +1210,17 @@ const FoodPage = () => {
                       <Grid item xs={12} sm={6} md={4} key={item.key}>
                         <Box
                           sx={{
-                            p: 1.25,
+                            p: 1,
                             borderRadius: 1.5,
                             backgroundColor: "action.hover",
-                            minHeight: 128,
+                            minHeight: 96,
                             aspectRatio: "1 / 1",
                             display: "flex",
                             flexDirection: "column",
                             justifyContent: "space-between",
+                            width: "100%",
+                            maxWidth: 140,
+                            mx: "auto",
                           }}
                         >
                           <Box>
@@ -1148,7 +1239,7 @@ const FoodPage = () => {
                               </Typography>
                             )}
                             <Typography variant="body2">
-                              {formatNumber(rawValue)} {item.sourceUnit}
+                              {formatNumber(rawValue, 0)} {item.sourceUnit}
                             </Typography>
                           </Box>
                           <Typography
@@ -1200,14 +1291,17 @@ const FoodPage = () => {
                       <Grid item xs={12} sm={6} md={4} key={item.key}>
                         <Box
                           sx={{
-                            p: 1.25,
+                            p: 1,
                             borderRadius: 1.5,
                             backgroundColor: "action.hover",
-                            minHeight: 128,
+                            minHeight: 96,
                             aspectRatio: "1 / 1",
                             display: "flex",
                             flexDirection: "column",
                             justifyContent: "space-between",
+                            width: "100%",
+                            maxWidth: 140,
+                            mx: "auto",
                           }}
                         >
                           <Box>
@@ -1224,7 +1318,7 @@ const FoodPage = () => {
                               {item.label}
                             </Typography>
                             <Typography variant="body2">
-                              {formatNumber(rawValue)} {item.sourceUnit}
+                              {formatNumber(rawValue, 0)} {item.sourceUnit}
                             </Typography>
                           </Box>
                           <Typography
