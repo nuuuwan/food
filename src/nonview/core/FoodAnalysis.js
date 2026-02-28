@@ -27,8 +27,11 @@ export class FoodAnalysis {
     this.warnings = warnings;
     this.classifications = {
       singaporeNutriGrade: classifications?.singaporeNutriGrade || "-",
+      singaporeNutriGradeReason:
+        classifications?.singaporeNutriGradeReason || "",
       novaClassCode: classifications?.novaClassCode || "-",
       novaClassLabel: classifications?.novaClassLabel || "Unknown",
+      novaClassReason: classifications?.novaClassReason || "",
     };
     this.servingSize = servingSize;
     this.photos = photos.map((photo) =>

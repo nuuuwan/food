@@ -34,8 +34,10 @@ const defaultNutrients = {
 
 const DEFAULT_CLASSIFICATIONS = {
   singaporeNutriGrade: "-",
+  singaporeNutriGradeReason: "",
   novaClassCode: "-",
   novaClassLabel: "Unknown",
+  novaClassReason: "",
 };
 
 const NOVA_LABEL_BY_CODE = {
@@ -68,6 +70,12 @@ const normalizeNovaCode = (value) => {
   return match ? `NOVA ${match[1]}` : "-";
 };
 
+const normalizeShortReason = (value, maxLength = 160) =>
+  String(value || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
+
 const inferNutriGradeFromNutrients = (nutrients) => {
   const sugar = toNonNegativeNumber(nutrients?.sugar);
   const saturatedFat = toNonNegativeNumber(nutrients?.saturatedFat);
@@ -85,6 +93,12 @@ const inferNutriGradeFromNutrients = (nutrients) => {
 
   const rank = { A: 1, B: 2, C: 3, D: 4 };
   return rank[sugarGrade] >= rank[satFatGrade] ? sugarGrade : satFatGrade;
+};
+
+const inferNutriGradeReasonFromNutrients = (nutrients) => {
+  const sugar = toNonNegativeNumber(nutrients?.sugar).toFixed(1);
+  const saturatedFat = toNonNegativeNumber(nutrients?.saturatedFat).toFixed(1);
+  return `Based on sugar ${sugar}g and saturated fat ${saturatedFat}g per 100g estimate.`;
 };
 
 const inferNovaCodeFromIngredients = (ingredients, nutrients) => {
@@ -130,6 +144,28 @@ const inferNovaCodeFromIngredients = (ingredients, nutrients) => {
   return "NOVA 1";
 };
 
+const inferNovaReasonFromIngredients = (ingredients, nutrients, novaClassCode) => {
+  const ingredientCount = (ingredients || []).filter(
+    (ingredient) => String(ingredient?.name || "").trim() !== "",
+  ).length;
+  const addedSugar = toNonNegativeNumber(nutrients?.addedSugar).toFixed(1);
+  const base = `${ingredientCount} listed ingredient${ingredientCount === 1 ? "" : "s"}`;
+
+  if (novaClassCode === "NOVA 4") {
+    return `${base} with additive/processing signals and added sugar (${addedSugar}g).`;
+  }
+  if (novaClassCode === "NOVA 3") {
+    return `${base} with processing indicators or added sugar (${addedSugar}g).`;
+  }
+  if (novaClassCode === "NOVA 2") {
+    return `${base} suggests processed culinary ingredient profile.`;
+  }
+  if (novaClassCode === "NOVA 1") {
+    return `${base} suggests minimal processing profile.`;
+  }
+  return "Insufficient evidence for a confident NOVA explanation.";
+};
+
 const normalizeClassifications = (analysis, nutrients, ingredients) => {
   const provided = analysis?.classifications || {};
   const normalizedNutriGrade = normalizeNutriGrade(
@@ -148,11 +184,21 @@ const normalizeClassifications = (analysis, nutrients, ingredients) => {
       ? inferNovaCodeFromIngredients(ingredients, nutrients)
       : normalizedNovaCode;
 
+  const singaporeNutriGradeReason =
+    normalizeShortReason(
+      provided?.singaporeNutriGradeReason || analysis?.nutriGradeReason,
+    ) || inferNutriGradeReasonFromNutrients(nutrients);
+  const novaClassReason =
+    normalizeShortReason(provided?.novaClassReason || analysis?.novaClassReason) ||
+    inferNovaReasonFromIngredients(ingredients, nutrients, novaClassCode);
+
   return {
     ...DEFAULT_CLASSIFICATIONS,
     singaporeNutriGrade,
+    singaporeNutriGradeReason,
     novaClassCode,
     novaClassLabel: NOVA_LABEL_BY_CODE[novaClassCode] || "Unknown",
+    novaClassReason,
   };
 };
 

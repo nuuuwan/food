@@ -369,6 +369,9 @@ const FoodPage = () => {
   )
     .trim()
     .toUpperCase();
+  const modelNutriGradeReason = String(
+    displayFood?.classifications?.singaporeNutriGradeReason || "",
+  ).trim();
   const inferredSingaporeNutriGrade = getSingaporeNutriGrade(
     sugarPer100g,
     saturatedFatPer100g,
@@ -396,6 +399,9 @@ const FoodPage = () => {
   const activeSingaporeGrade =
     singaporeGradeScale.find((item) => item.grade === singaporeNutriGrade) ||
     null;
+  const singaporeNutriGradeReason =
+    modelNutriGradeReason ||
+    `Estimated from sugar ${formatNumber(sugarPer100g, 1)}g and saturated fat ${formatNumber(saturatedFatPer100g, 1)}g per 100g.`;
 
   const getNovaLabelByCode = (code) =>
     ({
@@ -468,6 +474,9 @@ const FoodPage = () => {
   const modelNovaClassLabel = String(
     displayFood?.classifications?.novaClassLabel || "",
   ).trim();
+  const modelNovaClassReason = String(
+    displayFood?.classifications?.novaClassReason || "",
+  ).trim();
   const inferredNovaClass = inferNOVAClass();
   const novaClass =
     modelNovaClassCode !== "-"
@@ -476,6 +485,9 @@ const FoodPage = () => {
           label: modelNovaClassLabel || getNovaLabelByCode(modelNovaClassCode),
         }
       : inferredNovaClass;
+  const novaClassReason =
+    modelNovaClassReason ||
+    `Estimated from ingredient profile (${(ingredients || []).length} listed) and added sugar ${formatNumber(toNullableNumber(nutrients?.addedSugar) || 0, 1)}g.`;
   const novaClassNumber = (novaClass.code.match(/(\d+)/) || [])[1] || "-";
   const novaBadgeColor =
     {
@@ -1127,6 +1139,13 @@ const FoodPage = () => {
                     >
                       Estimated grade for this food: {singaporeNutriGrade}
                     </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ display: "block", mt: 0.25 }}
+                    >
+                      Why: {singaporeNutriGradeReason}
+                    </Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -1198,6 +1217,13 @@ const FoodPage = () => {
                         </Typography>
                         <Typography variant="body2" sx={{ mt: 0.25 }}>
                           {novaClass.label}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: "block", mt: 0.35 }}
+                        >
+                          Why: {novaClassReason}
                         </Typography>
                       </Box>
                     </Box>
