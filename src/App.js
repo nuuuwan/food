@@ -5,7 +5,6 @@ import { DataProvider } from "./nonview/core/DataContext";
 import ProcessingPage from "./view/pages/ProcessingPage";
 import FoodPage from "./view/pages/FoodPage";
 import HistoryPage from "./view/pages/HistoryPage";
-import CustomAppBar from "./view/moles/CustomAppBar";
 import CustomBottomNavigator from "./view/moles/CustomBottomNavigator";
 import "./App.css";
 
@@ -31,7 +30,6 @@ function App() {
       <DataProvider>
         <BrowserRouter basename="/food">
           <Box sx={{ pb: 7 }}>
-            <CustomAppBar />
             <Routes>
               <Route path="/" element={<Navigate to="/list" replace />} />
               <Route path="/processing" element={<ProcessingPage />} />

@@ -676,6 +676,23 @@ const FoodPage = () => {
     return normalized === "" || normalized === "unknown";
   };
 
+  const ingredientListText = (ingredients || [])
+    .map((ingredient) => {
+      const name = String(ingredient?.name || "").trim();
+      if (!name) {
+        return "";
+      }
+
+      const quantity = ingredient?.quantity;
+      if (isUnknownQuantity(quantity)) {
+        return name;
+      }
+
+      return `${name} (${String(quantity).trim()})`;
+    })
+    .filter(Boolean)
+    .join(", ");
+
   const renderPhotoCollage = () => {
     if (!photos || photos.length === 0) return null;
 
@@ -826,27 +843,13 @@ const FoodPage = () => {
       </Box>
 
       <Container maxWidth="lg" sx={{ pb: 4 }}>
-        <Box sx={{ mb: 2.5 }}>
-          <Typography
-            variant="subtitle2"
-            color="text.secondary"
-            sx={{ mb: 0.4 }}
-          >
-            Ingredients
-          </Typography>
-          <Box component="ul" sx={{ pl: 2.25, m: 0 }}>
-            {(ingredients || []).map((ingredient, index) => (
-              <Box component="li" key={index} sx={{ mb: 0.15 }}>
-                <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-                  {ingredient.name}
-                  {!isUnknownQuantity(ingredient.quantity)
-                    ? ` — ${ingredient.quantity}`
-                    : ""}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-        </Box>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ mb: 2.5, fontStyle: "italic" }}
+        >
+          {ingredientListText || "-"}
+        </Typography>
 
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Serving Size: {servingSize || "-"}
