@@ -43,6 +43,7 @@ export const DataProvider = ({ children }) => {
   };
 
   const startScan = async (imageData, scanMeta = {}) => {
+    setCurrentFood(null);
     try {
       await runScanWorkflow({
         imageData,
@@ -67,6 +68,7 @@ export const DataProvider = ({ children }) => {
 
   const resetScan = () => {
     setCurrentScan(null);
+    setCurrentFood(null);
     setAnalysisState("idle");
     setProcessingStatus({ title: "", detail: "" });
     setProcessingSnapshot(null);
