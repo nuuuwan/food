@@ -336,6 +336,32 @@ const FoodPage = () => {
     return `${dateStr} at ${timeStr}`;
   };
 
+  const getImageSizeKB = (imageUri) => {
+    if (!imageUri || typeof imageUri !== "string") {
+      return null;
+    }
+
+    const match = imageUri.match(/^data:.*;base64,(.+)$/);
+    if (!match) {
+      return null;
+    }
+
+    const base64 = match[1];
+    const bytes = Math.floor((base64.length * 3) / 4);
+    return bytes / 1024;
+  };
+
+  const primaryImageSizeKB = getImageSizeKB(photos?.[0]?.imageUri);
+
+  const isUnknownQuantity = (quantity) => {
+    if (quantity === null || quantity === undefined) {
+      return true;
+    }
+
+    const normalized = String(quantity).trim().toLowerCase();
+    return normalized === "" || normalized === "unknown";
+  };
+
   const renderPhotoCollage = () => {
     if (!photos || photos.length === 0) return null;
 
@@ -480,6 +506,12 @@ const FoodPage = () => {
       </Box>
 
       <Container maxWidth="lg" sx={{ pb: 4 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+          Image size:{" "}
+          {primaryImageSizeKB === null
+            ? "Unavailable"
+            : `${formatNumber(primaryImageSizeKB, 1)} KB`}
+        </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Serving Size: {servingSize || "-"}
         </Typography>
@@ -637,43 +669,6 @@ const FoodPage = () => {
                   No macro calorie breakdown available.
                 </Typography>
               )}
-
-              <Grid container spacing={1}>
-                {calorieSegments.map((segment) => {
-                  const pct =
-                    totalMacroCalories > 0
-                      ? (segment.calories / totalMacroCalories) * 100
-                      : 0;
-
-                  return (
-                    <Grid item xs={12} sm={4} key={segment.key}>
-                      <Box
-                        sx={{
-                          p: 1,
-                          borderRadius: 1.5,
-                          border: "1px solid",
-                          borderColor: "divider",
-                          backgroundColor: "background.paper",
-                        }}
-                      >
-                        <Typography
-                          variant="caption"
-                          sx={{ color: segment.color, fontWeight: 600 }}
-                        >
-                          {segment.label}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{ fontWeight: 600, color: segment.color }}
-                        >
-                          {formatNumber(segment.calories, 0)} kcal (
-                          {formatNumber(pct, 0)}%)
-                        </Typography>
-                      </Box>
-                    </Grid>
-                  );
-                })}
-              </Grid>
             </Box>
 
             <Box
@@ -875,6 +870,24 @@ const FoodPage = () => {
                 </Grid>
               )}
             </Box>
+
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: "block", mt: 2 }}
+            >
+              Results are estimated from label text extracted from the uploaded
+              image and model-based nutrient inference. Prompt and analysis
+              logic:{" "}
+              <a
+                href="https://github.com/nuuuwan/food/blob/main/api/analyze.js"
+                target="_blank"
+                rel="noreferrer"
+              >
+                api/analyze.js
+              </a>
+              .
+            </Typography>
           </CardContent>
         </Card>
 
@@ -887,9 +900,16 @@ const FoodPage = () => {
             <Box component="ol" sx={{ pl: 2 }}>
               {(ingredients || []).map((ingredient, index) => (
                 <li key={index}>
-                  <Typography variant="body1">
-                    {ingredient.name} - {ingredient.quantity}
-                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
+                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                      {ingredient.name}
+                    </Typography>
+                    {!isUnknownQuantity(ingredient.quantity) && (
+                      <Typography variant="body2" color="text.secondary">
+                        {ingredient.quantity}
+                      </Typography>
+                    )}
+                  </Box>
                 </li>
               ))}
             </Box>
