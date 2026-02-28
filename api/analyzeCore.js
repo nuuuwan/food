@@ -305,7 +305,9 @@ const normalizeClassifications = (analysis, nutrients, ingredients) => {
     : [];
   const inferredTriggerItems = getNovaTriggerItems(ingredients);
   const novaTriggerItems =
-    providedTriggerItems.length > 0 ? providedTriggerItems : inferredTriggerItems;
+    providedTriggerItems.length > 0
+      ? providedTriggerItems
+      : inferredTriggerItems;
   const novaClassReason = ensureSpecificNovaReason(
     rawNovaClassReason,
     novaClassCode,

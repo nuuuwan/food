@@ -477,6 +477,11 @@ const FoodPage = () => {
   const modelNovaClassReason = String(
     displayFood?.classifications?.novaClassReason || "",
   ).trim();
+  const modelNovaTriggerItems = Array.isArray(
+    displayFood?.classifications?.novaTriggerItems,
+  )
+    ? displayFood.classifications.novaTriggerItems.filter(Boolean)
+    : [];
   const inferredNovaClass = inferNOVAClass();
   const novaClass =
     modelNovaClassCode !== "-"
@@ -488,6 +493,10 @@ const FoodPage = () => {
   const novaClassReason =
     modelNovaClassReason ||
     `Estimated from ingredient profile (${(ingredients || []).length} listed) and added sugar ${formatNumber(toNullableNumber(nutrients?.addedSugar) || 0, 1)}g.`;
+  const novaSpecificItemText =
+    modelNovaTriggerItems.length > 0
+      ? modelNovaTriggerItems.join(", ")
+      : "";
   const novaClassNumber = (novaClass.code.match(/(\d+)/) || [])[1] || "-";
   const novaBadgeColor =
     {
@@ -705,6 +714,151 @@ const FoodPage = () => {
     .filter(Boolean)
     .join(", ");
 
+  const formatOverlayValue = (value, unit) => {
+    if (value === null || value === undefined || !Number.isFinite(value)) {
+      return `...${unit}/100g`;
+    }
+    return `${Math.max(0, Math.round(value))}${unit}/100g`;
+  };
+
+  const renderTopRatingsOverlay = () => (
+    <Box
+      sx={{
+        position: "absolute",
+        top: 12,
+        left: 0,
+        right: 0,
+        px: 1,
+        display: "flex",
+        gap: 1,
+        justifyContent: "center",
+        alignItems: "stretch",
+        overflowX: "auto",
+      }}
+    >
+      <Box
+        sx={{
+          minWidth: 210,
+          p: 0.6,
+          borderRadius: 1.5,
+          backgroundColor: "rgba(255,255,255,0.88)",
+          display: "grid",
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gap: 0.5,
+        }}
+      >
+        {warningBadges.map((item) => (
+          <Box
+            key={item.key}
+            sx={{
+              borderRadius: 1,
+              border: "1px solid",
+              borderColor: "common.black",
+              overflow: "hidden",
+            }}
+          >
+            <Box
+              sx={{
+                backgroundColor: item.panelColor,
+                color: "common.white",
+                textAlign: "center",
+                py: 0.35,
+              }}
+            >
+              <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                {item.label}
+              </Typography>
+            </Box>
+            <Box sx={{ p: 0.35, textAlign: "center", bgcolor: "common.white" }}>
+              <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                {formatOverlayValue(item.value, item.unit)}
+              </Typography>
+            </Box>
+          </Box>
+        ))}
+      </Box>
+
+      <Box
+        sx={{
+          minWidth: 170,
+          p: 0.6,
+          borderRadius: 1.5,
+          backgroundColor: "rgba(255,255,255,0.88)",
+        }}
+      >
+        <Typography sx={{ fontWeight: 900, textAlign: "center", lineHeight: 1, mb: 0.35 }}>
+          NUTRI-GRADE
+        </Typography>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+            border: "1px solid",
+            borderColor: "common.black",
+            borderRadius: 999,
+            overflow: "hidden",
+          }}
+        >
+          {singaporeGradeScale.map((gradeItem) => (
+            <Box
+              key={gradeItem.grade}
+              sx={{
+                py: 0.45,
+                textAlign: "center",
+                color: "common.white",
+                backgroundColor: gradeItem.color,
+                fontWeight: singaporeNutriGrade === gradeItem.grade ? 900 : 500,
+                outline:
+                  singaporeNutriGrade === gradeItem.grade
+                    ? "2px solid #000"
+                    : "none",
+              }}
+            >
+              {gradeItem.grade}
+            </Box>
+          ))}
+        </Box>
+      </Box>
+
+      <Box
+        sx={{
+          minWidth: 82,
+          borderRadius: 1.5,
+          backgroundColor: "rgba(255,255,255,0.88)",
+          p: 0.45,
+        }}
+      >
+        <Typography
+          sx={{
+            textAlign: "center",
+            color: "text.secondary",
+            fontWeight: 900,
+            lineHeight: 1,
+            mb: 0.2,
+          }}
+        >
+          NOVA
+        </Typography>
+        <Box
+          sx={{
+            minHeight: 52,
+            borderRadius: 0.7,
+            backgroundColor: novaBadgeColor,
+            color: "common.white",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "2rem",
+            fontWeight: 900,
+            lineHeight: 1,
+          }}
+        >
+          {novaClassNumber}
+        </Box>
+      </Box>
+    </Box>
+  );
+
   const renderPhotoCollage = () => {
     if (!photos || photos.length === 0) return null;
 
@@ -721,6 +875,7 @@ const FoodPage = () => {
             borderRadius: 0,
           }}
         >
+          {renderTopRatingsOverlay()}
           <img
             src={photos[0].imageUri}
             alt={productName}
@@ -769,6 +924,7 @@ const FoodPage = () => {
           borderRadius: 0,
         }}
       >
+        {renderTopRatingsOverlay()}
         <Grid container spacing={0.5} sx={{ height: "100%" }}>
           {photos.slice(0, 4).map((photo, index) => (
             <Grid
@@ -1225,6 +1381,15 @@ const FoodPage = () => {
                         >
                           Why: {novaClassReason}
                         </Typography>
+                        {novaClass.code === "NOVA 4" && novaSpecificItemText && (
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ display: "block", mt: 0.2, fontWeight: 700 }}
+                          >
+                            Ultra-processed trigger item(s): {novaSpecificItemText}
+                          </Typography>
+                        )}
                       </Box>
                     </Box>
                   </Box>

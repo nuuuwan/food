@@ -199,25 +199,26 @@ const ProcessingPage = () => {
 
   return (
     <>
-      {previewImage && (
-        <Box
+      <Box
+        sx={{
+          width: "100vw",
+          ml: "calc(50% - 50vw)",
+          mr: "calc(50% - 50vw)",
+          mt: 0,
+          mb: 2.5,
+        }}
+      >
+        <Paper
+          elevation={2}
           sx={{
-            width: "100vw",
-            ml: "calc(50% - 50vw)",
-            mr: "calc(50% - 50vw)",
-            mt: 0,
-            mb: 2.5,
+            overflow: "hidden",
+            position: "relative",
+            height: { xs: 260, sm: 340, md: 400 },
+            borderRadius: 0,
+            bgcolor: "grey.200",
           }}
         >
-          <Paper
-            elevation={2}
-            sx={{
-              overflow: "hidden",
-              position: "relative",
-              height: { xs: 260, sm: 340, md: 400 },
-              borderRadius: 0,
-            }}
-          >
+          {previewImage ? (
             <Box
               component="img"
               src={previewImage}
@@ -229,6 +230,21 @@ const ProcessingPage = () => {
                 display: "block",
               }}
             />
+          ) : (
+            <Box
+              sx={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Typography variant="body1" color="text.secondary">
+                Preparing image...
+              </Typography>
+            </Box>
+          )}
             <Box
               sx={{
                 position: "absolute",
@@ -379,35 +395,26 @@ const ProcessingPage = () => {
               </Box>
             </Box>
 
-            <Box
-              sx={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-                background:
-                  "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0))",
-                p: 2,
-              }}
-            >
-              <Typography
-                variant="h4"
-                sx={{ color: "common.white", fontWeight: 700 }}
-              >
-                {analysisPreview?.productName || "Building result..."}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: "rgba(255,255,255,0.9)" }}
-              >
-                {analysisState === "success"
-                  ? "Analysis ready"
-                  : "Analyzing image..."}
-              </Typography>
-            </Box>
-          </Paper>
-        </Box>
-      )}
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              background:
+                "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0))",
+              p: 2,
+            }}
+          >
+            <Typography variant="h4" sx={{ color: "common.white", fontWeight: 700 }}>
+              {analysisPreview?.productName || "Building result..."}
+            </Typography>
+            <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
+              {analysisState === "success" ? "Analysis ready" : "Analyzing image..."}
+            </Typography>
+          </Box>
+        </Paper>
+      </Box>
 
       <Container maxWidth="lg" sx={{ pb: 4 }}>
         <Card sx={{ mb: 3 }}>
