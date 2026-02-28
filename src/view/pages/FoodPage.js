@@ -304,6 +304,81 @@ const FoodPage = () => {
   const sugarPer100g = toPer100g(sugarGrams);
   const saltPer100g = toPer100g(saltGrams);
   const fatPer100g = toPer100g(fatGrams);
+  const saturatedFatPer100g = toPer100g(
+    toNullableNumber(nutrients?.saturatedFat) || 0,
+  );
+
+  const getSingaporeNutriGrade = (sugarValue, saturatedFatValue) => {
+    if (sugarValue === null && saturatedFatValue === null) {
+      return "-";
+    }
+
+    const sugarForGrade = sugarValue ?? Number.POSITIVE_INFINITY;
+    const satFatForGrade = saturatedFatValue ?? Number.POSITIVE_INFINITY;
+
+    if (sugarForGrade <= 1 && satFatForGrade <= 0.7) {
+      return "A";
+    }
+
+    if (sugarForGrade <= 5 && satFatForGrade <= 1.2) {
+      return "B";
+    }
+
+    if (sugarForGrade <= 10 && satFatForGrade <= 2.8) {
+      return "C";
+    }
+
+    return "D";
+  };
+
+  const singaporeNutriGrade = getSingaporeNutriGrade(
+    sugarPer100g,
+    saturatedFatPer100g,
+  );
+
+  const getUkTrafficLevel = (nutrientKey, valuePer100g) => {
+    if (valuePer100g === null || valuePer100g === undefined) {
+      return { label: "-", color: theme.palette.grey[500] };
+    }
+
+    if (nutrientKey === "sugar") {
+      if (valuePer100g <= 5) {
+        return { label: "Low", color: "#2e7d32" };
+      }
+      if (valuePer100g > 22.5) {
+        return { label: "High", color: "#c62828" };
+      }
+      return { label: "Med", color: "#f9a825" };
+    }
+
+    if (nutrientKey === "fat") {
+      if (valuePer100g <= 3) {
+        return { label: "Low", color: "#2e7d32" };
+      }
+      if (valuePer100g > 17.5) {
+        return { label: "High", color: "#c62828" };
+      }
+      return { label: "Med", color: "#f9a825" };
+    }
+
+    if (nutrientKey === "salt") {
+      if (valuePer100g <= 0.3) {
+        return { label: "Low", color: "#2e7d32" };
+      }
+      if (valuePer100g > 1.5) {
+        return { label: "High", color: "#c62828" };
+      }
+      return { label: "Med", color: "#f9a825" };
+    }
+
+    return { label: "-", color: theme.palette.grey[500] };
+  };
+
+  const ukTrafficLevels = [
+    { key: "sugar", label: "Sugar", level: getUkTrafficLevel("sugar", sugarPer100g) },
+    { key: "salt", label: "Salt", level: getUkTrafficLevel("salt", saltPer100g) },
+    { key: "fat", label: "Fat", level: getUkTrafficLevel("fat", fatPer100g) },
+  ];
 
   const getTrafficLightPanelColor = (key, valuePer100g) => {
     if (valuePer100g === null || valuePer100g === undefined) {
@@ -805,18 +880,28 @@ const FoodPage = () => {
                             height: 22,
                             borderRadius: 0.75,
                             backgroundColor: color,
-                            color: "common.white",
+                            color:
+                              singaporeNutriGrade === grade
+                                ? "common.white"
+                                : "rgba(255,255,255,0.6)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             fontSize: "0.72rem",
-                            fontWeight: 700,
+                            fontWeight: singaporeNutriGrade === grade ? 800 : 600,
+                            border:
+                              singaporeNutriGrade === grade
+                                ? "2px solid #000"
+                                : "1px solid rgba(255,255,255,0.4)",
                           }}
                         >
                           {grade}
                         </Box>
                       ))}
                     </Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
+                      Estimated grade for this food: {singaporeNutriGrade}
+                    </Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -834,24 +919,20 @@ const FoodPage = () => {
                       Front-of-pack traffic light
                     </Typography>
                     <Box sx={{ display: "flex", gap: 0.5, mt: 0.5 }}>
-                      {[
-                        ["Low", "#2e7d32"],
-                        ["Med", "#f9a825"],
-                        ["High", "#c62828"],
-                      ].map(([level, color]) => (
+                      {ukTrafficLevels.map((itemLevel) => (
                         <Box
-                          key={level}
+                          key={itemLevel.key}
                           sx={{
                             px: 0.6,
                             py: 0.2,
                             borderRadius: 0.75,
-                            backgroundColor: color,
+                            backgroundColor: itemLevel.level.color,
                             color: "common.white",
                             fontSize: "0.68rem",
                             fontWeight: 700,
                           }}
                         >
-                          {level}
+                          {itemLevel.label}: {itemLevel.level.label}
                         </Box>
                       ))}
                     </Box>

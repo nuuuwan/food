@@ -1,5 +1,6 @@
 const {
   buildAnalysisFromImage,
+  buildFoodIdentifier,
   handleOptions,
   saveFood,
   withCors,
@@ -94,9 +95,12 @@ const extractJsonObject = (text) => {
   }
 };
 
-const normalizeGeminiAnalysis = (analysis, imageData) => {
+const normalizeGeminiAnalysis = (analysis, imageData, imageHash) => {
   const timestamp = Date.now();
-  const id = `food-${timestamp}`;
+  const id = buildFoodIdentifier(
+    analysis?.productName || "unidentified-food-item",
+    imageHash,
+  );
   const nutrients = analysis?.nutrients || {};
 
   return {
@@ -206,7 +210,7 @@ const requestGeminiAnalysis = async (imageData, parsedImage) => {
         );
       }
 
-      return normalizeGeminiAnalysis(parsed, imageData);
+      return normalizeGeminiAnalysis(parsed, imageData, hashImageInput(imageData, parsedImage));
     }
   }
 
@@ -242,6 +246,11 @@ module.exports = async function handler(req, res) {
 
     console.error("Gemini analysis failed, falling back to mock:", error);
     analysis = buildAnalysisFromImage(imageData);
+    analysis.id = buildFoodIdentifier(analysis.productName, imageHash);
+    analysis.photos = (analysis.photos || []).map((photo, index) => ({
+      ...photo,
+      id: `${analysis.id}-photo-${index + 1}`,
+    }));
     const reason = error?.message || "Unknown error";
     analysis.warnings = [
       ...(analysis.warnings || []),

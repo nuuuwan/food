@@ -98,6 +98,28 @@ if (!globalThis.__foodMockStore) {
 
 const store = globalThis.__foodMockStore;
 
+const toKebabCase = (value) =>
+  String(value || "food")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "") || "food";
+
+const buildFoodIdentifier = (productName, imageHash) => {
+  const namePart = toKebabCase(productName || "food");
+  const hashPart = String(imageHash || "")
+    .toLowerCase()
+    .replace(/[^a-f0-9]/g, "")
+    .slice(0, 12);
+
+  if (!hashPart) {
+    return `${namePart}-${Date.now()}`;
+  }
+
+  return `${namePart}-${hashPart}`;
+};
+
 const withCors = (res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
@@ -183,4 +205,5 @@ module.exports = {
   getFoodById,
   saveFood,
   buildAnalysisFromImage,
+  buildFoodIdentifier,
 };

@@ -1,4 +1,5 @@
 const {
+  buildFoodIdentifier,
   getFoods,
   handleOptions,
   saveFood,
@@ -21,7 +22,9 @@ module.exports = function handler(req, res) {
     const payload = req.body || {};
     const normalizedFood = {
       ...payload,
-      id: payload.id || `food-${Date.now()}`,
+      id:
+        payload.id ||
+        buildFoodIdentifier(payload.productName || "food", payload.imageHash || ""),
       timestamp: payload.timestamp || Date.now(),
       nutrients: payload.nutrients || payload.nutritionInfo || {},
       ingredients: payload.ingredients || [],
