@@ -789,7 +789,11 @@ const FoodPage = () => {
 
       <Container maxWidth="lg" sx={{ pb: 4 }}>
         <Box sx={{ mb: 2.5 }}>
-          <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.4 }}>
+          <Typography
+            variant="subtitle2"
+            color="text.secondary"
+            sx={{ mb: 0.4 }}
+          >
             Ingredients
           </Typography>
           <Box component="ul" sx={{ pl: 2.25, m: 0 }}>
@@ -1524,7 +1528,6 @@ const FoodPage = () => {
             </Typography>
           </CardContent>
         </Card>
-
       </Container>
     </>
   );
