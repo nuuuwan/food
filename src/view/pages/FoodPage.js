@@ -379,26 +379,12 @@ const FoodPage = () => {
   const singaporeNutriGrade = ["A", "B", "C", "D"].includes(modelNutriGrade)
     ? modelNutriGrade
     : inferredSingaporeNutriGrade;
-  const singaporeNutriGradeColor =
-    {
-      A: "#2e7d32",
-      B: "#558b2f",
-      C: "#f9a825",
-      D: "#c62828",
-    }[singaporeNutriGrade] || theme.palette.grey[500];
-  const singaporeSugarPctEstimate =
-    sugarPer100g === null || sugarPer100g === undefined
-      ? null
-      : Math.max(0, Math.round(sugarPer100g));
   const singaporeGradeScale = [
     { grade: "A", color: "#1f8b43" },
     { grade: "B", color: "#8abf2f" },
     { grade: "C", color: "#f0a128" },
     { grade: "D", color: "#c71c22" },
   ];
-  const activeSingaporeGrade =
-    singaporeGradeScale.find((item) => item.grade === singaporeNutriGrade) ||
-    null;
   const singaporeNutriGradeReason =
     modelNutriGradeReason ||
     `Estimated from sugar ${formatNumber(sugarPer100g, 1)}g and saturated fat ${formatNumber(saturatedFatPer100g, 1)}g per 100g.`;
@@ -494,9 +480,7 @@ const FoodPage = () => {
     modelNovaClassReason ||
     `Estimated from ingredient profile (${(ingredients || []).length} listed) and added sugar ${formatNumber(toNullableNumber(nutrients?.addedSugar) || 0, 1)}g.`;
   const novaSpecificItemText =
-    modelNovaTriggerItems.length > 0
-      ? modelNovaTriggerItems.join(", ")
-      : "";
+    modelNovaTriggerItems.length > 0 ? modelNovaTriggerItems.join(", ") : "";
   const novaClassNumber = (novaClass.code.match(/(\d+)/) || [])[1] || "-";
   const novaBadgeColor =
     {
@@ -786,7 +770,9 @@ const FoodPage = () => {
           backgroundColor: "rgba(255,255,255,0.88)",
         }}
       >
-        <Typography sx={{ fontWeight: 900, textAlign: "center", lineHeight: 1, mb: 0.35 }}>
+        <Typography
+          sx={{ fontWeight: 900, textAlign: "center", lineHeight: 1, mb: 0.35 }}
+        >
           NUTRI-GRADE
         </Typography>
         <Box
@@ -1031,371 +1017,6 @@ const FoodPage = () => {
             <Typography variant="h5" sx={{ mb: 1 }}>
               Nutrition Facts
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Values per serving
-            </Typography>
-
-            <Box
-              sx={{
-                mb: 3,
-                p: { xs: 1.75, sm: 2.25 },
-                borderRadius: 2,
-                backgroundColor: "background.default",
-              }}
-            >
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-                  gap: 0,
-                }}
-              >
-                {warningBadges.map((item) => {
-                  const valueLabel =
-                    item.value === null || item.value === undefined
-                      ? `...${item.unit}/100g`
-                      : `${formatNumber(item.value, 0)}${item.unit}/100g`;
-
-                  return (
-                    <Box key={item.key} sx={{ display: "flex" }}>
-                      <Box
-                        sx={{
-                          width: "100%",
-                          minHeight: 109,
-                          borderRadius: 2,
-                          border: "2px solid",
-                          borderColor: "common.black",
-                          backgroundColor: item.panelColor,
-                          display: "flex",
-                          flexDirection: "column",
-                          overflow: "hidden",
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            pt: 0.9,
-                            pb: 0.4,
-                            px: 0.8,
-                            flex: 1,
-                            textAlign: "center",
-                            color: "common.white",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              display: "block",
-                              opacity: 0.96,
-                              lineHeight: 1.05,
-                              fontWeight: 700,
-                            }}
-                          >
-                            {item.sinhalaLabel}
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              display: "block",
-                              opacity: 0.96,
-                              lineHeight: 1.05,
-                              fontWeight: 600,
-                            }}
-                          >
-                            {item.tamilLabel}
-                          </Typography>
-                          <Typography
-                            variant="subtitle1"
-                            sx={{ fontWeight: 800, lineHeight: 1.05, mt: 0.15 }}
-                          >
-                            {item.label}
-                          </Typography>
-                        </Box>
-                        <Box
-                          sx={{
-                            mx: 0.65,
-                            mb: 0.65,
-                            px: 0.8,
-                            py: 0.5,
-                            borderRadius: 1,
-                            borderTop: "1px solid",
-                            border: "1px solid",
-                            borderColor: "grey.500",
-                            backgroundColor: "common.white",
-                            textAlign: "center",
-                          }}
-                        >
-                          <Typography
-                            variant="body2"
-                            sx={{ fontWeight: 700, color: "text.primary" }}
-                          >
-                            {valueLabel}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Box>
-                  );
-                })}
-              </Box>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ display: "block", mt: 1.25 }}
-              >
-                🇱🇰 This traffic-light system shows sugar, salt, and fat per 100g
-                (green = low, amber = medium, red = high), aligned to Sri Lanka
-                Food (Color Coding for Sugar, Salt and Fat) Regulations, 2019
-                under Food Act No. 26 of 1980.
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ display: "block", mt: 0.5 }}
-              >
-                Estimated labels:
-              </Typography>
-              <Grid container spacing={1} sx={{ mt: 0.5 }}>
-                <Grid item xs={12} sm={6}>
-                  <Box
-                    sx={{
-                      borderRadius: 1.5,
-                      backgroundColor: "action.hover",
-                      px: 1.5,
-                      py: 1,
-                    }}
-                  >
-                    <Typography variant="caption" color="text.secondary">
-                      🇸🇬 Singapore
-                    </Typography>
-                    <Box
-                      sx={{
-                        mt: 0.6,
-                        width: "100%",
-                        maxWidth: 360,
-                        mx: "auto",
-                        px: 1,
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          fontSize: "2rem",
-                          fontWeight: 900,
-                          letterSpacing: 0.5,
-                          lineHeight: 1,
-                          mb: 0.6,
-                          textAlign: "center",
-                        }}
-                      >
-                        NUTRI-GRADE
-                      </Box>
-                      <Box sx={{ position: "relative" }}>
-                        <Box
-                          sx={{
-                            display: "grid",
-                            gridTemplateColumns:
-                              "repeat(4, minmax(0, 1fr)) auto",
-                            borderRadius: 999,
-                            overflow: "visible",
-                            border: "2px solid",
-                            borderColor: "common.black",
-                            backgroundColor: "background.paper",
-                            minHeight: 72,
-                          }}
-                        >
-                          {singaporeGradeScale.map((gradeItem) => (
-                            <Box
-                              key={gradeItem.grade}
-                              sx={{
-                                position: "relative",
-                                overflow: "visible",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                backgroundColor: gradeItem.color,
-                                color: "common.white",
-                                fontSize: "2.1rem",
-                                fontWeight: 500,
-                                lineHeight: 1,
-                              }}
-                            >
-                              {gradeItem.grade}
-                              {singaporeNutriGrade === gradeItem.grade && (
-                                <Box
-                                  sx={{
-                                    position: "absolute",
-                                    width: 88,
-                                    height: 88,
-                                    top: "50%",
-                                    left: "50%",
-                                    transform: "translate(-50%, -50%)",
-                                    borderRadius: "50%",
-                                    border: "6px solid",
-                                    borderColor: "common.black",
-                                    backgroundColor:
-                                      activeSingaporeGrade?.color ||
-                                      singaporeNutriGradeColor,
-                                    color: "common.white",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    fontSize: "3.1rem",
-                                    fontWeight: 700,
-                                    lineHeight: 1,
-                                    boxShadow: 2,
-                                    zIndex: 3,
-                                  }}
-                                >
-                                  {singaporeNutriGrade}
-                                </Box>
-                              )}
-                            </Box>
-                          ))}
-                          <Box
-                            sx={{
-                              minWidth: 86,
-                              px: 1,
-                              display: "flex",
-                              flexDirection: "column",
-                              justifyContent: "center",
-                              alignItems: "center",
-                              backgroundColor: "common.white",
-                              borderLeft: "2px solid",
-                              borderColor: "common.black",
-                              color: "common.black",
-                            }}
-                          >
-                            <Typography
-                              variant="h4"
-                              sx={{ fontWeight: 900, lineHeight: 1 }}
-                            >
-                              {singaporeSugarPctEstimate ?? "-"}
-                              <Typography
-                                component="span"
-                                sx={{ fontSize: "0.55em", fontWeight: 800 }}
-                              >
-                                %
-                              </Typography>
-                            </Typography>
-                            <Typography
-                              variant="body1"
-                              sx={{ fontWeight: 800, lineHeight: 1 }}
-                            >
-                              sugar
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </Box>
-                    </Box>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ display: "block", mt: 0.5 }}
-                    >
-                      Estimated grade for this food: {singaporeNutriGrade}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ display: "block", mt: 0.25 }}
-                    >
-                      Why: {singaporeNutriGradeReason}
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Box
-                    sx={{
-                      borderRadius: 1.5,
-                      backgroundColor: "action.hover",
-                      p: 1,
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        gap: 1.25,
-                        alignItems: "flex-start",
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          width: 96,
-                          border: "1px solid",
-                          borderColor: "grey.400",
-                          backgroundColor: "grey.100",
-                          flexShrink: 0,
-                        }}
-                      >
-                        <Typography
-                          sx={{
-                            textAlign: "center",
-                            color: "text.secondary",
-                            fontWeight: 900,
-                            fontSize: "2rem",
-                            lineHeight: 1,
-                            py: 0.4,
-                            letterSpacing: 0.5,
-                          }}
-                        >
-                          NOVA
-                        </Typography>
-                        <Box
-                          sx={{
-                            mx: 0.35,
-                            mb: 0.35,
-                            minHeight: 112,
-                            backgroundColor: novaBadgeColor,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Typography
-                            sx={{
-                              color: "common.white",
-                              fontWeight: 800,
-                              fontSize: "5rem",
-                              lineHeight: 0.95,
-                            }}
-                          >
-                            {novaClassNumber}
-                          </Typography>
-                        </Box>
-                      </Box>
-                      <Box sx={{ pt: 0.5 }}>
-                        <Typography variant="caption" color="text.secondary">
-                          🌍 NOVA System
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                          {novaClass.code}
-                        </Typography>
-                        <Typography variant="body2" sx={{ mt: 0.25 }}>
-                          {novaClass.label}
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ display: "block", mt: 0.35 }}
-                        >
-                          Why: {novaClassReason}
-                        </Typography>
-                        {novaClass.code === "NOVA 4" && novaSpecificItemText && (
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ display: "block", mt: 0.2, fontWeight: 700 }}
-                          >
-                            Ultra-processed trigger item(s): {novaSpecificItemText}
-                          </Typography>
-                        )}
-                      </Box>
-                    </Box>
-                  </Box>
-                </Grid>
-              </Grid>
-            </Box>
 
             <Box
               sx={{
@@ -1737,6 +1358,37 @@ const FoodPage = () => {
                     );
                   })}
                 </Grid>
+              )}
+            </Box>
+
+            <Box
+              sx={{
+                mt: 3,
+                p: { xs: 1.75, sm: 2.25 },
+                borderRadius: 2,
+                backgroundColor: "background.default",
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ mb: 0.8, fontWeight: 600 }}>
+                Classification Explanations
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.35 }}>
+                Sri Lanka Traffic Light: Based on estimated sugar, salt, and fat per 100g.
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.35 }}>
+                Singapore Nutri-Grade: {singaporeNutriGrade} — {singaporeNutriGradeReason}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                NOVA: {novaClass.code} — {novaClassReason}
+              </Typography>
+              {novaClass.code === "NOVA 4" && novaSpecificItemText && (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mt: 0.35, fontWeight: 700 }}
+                >
+                  Ultra-processed trigger item(s): {novaSpecificItemText}
+                </Typography>
               )}
             </Box>
 

@@ -245,155 +245,155 @@ const ProcessingPage = () => {
               </Typography>
             </Box>
           )}
+          <Box
+            sx={{
+              position: "absolute",
+              top: 12,
+              left: 0,
+              right: 0,
+              px: 1,
+              display: "flex",
+              gap: 1,
+              justifyContent: "center",
+              alignItems: "stretch",
+              overflowX: "auto",
+            }}
+          >
             <Box
               sx={{
-                position: "absolute",
-                top: 12,
-                left: 0,
-                right: 0,
-                px: 1,
-                display: "flex",
-                gap: 1,
-                justifyContent: "center",
-                alignItems: "stretch",
-                overflowX: "auto",
+                minWidth: 210,
+                p: 0.6,
+                borderRadius: 1.5,
+                backgroundColor: "rgba(255,255,255,0.88)",
+                display: "grid",
+                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                gap: 0.5,
               }}
             >
-              <Box
-                sx={{
-                  minWidth: 210,
-                  p: 0.6,
-                  borderRadius: 1.5,
-                  backgroundColor: "rgba(255,255,255,0.88)",
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-                  gap: 0.5,
-                }}
-              >
-                {trafficFigures.map((item) => (
-                  <Box
-                    key={item.key}
-                    sx={{
-                      borderRadius: 1,
-                      border: "1px solid",
-                      borderColor: "common.black",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        backgroundColor: item.color,
-                        color: "common.white",
-                        textAlign: "center",
-                        py: 0.35,
-                      }}
-                    >
-                      <Typography variant="caption" sx={{ fontWeight: 700 }}>
-                        {item.label}
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{
-                        p: 0.35,
-                        textAlign: "center",
-                        bgcolor: "common.white",
-                      }}
-                    >
-                      <Typography variant="caption" sx={{ fontWeight: 700 }}>
-                        {formatNutrientValue(item.value, item.unit)}
-                      </Typography>
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-
-              <Box
-                sx={{
-                  minWidth: 170,
-                  p: 0.6,
-                  borderRadius: 1.5,
-                  backgroundColor: "rgba(255,255,255,0.88)",
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontWeight: 900,
-                    textAlign: "center",
-                    lineHeight: 1,
-                    mb: 0.35,
-                  }}
-                >
-                  NUTRI-GRADE
-                </Typography>
+              {trafficFigures.map((item) => (
                 <Box
+                  key={item.key}
                   sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+                    borderRadius: 1,
                     border: "1px solid",
                     borderColor: "common.black",
-                    borderRadius: 999,
                     overflow: "hidden",
                   }}
                 >
-                  {singaporeGradeScale.map((gradeItem) => (
-                    <Box
-                      key={gradeItem.grade}
-                      sx={{
-                        py: 0.45,
-                        textAlign: "center",
-                        color: "common.white",
-                        backgroundColor: gradeItem.color,
-                        fontWeight:
-                          singaporeNutriGrade === gradeItem.grade ? 900 : 500,
-                        outline:
-                          singaporeNutriGrade === gradeItem.grade
-                            ? "2px solid #000"
-                            : "none",
-                      }}
-                    >
-                      {gradeItem.grade}
-                    </Box>
-                  ))}
+                  <Box
+                    sx={{
+                      backgroundColor: item.color,
+                      color: "common.white",
+                      textAlign: "center",
+                      py: 0.35,
+                    }}
+                  >
+                    <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                      {item.label}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      p: 0.35,
+                      textAlign: "center",
+                      bgcolor: "common.white",
+                    }}
+                  >
+                    <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                      {formatNutrientValue(item.value, item.unit)}
+                    </Typography>
+                  </Box>
                 </Box>
-              </Box>
+              ))}
+            </Box>
 
-              <Box
+            <Box
+              sx={{
+                minWidth: 170,
+                p: 0.6,
+                borderRadius: 1.5,
+                backgroundColor: "rgba(255,255,255,0.88)",
+              }}
+            >
+              <Typography
                 sx={{
-                  minWidth: 82,
-                  borderRadius: 1.5,
-                  backgroundColor: "rgba(255,255,255,0.88)",
-                  p: 0.45,
+                  fontWeight: 900,
+                  textAlign: "center",
+                  lineHeight: 1,
+                  mb: 0.35,
                 }}
               >
-                <Typography
-                  sx={{
-                    textAlign: "center",
-                    color: "text.secondary",
-                    fontWeight: 900,
-                    lineHeight: 1,
-                    mb: 0.2,
-                  }}
-                >
-                  NOVA
-                </Typography>
-                <Box
-                  sx={{
-                    minHeight: 52,
-                    borderRadius: 0.7,
-                    backgroundColor: novaBadgeColor,
-                    color: "common.white",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "2rem",
-                    fontWeight: 900,
-                    lineHeight: 1,
-                  }}
-                >
-                  {novaClassNumber}
-                </Box>
+                NUTRI-GRADE
+              </Typography>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+                  border: "1px solid",
+                  borderColor: "common.black",
+                  borderRadius: 999,
+                  overflow: "hidden",
+                }}
+              >
+                {singaporeGradeScale.map((gradeItem) => (
+                  <Box
+                    key={gradeItem.grade}
+                    sx={{
+                      py: 0.45,
+                      textAlign: "center",
+                      color: "common.white",
+                      backgroundColor: gradeItem.color,
+                      fontWeight:
+                        singaporeNutriGrade === gradeItem.grade ? 900 : 500,
+                      outline:
+                        singaporeNutriGrade === gradeItem.grade
+                          ? "2px solid #000"
+                          : "none",
+                    }}
+                  >
+                    {gradeItem.grade}
+                  </Box>
+                ))}
               </Box>
             </Box>
+
+            <Box
+              sx={{
+                minWidth: 82,
+                borderRadius: 1.5,
+                backgroundColor: "rgba(255,255,255,0.88)",
+                p: 0.45,
+              }}
+            >
+              <Typography
+                sx={{
+                  textAlign: "center",
+                  color: "text.secondary",
+                  fontWeight: 900,
+                  lineHeight: 1,
+                  mb: 0.2,
+                }}
+              >
+                NOVA
+              </Typography>
+              <Box
+                sx={{
+                  minHeight: 52,
+                  borderRadius: 0.7,
+                  backgroundColor: novaBadgeColor,
+                  color: "common.white",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "2rem",
+                  fontWeight: 900,
+                  lineHeight: 1,
+                }}
+              >
+                {novaClassNumber}
+              </Box>
+            </Box>
+          </Box>
 
           <Box
             sx={{
@@ -406,11 +406,16 @@ const ProcessingPage = () => {
               p: 2,
             }}
           >
-            <Typography variant="h4" sx={{ color: "common.white", fontWeight: 700 }}>
+            <Typography
+              variant="h4"
+              sx={{ color: "common.white", fontWeight: 700 }}
+            >
               {analysisPreview?.productName || "Building result..."}
             </Typography>
             <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
-              {analysisState === "success" ? "Analysis ready" : "Analyzing image..."}
+              {analysisState === "success"
+                ? "Analysis ready"
+                : "Analyzing image..."}
             </Typography>
           </Box>
         </Paper>
