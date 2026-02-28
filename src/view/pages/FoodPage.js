@@ -706,13 +706,21 @@ const FoodPage = () => {
                         >
                           <Typography
                             variant="body2"
-                            sx={{ display: "block", opacity: 0.95, lineHeight: 1.02 }}
+                            sx={{
+                              display: "block",
+                              opacity: 0.95,
+                              lineHeight: 1.02,
+                            }}
                           >
                             {item.sinhalaLabel}
                           </Typography>
                           <Typography
                             variant="caption"
-                            sx={{ display: "block", opacity: 0.95, lineHeight: 1.02 }}
+                            sx={{
+                              display: "block",
+                              opacity: 0.95,
+                              lineHeight: 1.02,
+                            }}
                           >
                             {item.tamilLabel}
                           </Typography>
@@ -753,10 +761,10 @@ const FoodPage = () => {
                 color="text.secondary"
                 sx={{ display: "block", mt: 1.25 }}
               >
-                🇱🇰 This traffic-light system shows sugar, salt, and fat per
-                100g (green = low, amber = medium, red = high), aligned to Sri
-                Lanka Food (Color Coding for Sugar, Salt and Fat) Regulations,
-                2019 under Food Act No. 26 of 1980.
+                🇱🇰 This traffic-light system shows sugar, salt, and fat per 100g
+                (green = low, amber = medium, red = high), aligned to Sri Lanka
+                Food (Color Coding for Sugar, Salt and Fat) Regulations, 2019
+                under Food Act No. 26 of 1980.
               </Typography>
               <Typography
                 variant="caption"
@@ -925,7 +933,11 @@ const FoodPage = () => {
                         </Box>
                         <Typography
                           variant="body2"
-                          sx={{ fontWeight: 600, color: "text.secondary", mt: 0.5 }}
+                          sx={{
+                            fontWeight: 600,
+                            color: "text.secondary",
+                            mt: 0.5,
+                          }}
                         >
                           {percent === null
                             ? "-"
@@ -994,7 +1006,11 @@ const FoodPage = () => {
                           </Box>
                           <Typography
                             variant="body2"
-                            sx={{ fontWeight: 600, color: "text.secondary", mt: 0.5 }}
+                            sx={{
+                              fontWeight: 600,
+                              color: "text.secondary",
+                              mt: 0.5,
+                            }}
                           >
                             {percent === null
                               ? "-"
@@ -1061,7 +1077,11 @@ const FoodPage = () => {
                           </Box>
                           <Typography
                             variant="body2"
-                            sx={{ fontWeight: 600, color: "text.secondary", mt: 0.5 }}
+                            sx={{
+                              fontWeight: 600,
+                              color: "text.secondary",
+                              mt: 0.5,
+                            }}
                           >
                             {percent === null
                               ? "-"
