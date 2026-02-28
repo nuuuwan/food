@@ -144,7 +144,11 @@ const inferNovaCodeFromIngredients = (ingredients, nutrients) => {
   return "NOVA 1";
 };
 
-const inferNovaReasonFromIngredients = (ingredients, nutrients, novaClassCode) => {
+const inferNovaReasonFromIngredients = (
+  ingredients,
+  nutrients,
+  novaClassCode,
+) => {
   const ingredientCount = (ingredients || []).filter(
     (ingredient) => String(ingredient?.name || "").trim() !== "",
   ).length;
@@ -189,8 +193,9 @@ const normalizeClassifications = (analysis, nutrients, ingredients) => {
       provided?.singaporeNutriGradeReason || analysis?.nutriGradeReason,
     ) || inferNutriGradeReasonFromNutrients(nutrients);
   const novaClassReason =
-    normalizeShortReason(provided?.novaClassReason || analysis?.novaClassReason) ||
-    inferNovaReasonFromIngredients(ingredients, nutrients, novaClassCode);
+    normalizeShortReason(
+      provided?.novaClassReason || analysis?.novaClassReason,
+    ) || inferNovaReasonFromIngredients(ingredients, nutrients, novaClassCode);
 
   return {
     ...DEFAULT_CLASSIFICATIONS,
