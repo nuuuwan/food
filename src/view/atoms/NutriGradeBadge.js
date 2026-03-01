@@ -8,7 +8,10 @@ const NutriGradeBadge = ({ singaporeGradeScale, singaporeNutriGrade }) => {
 
   return (
     <Box
-      sx={{ display: "flex", flexDirection: "column", alignItems: "stretch" }}
+      sx={{
+        height: 48,
+        width: 48,
+      }}
     >
       <Typography
         sx={{
@@ -26,15 +29,15 @@ const NutriGradeBadge = ({ singaporeGradeScale, singaporeNutriGrade }) => {
       </Typography>
       <Box
         sx={{
-          borderRadius: 1,
+          borderRadius: 40,
           backgroundColor: activeGrade?.color || "#9e9e9e",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           flex: 1,
-          minHeight: 32,
-          minWidth: 32,
-          px: 0.5,
+          width: 24,
+          height: 24,
+          margin: "auto",
         }}
       >
         <Typography
@@ -42,7 +45,6 @@ const NutriGradeBadge = ({ singaporeGradeScale, singaporeNutriGrade }) => {
             color: "white",
             fontWeight: 900,
             fontSize: "1rem",
-            lineHeight: 1,
           }}
         >
           {activeGrade?.grade || "-"}

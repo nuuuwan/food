@@ -2,7 +2,12 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 
 const NovaBadge = ({ novaBadgeColor, novaClassNumber }) => (
-  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "stretch" }}>
+  <Box
+    sx={{
+      height: 48,
+      width: 48,
+    }}
+  >
     <Typography
       sx={{
         fontSize: "0.44rem",
@@ -25,8 +30,9 @@ const NovaBadge = ({ novaBadgeColor, novaClassNumber }) => (
         alignItems: "center",
         justifyContent: "center",
         flex: 1,
-        minHeight: 32,
-        minWidth: 32,
+        height: 24,
+        width: 24,
+        margin: "auto",
         px: 0.5,
       }}
     >

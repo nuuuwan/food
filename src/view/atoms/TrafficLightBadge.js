@@ -1,17 +1,6 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 
-const LABEL_SX = {
-  fontSize: "0.44rem",
-  fontWeight: 700,
-  letterSpacing: "0.04em",
-  textTransform: "uppercase",
-  color: "rgba(0,0,0,0.5)",
-  lineHeight: 1,
-  mb: 0.3,
-  textAlign: "center",
-};
-
 const formatValue = (value, unit) => {
   if (value === null || value === undefined || !Number.isFinite(value)) {
     return `\u2026${unit}`;
@@ -23,8 +12,7 @@ const TrafficLightBadge = ({ warningBadges }) => (
   <Box
     sx={{
       display: "flex",
-      gap: 0.4,
-      alignItems: "stretch",
+      gap: 0.25,
     }}
   >
     {warningBadges.map((item) => (
@@ -32,7 +20,6 @@ const TrafficLightBadge = ({ warningBadges }) => (
         key={item.key}
         sx={{ display: "flex", flexDirection: "column", alignItems: "stretch" }}
       >
-        <Typography sx={LABEL_SX}>{item.label}</Typography>
         <Box
           sx={{
             borderRadius: 1,
@@ -42,33 +29,59 @@ const TrafficLightBadge = ({ warningBadges }) => (
             alignItems: "center",
             justifyContent: "center",
             flex: 1,
-            minHeight: 32,
-            minWidth: 36,
-            px: 0.3,
-            py: 0.4,
+            p: 0.5,
+            width: 48,
+            height: 48,
           }}
         >
           <Typography
             sx={{
+              fontSize: "0.5rem",
+              letterSpacing: "0.04em",
               color: "white",
-              fontWeight: 800,
-              fontSize: "0.62rem",
               lineHeight: 1,
+              mb: 0.3,
+              textAlign: "center",
             }}
           >
-            {formatValue(item.value, item.unit)}
+            {item.label}
           </Typography>
-          <Typography
+          <Box
             sx={{
-              color: "rgba(255,255,255,0.8)",
-              fontWeight: 600,
-              fontSize: "0.38rem",
-              lineHeight: 1,
-              mt: 0.25,
+              borderRadius: 1,
+              backgroundColor: "white",
+              color: "black",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              flex: 1,
+              p: 0.25,
+              width: 40,
+              height: 40,
             }}
           >
-            per 100g
-          </Typography>
+            <Typography
+              sx={{
+                fontWeight: 800,
+                fontSize: "0.62rem",
+                lineHeight: 1,
+              }}
+            >
+              {formatValue(item.value, item.unit)}
+            </Typography>
+            <Typography
+              sx={{
+                fontWeight: 600,
+                fontSize: "0.38rem",
+                lineHeight: 1,
+                mt: 0.25,
+                opacity: 0.5,
+              }}
+            >
+              per 100g
+            </Typography>
+          </Box>
         </Box>
       </Box>
     ))}
