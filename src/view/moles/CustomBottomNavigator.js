@@ -125,7 +125,7 @@ const CustomBottomNavigator = () => {
           sx={{ flex: 1 }}
         >
           <BottomNavigationAction
-            label={isUploading ? "Uploading" : "Camera"}
+            label={isUploading ? "Scanning..." : "Camera"}
             icon={<CameraAltIcon />}
             disabled={isUploading}
           />

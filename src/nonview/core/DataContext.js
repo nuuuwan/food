@@ -24,6 +24,7 @@ export const DataProvider = ({ children }) => {
   });
   const [processingSnapshot, setProcessingSnapshot] = useState(null);
   const [analysisPreview, setAnalysisPreview] = useState(null);
+  const [scanError, setScanError] = useState(null);
 
   useEffect(() => {
     loadInitialHistory({ setIsLoading, setFoodHistory });
@@ -58,6 +59,14 @@ export const DataProvider = ({ children }) => {
       });
     } catch (error) {
       console.error("Failed to analyze food photo:", error);
+      const msg = error?.message || "";
+      const isNonFood = msg.toLowerCase().includes("not a food");
+      setScanError({
+        isNonFood,
+        message: isNonFood
+          ? msg.replace(/^not a food image:\s*/i, "")
+          : "Could not process image. Please try again.",
+      });
       setProcessingStatus({
         title: "Failed",
         detail: "Could not process image",
@@ -73,6 +82,7 @@ export const DataProvider = ({ children }) => {
     setProcessingStatus({ title: "", detail: "" });
     setProcessingSnapshot(null);
     setAnalysisPreview(null);
+    setScanError(null);
   };
 
   const loadFoodById = async (foodId) => {
@@ -95,6 +105,7 @@ export const DataProvider = ({ children }) => {
     processingStatus,
     processingSnapshot,
     analysisPreview,
+    scanError,
     startScan,
     completeAnalysis,
     resetScan,

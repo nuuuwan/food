@@ -7,6 +7,7 @@ import { SINGAPORE_GRADE_SCALE } from "../../nonview/core/singaporeNutriGrade";
 import PhotoCollage from "../moles/PhotoCollage";
 import FoodMetaInfo from "../moles/FoodMetaInfo";
 import FoodNutrientCard from "../moles/FoodNutrientCard";
+import NonFoodErrorModal from "../atoms/NonFoodErrorModal";
 
 const FoodPage = () => {
   const { foodId } = useParams();
@@ -19,6 +20,8 @@ const FoodPage = () => {
     processingStatus,
     processingSnapshot,
     analysisPreview,
+    scanError,
+    resetScan,
   } = useData();
 
   const isProcessing = !foodId;
@@ -45,10 +48,15 @@ const FoodPage = () => {
     if (!isProcessing) return;
     if (analysisState === "success" && currentFood?.id) {
       navigate(`/item/${currentFood.id}`, { replace: true });
-    } else if (analysisState === "error") {
+    } else if (analysisState === "error" && !scanError?.isNonFood) {
       navigate("/list", { replace: true });
     }
-  }, [isProcessing, analysisState, currentFood, navigate]);
+  }, [isProcessing, analysisState, currentFood, scanError, navigate]);
+
+  const handleDismissError = () => {
+    resetScan();
+    navigate("/list", { replace: true });
+  };
 
   const routeFood =
     currentFood && currentFood.id === foodId
@@ -105,6 +113,15 @@ const FoodPage = () => {
 
   return (
     <>
+      <NonFoodErrorModal
+        open={
+          isProcessing &&
+          analysisState === "error" &&
+          Boolean(scanError?.isNonFood)
+        }
+        reason={scanError?.message}
+        onDismiss={handleDismissError}
+      />
       <Box
         sx={{
           width: "100vw",
