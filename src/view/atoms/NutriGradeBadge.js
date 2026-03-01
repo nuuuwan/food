@@ -12,7 +12,7 @@ const NutriGradeBadge = ({ singaporeGradeScale, singaporeNutriGrade }) => {
     >
       <Typography
         sx={{
-          fontSize: "0.44rem",
+          fontSize: "0.4rem",
           fontWeight: 700,
           letterSpacing: "0.04em",
           textTransform: "uppercase",
