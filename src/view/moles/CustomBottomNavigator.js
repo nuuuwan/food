@@ -13,7 +13,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useData } from "../../nonview/core/DataContext";
 import { useImageScanUploader } from "../../nonview/core/useImageScanUploader";
 import VERSION from "../../nonview/cons/VERSION";
-import { getStorageStats } from "../../nonview/core/storageStats";
+
 import AppBarMenu from "./AppBarMenu";
 
 const CustomBottomNavigator = () => {
@@ -28,7 +28,6 @@ const CustomBottomNavigator = () => {
     startScan,
     navigateToProcessing: () => navigate("/processing"),
   });
-  const storageStats = getStorageStats();
 
   const openUploader = useCallback(() => {
     if (fileInputRef.current && !isUploading) {
@@ -139,7 +138,6 @@ const CustomBottomNavigator = () => {
         onClose={handleCloseMenu}
         onGitHub={handleGitHubClick}
         onRefresh={handleRefresh}
-        stats={storageStats}
         version={VERSION.DATETIME_STR}
       />
       <input
