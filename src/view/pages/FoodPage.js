@@ -39,7 +39,7 @@ const FoodPage = () => {
   useEffect(() => {
     if (!isProcessing) return;
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [isProcessing]);
+  }, [isProcessing, processingSnapshot]);
 
   useEffect(() => {
     if (!isProcessing) return;
