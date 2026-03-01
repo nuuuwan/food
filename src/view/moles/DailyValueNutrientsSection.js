@@ -10,7 +10,7 @@ import { DAILY_VALUE_FIELDS } from "../../nonview/core/nutritionConstants";
 
 const DailyValueNutrientsSection = ({ nutrients }) => (
   <Paper
-    elevation={0}
+    elevation={1}
     sx={{
       mb: 3,
       p: { xs: 1.75, sm: 2.25 },

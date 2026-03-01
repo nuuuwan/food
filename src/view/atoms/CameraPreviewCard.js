@@ -4,7 +4,7 @@ import CameraAltIcon from "@mui/icons-material/CameraAlt";
 
 const CameraPreviewCard = ({ previewImage }) => (
   <Paper
-    elevation={3}
+    elevation={1}
     sx={{
       height: 400,
       display: "flex",

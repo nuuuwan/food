@@ -13,7 +13,7 @@ const CalorieBreakdownSection = ({
   totalMacroCalories,
 }) => (
   <Paper
-    elevation={0}
+    elevation={1}
     sx={{
       mb: 3,
       p: { xs: 1.75, sm: 2.25 },

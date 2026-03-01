@@ -8,7 +8,7 @@ import {
 
 const MineralsDVSection = ({ nutrients, sortedVisibleMineralFields }) => (
   <Paper
-    elevation={0}
+    elevation={1}
     sx={{
       p: { xs: 1.75, sm: 2.25 },
       borderRadius: 2,

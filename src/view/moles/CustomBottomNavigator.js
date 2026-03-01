@@ -108,7 +108,7 @@ const CustomBottomNavigator = () => {
   return (
     <Paper
       sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
-      elevation={3}
+      elevation={1}
     >
       <Box sx={{ display: "flex", alignItems: "center", pl: 0.5 }}>
         <IconButton
