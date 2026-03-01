@@ -1,0 +1,112 @@
+export const DAILY_VALUE_FIELDS = [
+  {
+    key: "fiber",
+    label: "Fibre",
+    sourceUnit: "g",
+    displayUnit: "g",
+    dailyValue: 28,
+    dailyValueUnit: "g",
+  },
+  {
+    key: "sugar",
+    label: "Sugar",
+    sourceUnit: "g",
+    displayUnit: "g",
+    dailyValue: 25,
+    dailyValueUnit: "g",
+  },
+  {
+    key: "cholesterol",
+    label: "Cholesterol",
+    sourceUnit: "mg",
+    displayUnit: "mg",
+    dailyValue: 300,
+    dailyValueUnit: "mg",
+  },
+];
+
+export const VITAMIN_DV_FIELDS = [
+  {
+    key: "vitaminD",
+    label: "D",
+    alternativeName: "Calciferol",
+    sourceUnit: "mcg",
+    dailyValue: 20,
+    dailyValueUnit: "mcg",
+  },
+  {
+    key: "vitaminB12",
+    label: "B12",
+    alternativeName: "Cobalamin",
+    sourceUnit: "mcg",
+    dailyValue: 2.4,
+    dailyValueUnit: "mcg",
+  },
+  {
+    key: "folate",
+    label: "B9",
+    alternativeName: "Folate",
+    sourceUnit: "mcg",
+    dailyValue: 400,
+    dailyValueUnit: "mcg",
+  },
+  {
+    key: "vitaminC",
+    label: "C",
+    alternativeName: "Ascorbic Acid",
+    sourceUnit: "mg",
+    dailyValue: 90,
+    dailyValueUnit: "mg",
+  },
+];
+
+export const MINERAL_DV_FIELDS = [
+  {
+    key: "sodium",
+    label: "Sodium",
+    alternativeName: "Na",
+    sourceUnit: "mg",
+    dailyValue: 2300,
+    dailyValueUnit: "mg",
+  },
+  {
+    key: "potassium",
+    label: "Potassium",
+    alternativeName: "K",
+    sourceUnit: "mg",
+    dailyValue: 4700,
+    dailyValueUnit: "mg",
+  },
+  {
+    key: "calcium",
+    label: "Calcium",
+    alternativeName: "Ca",
+    sourceUnit: "mg",
+    dailyValue: 1300,
+    dailyValueUnit: "mg",
+  },
+  {
+    key: "iron",
+    label: "Iron",
+    alternativeName: "Fe",
+    sourceUnit: "mg",
+    dailyValue: 18,
+    dailyValueUnit: "mg",
+  },
+  {
+    key: "magnesium",
+    label: "Magnesium",
+    alternativeName: "Mg",
+    sourceUnit: "mg",
+    dailyValue: 420,
+    dailyValueUnit: "mg",
+  },
+  {
+    key: "zinc",
+    label: "Zinc",
+    alternativeName: "Zn",
+    sourceUnit: "mg",
+    dailyValue: 11,
+    dailyValueUnit: "mg",
+  },
+];
