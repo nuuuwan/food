@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useData } from "../../nonview/core/DataContext";
 import { Box, Button, Typography, Container, Grid } from "@mui/material";
+import LockIcon from "@mui/icons-material/Lock";
 import HistoryFoodCard from "../moles/HistoryFoodCard";
 
 const HistoryPage = () => {
@@ -19,12 +20,31 @@ const HistoryPage = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h3" gutterBottom>
-        History
+        Your Food
       </Typography>
 
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
         {foodHistory.length} scanned item{foodHistory.length !== 1 ? "s" : ""}
       </Typography>
+
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 1,
+          mb: 3,
+          px: 1.5,
+          py: 1.25,
+          borderRadius: 2,
+          bgcolor: "action.hover",
+        }}
+      >
+        <LockIcon sx={{ fontSize: "1rem", mt: 0.2, color: "text.secondary", flexShrink: 0 }} />
+        <Typography variant="caption" color="text.secondary">
+          Your data is stored only on this device. Nothing is sent to the cloud
+          — your food history stays completely private.
+        </Typography>
+      </Box>
 
       {foodHistory.length === 0 ? (
         <Box sx={{ textAlign: "center", py: 8 }}>

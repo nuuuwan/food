@@ -130,7 +130,7 @@ const CustomBottomNavigator = () => {
             icon={<CameraAltIcon />}
             disabled={isUploading}
           />
-          <BottomNavigationAction label="History" icon={<HistoryIcon />} />
+          <BottomNavigationAction label="Your Food" icon={<HistoryIcon />} />
         </BottomNavigation>
       </Box>
       <AppBarMenu
