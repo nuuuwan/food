@@ -17,39 +17,19 @@ const TopRatingsOverlay = ({
       top: 8,
       right: 8,
       display: "flex",
-      gap: 0.5,
+      gap: 1,
       alignItems: "stretch",
       backgroundColor: "rgba(255,255,255,0.90)",
       backdropFilter: "blur(8px)",
-      borderRadius: 1.5,
-      p: 0.6,
+      borderRadius: 2,
+      p: 1,
     }}
   >
     <TrafficLightBadge warningBadges={warningBadges} />
 
-    <Box
-      sx={{
-        width: 1,
-        bgcolor: "rgba(0,0,0,0.1)",
-        alignSelf: "stretch",
-        mx: 0.2,
-        borderRadius: 4,
-      }}
-    />
-
     <NutriGradeBadge
       singaporeGradeScale={singaporeGradeScale}
       singaporeNutriGrade={singaporeNutriGrade}
-    />
-
-    <Box
-      sx={{
-        width: 1,
-        bgcolor: "rgba(0,0,0,0.1)",
-        alignSelf: "stretch",
-        mx: 0.2,
-        borderRadius: 4,
-      }}
     />
 
     <NovaBadge
