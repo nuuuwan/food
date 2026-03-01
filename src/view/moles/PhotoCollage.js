@@ -16,16 +16,21 @@ const PhotoCollage = ({
   singaporeNutriGrade,
   novaBadgeColor,
   novaClassNumber,
+  previewImageUri,
+  statusMessage,
 }) => {
-  if (!photos || photos.length === 0) {
+  const hasPhotos = photos && photos.length > 0;
+  if (!hasPhotos && !previewImageUri) {
     return null;
   }
 
   const collageHeight = { xs: 280, sm: 380, md: 460 };
-  const primaryImageSizeKB = getImageSizeKB(photos?.[0]?.imageUri);
+  const primaryImageSizeKB = hasPhotos
+    ? getImageSizeKB(photos[0]?.imageUri)
+    : null;
   const imageSizeLabel =
     primaryImageSizeKB === null
-      ? "Unavailable"
+      ? null
       : `${formatNumber(primaryImageSizeKB, 1)} KB`;
 
   const overlay = (
@@ -37,6 +42,12 @@ const PhotoCollage = ({
       novaClassNumber={novaClassNumber}
     />
   );
+
+  const subtitleLine = statusMessage
+    ? statusMessage
+    : timestamp
+      ? `${formatDateTime(timestamp)}${hasPhotos && photos.length > 1 ? ` • ${photos.length} photos` : ""}`
+      : null;
 
   const caption = (
     <Box
@@ -50,17 +61,49 @@ const PhotoCollage = ({
       }}
     >
       <Typography variant="h4" sx={{ color: "white", fontWeight: "bold" }}>
-        {productName}
+        {productName || "Building result..."}
       </Typography>
-      <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
-        {formatDateTime(timestamp)}
-        {photos.length > 1 ? ` • ${photos.length} photos` : ""}
-      </Typography>
-      <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
-        {imageSizeLabel}
-      </Typography>
+      {subtitleLine && (
+        <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
+          {subtitleLine}
+        </Typography>
+      )}
+      {imageSizeLabel && (
+        <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.9)" }}>
+          {imageSizeLabel}
+        </Typography>
+      )}
     </Box>
   );
+
+  // Preview image (processing mode) — single image, no photo object array
+  if (!hasPhotos && previewImageUri) {
+    return (
+      <Paper
+        elevation={2}
+        sx={{
+          overflow: "hidden",
+          position: "relative",
+          height: collageHeight,
+          borderRadius: 0,
+          bgcolor: "grey.200",
+        }}
+      >
+        {overlay}
+        <img
+          src={previewImageUri}
+          alt={productName || "Analyzing..."}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+        />
+        {caption}
+      </Paper>
+    );
+  }
 
   if (photos.length === 1) {
     return (

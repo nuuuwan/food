@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 import { Box, Container, Typography } from "@mui/material";
 import { useData } from "../../nonview/core/DataContext";
@@ -29,13 +29,29 @@ import FoodNutrientCard from "../moles/FoodNutrientCard";
 const FoodPage = () => {
   const theme = useTheme();
   const { foodId } = useParams();
-  const { currentFood, foodHistory, loadFoodById } = useData();
+  const navigate = useNavigate();
+  const {
+    currentFood,
+    foodHistory,
+    loadFoodById,
+    analysisState,
+    processingStatus,
+    processingSnapshot,
+    analysisPreview,
+  } = useData();
+
+  // True when rendered at /processing (no foodId in route)
+  const isProcessing = !foodId;
+  const statusMessage =
+    processingStatus?.detail || processingStatus?.title || null;
 
   const routeFoodFromHistory = useMemo(
-    () => foodHistory.find((item) => item.id === foodId) || null,
+    () =>
+      foodId ? foodHistory.find((item) => item.id === foodId) || null : null,
     [foodHistory, foodId],
   );
 
+  // Load by ID when viewing a saved food
   useEffect(() => {
     if (!foodId) return;
     if (!currentFood || currentFood.id !== foodId) {
@@ -43,18 +59,39 @@ const FoodPage = () => {
     }
   }, [foodId, currentFood, loadFoodById]);
 
-  const displayFood =
+  // Navigate away once processing finishes
+  useEffect(() => {
+    if (!isProcessing) return;
+    if (analysisState === "success" && currentFood?.id) {
+      navigate(`/item/${currentFood.id}`, { replace: true });
+    } else if (analysisState === "error") {
+      navigate("/list", { replace: true });
+    }
+  }, [isProcessing, analysisState, currentFood, navigate]);
+
+  const routeFood =
     currentFood && currentFood.id === foodId
       ? currentFood
       : routeFoodFromHistory;
 
-  if (!displayFood) {
+  // When viewing by ID but data isn't available yet, show a spinner
+  if (!isProcessing && !routeFood) {
     return (
       <Container maxWidth="md" sx={{ mt: 4 }}>
         <Typography>Loading...</Typography>
       </Container>
     );
   }
+
+  // In processing mode, build a partial food object from whatever has arrived
+  const displayFood = routeFood ?? {
+    productName: analysisPreview?.productName || null,
+    nutrients: null,
+    ingredients: [],
+    servingSize: analysisPreview?.servingSize || null,
+    timestamp: null,
+    photos: [],
+  };
 
   const {
     productName,
@@ -212,6 +249,10 @@ const FoodPage = () => {
   );
 
   const ingredientListText = formatIngredientListText(ingredients);
+  const fadeSx = (ready) => ({
+    opacity: isProcessing && !ready ? 0.35 : 1,
+    transition: "opacity 260ms ease",
+  });
 
   return (
     <>
@@ -233,6 +274,10 @@ const FoodPage = () => {
           singaporeGradeScale={SINGAPORE_GRADE_SCALE}
           novaBadgeColor={novaBadgeColor}
           novaClassNumber={novaClassNumber}
+          previewImageUri={
+            isProcessing ? processingSnapshot?.previewImage : undefined
+          }
+          statusMessage={isProcessing ? statusMessage : undefined}
         />
       </Box>
 
@@ -240,32 +285,46 @@ const FoodPage = () => {
         <Typography
           variant="body2"
           color="text.secondary"
-          sx={{ mb: 2.5, fontStyle: "italic" }}
+          sx={{
+            mb: 2.5,
+            fontStyle: "italic",
+            ...fadeSx(Boolean(ingredientListText)),
+          }}
         >
-          {ingredientListText || "-"}
+          {ingredientListText ||
+            (isProcessing ? "Building ingredient list..." : "-")}
         </Typography>
 
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            mb: 2,
+            ...fadeSx(Boolean(servingSize || effectiveServingSizeGrams)),
+          }}
+        >
           Serving Size: {servingSize || "-"}
           {effectiveServingSizeGrams !== null
             ? ` • ${formatNumber(effectiveServingSizeGrams, 1)} g`
             : ""}
         </Typography>
 
-        <FoodNutrientCard
-          nutrients={nutrients}
-          calorieSegments={calorieSegments}
-          totalCalories={totalCalories}
-          totalMacroCalories={totalMacroCalories}
-          sortedVisibleVitaminFields={sortedVisibleVitaminFields}
-          sortedVisibleMineralFields={sortedVisibleMineralFields}
-          singaporeNutriGrade={singaporeNutriGrade}
-          singaporeNutriGradeReason={singaporeNutriGradeReason}
-          novaClass={novaClass}
-          novaClassReason={novaClassReason}
-          novaSpecificItemText={novaSpecificItemText}
-          warningBadges={warningBadges}
-        />
+        <Box sx={fadeSx(Boolean(nutrients))}>
+          <FoodNutrientCard
+            nutrients={nutrients}
+            calorieSegments={calorieSegments}
+            totalCalories={totalCalories}
+            totalMacroCalories={totalMacroCalories}
+            sortedVisibleVitaminFields={sortedVisibleVitaminFields}
+            sortedVisibleMineralFields={sortedVisibleMineralFields}
+            singaporeNutriGrade={singaporeNutriGrade}
+            singaporeNutriGradeReason={singaporeNutriGradeReason}
+            novaClass={novaClass}
+            novaClassReason={novaClassReason}
+            novaSpecificItemText={novaSpecificItemText}
+            warningBadges={warningBadges}
+          />
+        </Box>
       </Container>
     </>
   );
