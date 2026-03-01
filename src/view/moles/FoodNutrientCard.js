@@ -1,10 +1,21 @@
 import React from "react";
-import { Card, CardContent, Typography } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardContent,
+  CircularProgress,
+  Typography,
+} from "@mui/material";
 import CalorieBreakdownSection from "./CalorieBreakdownSection";
 import DailyValueNutrientsSection from "./DailyValueNutrientsSection";
 import VitaminsDVSection from "./VitaminsDVSection";
 import MineralsDVSection from "./MineralsDVSection";
 import ClassificationExplanations from "./ClassificationExplanations";
+
+const fadeSx = (isProcessing, ready) => ({
+  opacity: isProcessing && !ready ? 0.35 : 1,
+  transition: "opacity 260ms ease",
+});
 
 const FoodNutrientCard = ({
   nutrients,
@@ -19,9 +30,19 @@ const FoodNutrientCard = ({
   novaClassReason,
   novaSpecificItemText,
   warningBadges,
+  isProcessing,
+  statusMessage,
 }) => (
-  <Card sx={{ mb: 3 }}>
+  <Card sx={{ mb: 3, ...fadeSx(isProcessing, Boolean(nutrients)) }}>
     <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+      {isProcessing && !nutrients && (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
+          <CircularProgress size={18} thickness={5} />
+          <Typography variant="body2" color="text.secondary">
+            {statusMessage || "Analyzing image..."}
+          </Typography>
+        </Box>
+      )}
       <CalorieBreakdownSection
         calorieSegments={calorieSegments}
         totalCalories={totalCalories}
