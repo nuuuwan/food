@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
-import { Box, Container, Typography } from "@mui/material";
+import { Box, CircularProgress, Container, Typography } from "@mui/material";
 import { useData } from "../../nonview/core/DataContext";
 import {
   toNullableNumber,
@@ -77,8 +77,18 @@ const FoodPage = () => {
   // When viewing by ID but data isn't available yet, show a spinner
   if (!isProcessing && !routeFood) {
     return (
-      <Container maxWidth="md" sx={{ mt: 4 }}>
-        <Typography>Loading...</Typography>
+      <Container
+        maxWidth="md"
+        sx={{
+          mt: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 2,
+        }}
+      >
+        <CircularProgress />
+        <Typography color="text.secondary">Loading...</Typography>
       </Container>
     );
   }
@@ -308,6 +318,23 @@ const FoodPage = () => {
             ? ` • ${formatNumber(effectiveServingSizeGrams, 1)} g`
             : ""}
         </Typography>
+
+        {isProcessing && !nutrients && (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1.5,
+              mb: 3,
+              color: "text.secondary",
+            }}
+          >
+            <CircularProgress size={18} thickness={5} />
+            <Typography variant="body2" color="text.secondary">
+              {statusMessage || "Analyzing image..."}
+            </Typography>
+          </Box>
+        )}
 
         <Box sx={fadeSx(Boolean(nutrients))}>
           <FoodNutrientCard
