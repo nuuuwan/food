@@ -60,7 +60,8 @@ export const DataProvider = ({ children }) => {
     } catch (error) {
       console.error("Failed to analyze food photo:", error);
       const msg = error?.message || "";
-      const isNonFood = msg.toLowerCase().includes("not a food");
+      const isNonFood =
+        error?.isNonFood === true || msg.toLowerCase().includes("not a food");
       setScanError({
         isNonFood,
         message: isNonFood

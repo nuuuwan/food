@@ -114,11 +114,7 @@ const FoodPage = () => {
   return (
     <>
       <NonFoodErrorModal
-        open={
-          isProcessing &&
-          analysisState === "error" &&
-          Boolean(scanError?.isNonFood)
-        }
+        open={Boolean(scanError?.isNonFood)}
         reason={scanError?.message}
         onDismiss={handleDismissError}
       />

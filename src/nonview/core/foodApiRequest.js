@@ -21,14 +21,20 @@ const requestFromBase = async (path, options, baseURL) => {
   });
 
   if (!response.ok) {
+    let errorMessage = `Request failed: ${response.status}`;
+    let isNonFood = false;
     try {
       const errorPayload = await response.json();
-      throw new Error(
-        errorPayload?.error || `Request failed: ${response.status}`,
-      );
+      if (errorPayload?.error) {
+        errorMessage = errorPayload.error;
+        isNonFood = response.status === 422;
+      }
     } catch {
-      throw new Error(`Request failed: ${response.status}`);
+      // JSON parse failed, keep default message
     }
+    const err = new Error(errorMessage);
+    if (isNonFood) err.isNonFood = true;
+    throw err;
   }
 
   return response.json();
