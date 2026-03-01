@@ -59,6 +59,12 @@ const FoodPage = () => {
     }
   }, [foodId, currentFood, loadFoodById]);
 
+  // Scroll to top when a new upload starts
+  useEffect(() => {
+    if (!isProcessing) return;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [isProcessing]);
+
   // Navigate away once processing finishes
   useEffect(() => {
     if (!isProcessing) return;
