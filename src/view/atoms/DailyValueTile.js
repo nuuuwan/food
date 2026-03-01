@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import { formatNumber } from "../../nonview/core/nutritionUtils";
 
 const DailyValueTile = ({
@@ -9,28 +10,26 @@ const DailyValueTile = ({
   unit,
   percentDV,
   showSymbolAsLabel,
+  color,
+  extraInfo,
 }) => (
   <Box
     sx={{
       p: 1,
       borderRadius: 1.5,
-      backgroundColor: "action.hover",
-      minHeight: 96,
-      minWidth: 96,
-      aspectRatio: "1 / 1",
+      backgroundColor: color ? alpha(color, 0.1) : "action.hover",
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
-      width: "100%",
-      height: "100%",
-      m: 1,
-      p: 1,
     }}
   >
     <Box>
       <Typography
         variant="h6"
-        sx={{ fontWeight: showSymbolAsLabel ? 700 : 600 }}
+        sx={{
+          fontWeight: showSymbolAsLabel ? 700 : 600,
+          color: color || "inherit",
+        }}
       >
         {showSymbolAsLabel ? alternativeName || label : label}
       </Typography>
@@ -47,10 +46,15 @@ const DailyValueTile = ({
       <Typography variant="body2">
         {formatNumber(value, 0)} {unit}
       </Typography>
+      {extraInfo && (
+        <Typography variant="body2" color="text.secondary">
+          {extraInfo}
+        </Typography>
+      )}
     </Box>
     <Typography
       variant="body1"
-      sx={{ fontWeight: 600, color: "text.secondary", mt: 0.5 }}
+      sx={{ fontWeight: 600, color: color || "text.secondary", mt: 0.5 }}
     >
       {percentDV === null ? "-" : `${formatNumber(percentDV, 0)}% DV`}
     </Typography>

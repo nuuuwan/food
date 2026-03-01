@@ -1,8 +1,11 @@
 import React from "react";
 import { Box, Paper, Grid, Typography } from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
-import MacroCalorieTile from "../atoms/MacroCalorieTile";
-import { formatNumber } from "../../nonview/core/nutritionUtils";
+import DailyValueTile from "../atoms/DailyValueTile";
+import {
+  formatNumber,
+  getDailyValuePercent,
+} from "../../nonview/core/nutritionUtils";
 
 const CalorieBreakdownSection = ({
   calorieSegments,
@@ -59,14 +62,30 @@ const CalorieBreakdownSection = ({
     )}
 
     <Grid container spacing={1}>
-      {calorieSegments.map((segment) => (
-        <Grid item xs={12} sm={4} key={segment.key}>
-          <MacroCalorieTile
-            segment={segment}
-            totalMacroCalories={totalMacroCalories}
-          />
-        </Grid>
-      ))}
+      {calorieSegments.map((segment) => {
+        const pct =
+          totalMacroCalories > 0
+            ? (segment.calories / totalMacroCalories) * 100
+            : 0;
+        const gramsDvPct = getDailyValuePercent(
+          segment.grams,
+          segment.gramsUnit,
+          segment.dailyValue,
+          segment.dailyValueUnit,
+        );
+        return (
+          <Grid item xs={12} sm={4} key={segment.key}>
+            <DailyValueTile
+              label={segment.label}
+              value={segment.grams}
+              unit={segment.gramsUnit}
+              percentDV={gramsDvPct}
+              color={segment.color}
+              extraInfo={`${formatNumber(segment.calories, 0)} kcal · ${formatNumber(pct, 0)}%`}
+            />
+          </Grid>
+        );
+      })}
     </Grid>
   </Paper>
 );
