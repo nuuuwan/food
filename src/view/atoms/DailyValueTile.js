@@ -16,18 +16,20 @@ const DailyValueTile = ({
       borderRadius: 1.5,
       backgroundColor: "action.hover",
       minHeight: 96,
+      minWidth: 96,
       aspectRatio: "1 / 1",
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
       width: "100%",
-      maxWidth: 140,
-      mx: "auto",
+      height: "100%",
+      m: 1,
+      p: 1,
     }}
   >
     <Box>
       <Typography
-        variant="body2"
+        variant="h6"
         sx={{ fontWeight: showSymbolAsLabel ? 700 : 600 }}
       >
         {showSymbolAsLabel ? alternativeName || label : label}
@@ -47,7 +49,7 @@ const DailyValueTile = ({
       </Typography>
     </Box>
     <Typography
-      variant="body2"
+      variant="body1"
       sx={{ fontWeight: 600, color: "text.secondary", mt: 0.5 }}
     >
       {percentDV === null ? "-" : `${formatNumber(percentDV, 0)}% DV`}
